@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  description: CRUD for mottaksadresser, oversettelser og skjemadefinisjoner
+  version: 1.0.1
+  title: forms-api
+  contact:
+    name: team-fyllut-sendinn
+    url: https://nav-it.slack.com/archives/C04J0SGHQTD
+  license:
+    name: MIT License
+    url: https://github.com/navikt/forms-api/blob/main/LICENSE.md
+tags:
+  - name: mottaksadresser
+    description: Mottaksadresser
+
+paths:
+  /mottaksadresser:
+    get:
+      summary: Hent mottaksadresser
+      description: Henter alle mottaksadresser
+      operationId: getMottaksadresser
+      responses:
+        '200':
+          description: Alle mottaksadresser returneres
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mottaksadresse"
+      tags:
+        - mottaksadresser
+
+components:
+  schemas:
+    UUID:
+      type: string
+      description : A Universally Unique Identifier
+      example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
+    Mottaksadresse:
+      type: object
+      description: En mottaksadresse
+      required:
+      - adresselinje1
+      - postnummer
+      - poststed
+      properties:
+        mottaksadresseId:
+          $ref: "#/components/schemas/UUID"
+        adresselinje1:
+          type: string
+        adresselinje2:
+          type: string
+        adresselinje3:
+          type: string
+        postnummer:
+          type: string
+        poststed:
+          type: string
+        temakoder:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: Opprettet dato og tid
+          example: 2021-12-03T14:10:00Z
+        changedAt:
+          type: string
+          format: date-time
+          description: Opprettet dato og tid
+          example: 2021-12-03T14:10:00Z
+
