@@ -11,10 +11,10 @@ info:
     url: https://github.com/navikt/forms-api/blob/main/LICENSE.md
 tags:
   - name: mottaksadresser
-    description: Mottaksadresser
+    description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
 
 paths:
-  /mottaksadresser:
+  /v1/mottaksadresser:
     get:
       summary: Hent mottaksadresser
       description: Henter alle mottaksadresser
@@ -41,22 +41,28 @@ components:
       type: object
       description: En mottaksadresse
       required:
+      - mottaksadresseId
       - adresselinje1
       - postnummer
       - poststed
+      - createdAt
       properties:
         mottaksadresseId:
           $ref: "#/components/schemas/UUID"
         adresselinje1:
           type: string
+          example: NAV Økonomi Stønad
         adresselinje2:
           type: string
+          example: Postboks 352 Etterstad
         adresselinje3:
           type: string
         postnummer:
           type: string
+          example: 0591
         poststed:
           type: string
+          example: Oslo
         temakoder:
           type: string
         createdAt:
