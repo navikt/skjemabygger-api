@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  description: CRUD for mottaksadresser, oversettelser og skjemadefinisjoner
+  description: CRUD for skjemadefinisjoner, oversettelser og mottaksadresser
   version: 1.0.1
   title: forms-api
   contact:
@@ -14,22 +14,22 @@ tags:
     description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
 
 paths:
-  /v1/mottaksadresser:
+  /v1/recipients:
     get:
-      summary: Hent mottaksadresser
-      description: Henter alle mottaksadresser
-      operationId: getMottaksadresser
+      summary: Hent mottakere av papirsøknad
+      description: Henter alle mulige mottakere av søknader som sendes inn på papir i posten.
+      operationId: getRecipients
       responses:
         '200':
-          description: Alle mottaksadresser returneres
+          description: Alle mulige mottakere returneres
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Mottaksadresse"
+                  $ref: "#/components/schemas/Recipient"
       tags:
-        - mottaksadresser
+        - recipients
 
 components:
   schemas:
@@ -37,42 +37,48 @@ components:
       type: string
       description : A Universally Unique Identifier
       example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
-    Mottaksadresse:
+    Recipient:
       type: object
-      description: En mottaksadresse
+      description: En mottaker
       required:
-      - mottaksadresseId
-      - adresselinje1
-      - postnummer
-      - poststed
+      - recipientId
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
       - createdAt
+      - changedAt
       properties:
-        mottaksadresseId:
+        recipientId:
           $ref: "#/components/schemas/UUID"
-        adresselinje1:
+        name:
           type: string
           example: NAV Økonomi Stønad
-        adresselinje2:
+          description: Mottakerens navn
+        poBoxAddress:
           type: string
           example: Postboks 352 Etterstad
-        adresselinje3:
-          type: string
-        postnummer:
+          description: Postboksadresse
+        postalCode:
           type: string
           example: 0591
-        poststed:
+          description: Norsk postnummer
+        postalName:
           type: string
           example: Oslo
-        temakoder:
+          description: Norsk poststed
+        archiveSubjects:
           type: string
+          example: PEN,BIL
+          description: Kommaseparert liste med temakoder knyttet til denne mottakeren
         createdAt:
           type: string
           format: date-time
-          description: Opprettet dato og tid
+          description: Dato og tid for når mottakeren ble opprettet
           example: 2021-12-03T14:10:00Z
         changedAt:
           type: string
           format: date-time
-          description: Opprettet dato og tid
+          description: Dato og tid for når mottakeren sist ble endret
           example: 2021-12-03T14:10:00Z
 
