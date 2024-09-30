@@ -26,7 +26,7 @@ class RecipientsService(
 		postalName: String,
 		archiveSubjects: String?,
 		userId: String,
-	): RecipientDto? {
+	): RecipientDto {
 		val now = LocalDateTime.now()
 		val db = RecipientEntity(
 			id = null,
