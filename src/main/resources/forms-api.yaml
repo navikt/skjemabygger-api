@@ -27,7 +27,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Recipient"
+                  $ref: "#/components/schemas/RecipientDto"
       tags:
         - recipients
     post:
@@ -46,7 +46,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Recipient"
+                $ref: "#/components/schemas/RecipientDto"
       tags:
         - recipients
 
@@ -81,7 +81,7 @@ components:
       example: A123456
       description: User name
 
-    Recipient:
+    RecipientDto:
       type: object
       description: En mottaker
       required:

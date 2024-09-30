@@ -1,6 +1,6 @@
 package no.nav.forms.recipients
 
-import no.nav.forms.model.Recipient
+import no.nav.forms.model.RecipientDto
 import no.nav.forms.recipients.repository.RecipientEntity
 import no.nav.forms.recipients.repository.RecipientRepository
 import no.nav.forms.recipients.utils.convertRecipientToDto
@@ -12,7 +12,7 @@ import java.util.*
 class RecipientsService(
 	private val recipientsRepository: RecipientRepository,
 ) {
-	fun getRecipients(): List<Recipient> {
+	fun getRecipients(): List<RecipientDto> {
 		val allRecipients = recipientsRepository.findAll()
 
 		return allRecipients.map(::convertRecipientToDto)
@@ -26,7 +26,7 @@ class RecipientsService(
 		postalName: String,
 		archiveSubjects: String?,
 		userId: String,
-	): Recipient? {
+	): RecipientDto? {
 		val now = LocalDateTime.now()
 		val db = RecipientEntity(
 			id = null,
