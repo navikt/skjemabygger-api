@@ -10,7 +10,7 @@ info:
     name: MIT License
     url: https://github.com/navikt/forms-api/blob/main/LICENSE.md
 tags:
-  - name: mottaksadresser
+  - name: recipients
     description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
 
 paths:
