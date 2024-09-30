@@ -17,3 +17,5 @@ CREATE TABLE recipients
 
 ALTER TABLE recipients
 ADD CONSTRAINT constraint_name UNIQUE (recipientid);
+
+CREATE INDEX recipients_recipientid_idx ON recipients(recipientid);
