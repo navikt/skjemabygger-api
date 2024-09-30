@@ -30,6 +30,25 @@ paths:
                   $ref: "#/components/schemas/Recipient"
       tags:
         - recipients
+    post:
+      summary: Opprett en ny mottaker
+      description: Oppretter en ny mottaker.
+      operationId: createRecipient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewRecipientRequest"
+        required: true
+      responses:
+        200:
+          description: Den nye mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipient"
+      tags:
+        - recipients
 
 components:
   schemas:
@@ -37,6 +56,31 @@ components:
       type: string
       description : A Universally Unique Identifier
       example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
+    RecipientName:
+      type: string
+      example: NAV Økonomi Stønad
+      description: Mottakerens navn
+    PoBoxAddress:
+      type: string
+      example: Postboks 352 Etterstad
+      description: Postboksadresse
+    PostalCode:
+      type: string
+      example: 0591
+      description: Norsk postnummer
+    PostalName:
+      type: string
+      example: Oslo
+      description: Norsk poststed
+    RecipientArchiveSubjects:
+      type: string
+      example: PEN,BIL
+      description: Kommaseparert liste med temakoder knyttet til denne mottakeren
+    UserId:
+      type: string
+      example: A123456
+      description: User name
+
     Recipient:
       type: object
       description: En mottaker
@@ -47,38 +91,55 @@ components:
       - postalCode
       - postalName
       - createdAt
+      - createdBy
       - changedAt
+      - changedBy
       properties:
         recipientId:
           $ref: "#/components/schemas/UUID"
         name:
-          type: string
-          example: NAV Økonomi Stønad
-          description: Mottakerens navn
+          $ref: "#/components/schemas/RecipientName"
         poBoxAddress:
-          type: string
-          example: Postboks 352 Etterstad
-          description: Postboksadresse
+          $ref: "#/components/schemas/PoBoxAddress"
         postalCode:
-          type: string
-          example: 0591
-          description: Norsk postnummer
+          $ref: "#/components/schemas/PostalCode"
         postalName:
-          type: string
-          example: Oslo
-          description: Norsk poststed
+          $ref: "#/components/schemas/PostalName"
         archiveSubjects:
-          type: string
-          example: PEN,BIL
-          description: Kommaseparert liste med temakoder knyttet til denne mottakeren
+          $ref: "#/components/schemas/RecipientArchiveSubjects"
         createdAt:
           type: string
           format: date-time
           description: Dato og tid for når mottakeren ble opprettet
           example: 2021-12-03T14:10:00Z
+        createdBy:
+          $ref: "#/components/schemas/UserId"
         changedAt:
           type: string
           format: date-time
           description: Dato og tid for når mottakeren sist ble endret
           example: 2021-12-03T14:10:00Z
+        changedBy:
+          $ref: "#/components/schemas/UserId"
 
+    NewRecipientRequest:
+      type: object
+      description: Nødvendige data for å opprette en ny mottaker
+      required:
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
+      properties:
+        recipientId:
+          $ref: "#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/RecipientName"
+        poBoxAddress:
+          $ref: "#/components/schemas/PoBoxAddress"
+        postalCode:
+          $ref: "#/components/schemas/PostalCode"
+        postalName:
+          $ref: "#/components/schemas/PostalName"
+        archiveSubjects:
+          $ref: "#/components/schemas/RecipientArchiveSubjects"

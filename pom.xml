@@ -26,13 +26,18 @@
 		<tag/>
 		<url/>
 	</scm>
+
 	<properties>
 		<java.version>21</java.version>
 		<kotlin.version>2.0.20</kotlin.version>
+
 		<!-- OpenAPI -->
 		<openapi-generator-maven-plugin.version>7.8.0</openapi-generator-maven-plugin.version>
 		<springdoc-openapi.version>2.6.0</springdoc-openapi.version>
 		<swagger-annotations.version>2.2.24</swagger-annotations.version>
+
+		<!--Database-->
+		<otj-pg-embedded.version>1.1.0</otj-pg-embedded.version>
 	</properties>
 
 	<dependencies>
@@ -63,6 +68,26 @@
 			<artifactId>kotlin-stdlib</artifactId>
 		</dependency>
 		<!-- Kotlin end -->
+
+		<!-- Database start -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.opentable.components</groupId>
+			<artifactId>otj-pg-embedded</artifactId>
+			<version>${otj-pg-embedded.version}</version>
+		</dependency>
+		<!-- Database end -->
 
 		<!-- OpenAPI / Swagger start -->
 		<dependency>
@@ -136,6 +161,8 @@
 					</args>
 					<compilerPlugins>
 						<plugin>spring</plugin>
+						<plugin>jpa</plugin>
+						<plugin>kotlinx-serialization</plugin>
 					</compilerPlugins>
 					<sourceDirs>
 						<source>target/generated-sources/openapi</source>
@@ -146,6 +173,16 @@
 					<dependency>
 						<groupId>org.jetbrains.kotlin</groupId>
 						<artifactId>kotlin-maven-allopen</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-noarg</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-serialization</artifactId>
 						<version>${kotlin.version}</version>
 					</dependency>
 				</dependencies>
