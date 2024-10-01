@@ -16,6 +16,10 @@ class RecipientsController(
 		return ResponseEntity.ok(recipientsService.getRecipients())
 	}
 
+	override fun getRecipient(recipientId: String): ResponseEntity<RecipientDto> {
+		return ResponseEntity.ok(recipientsService.getRecipient(recipientId))
+	}
+
 	override fun createRecipient(newRecipientRequest: NewRecipientRequest): ResponseEntity<RecipientDto> {
 		val userId = "testuser" // TODO user handler
 		val dto = recipientsService.createRecipient(

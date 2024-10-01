@@ -51,6 +51,33 @@ paths:
         - recipients
 
   /v1/recipients/{recipientId}:
+    get:
+      summary: Hent en mottaker
+      description: Returnerer mottakeren med gitt id
+      operationId: getRecipient
+      parameters:
+        - name: recipientId
+          in: path
+          description: Mottakerens id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        200:
+          description: Mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipientDto"
+        404:
+          description: Fant ikke mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+      tags:
+        - recipients
+
     put:
       summary: Oppdater en mottaker
       description: Oppdater en mottaker

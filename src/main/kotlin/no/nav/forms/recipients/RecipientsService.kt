@@ -15,8 +15,13 @@ class RecipientsService(
 ) {
 	fun getRecipients(): List<RecipientDto> {
 		val allRecipients = recipientsRepository.findAll()
-
 		return allRecipients.map(::convertRecipientToDto)
+	}
+
+	fun getRecipient(recipientId: String): RecipientDto {
+		val entity = recipientsRepository.findByRecipientId(recipientId) ?:
+		  throw ResourceNotFoundException("Recipient not found", recipientId)
+		return convertRecipientToDto(entity)
 	}
 
 	fun createRecipient(
