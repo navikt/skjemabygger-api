@@ -41,7 +41,7 @@ paths:
               $ref: "#/components/schemas/NewRecipientRequest"
         required: true
       responses:
-        200:
+        201:
           description: Den nye mottakeren
           content:
             application/json:
@@ -102,6 +102,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RecipientDto"
+        404:
+          description: Fant ikke mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+      tags:
+        - recipients
+    delete:
+      summary: Slett en mottaker
+      description: Sletter en mottaker fra databasen
+      operationId: deleteRecipient
+      parameters:
+        - name: recipientId
+          in: path
+          description: Mottakerens id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      responses:
+        204:
+          description: Mottakeren har blitt slettet
         404:
           description: Fant ikke mottakeren
           content:

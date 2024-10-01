@@ -11,7 +11,14 @@ class RestExceptionHandler {
 
 	@ExceptionHandler
 	fun handleResourceNotFound(exception: ResourceNotFoundException): ResponseEntity<ErrorResponseDto> {
+		// TODO log exception
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponseDto(exception.message))
+	}
+
+	@ExceptionHandler
+	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
+		// TODO log exception
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseDto("Something went wrong"))
 	}
 
 }

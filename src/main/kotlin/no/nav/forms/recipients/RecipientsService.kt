@@ -77,4 +77,10 @@ class RecipientsService(
 		)
 		return convertRecipientToDto(updatedEntity)
 	}
+
+	fun deleteRecipient(recipientId: String) {
+		val entity = recipientsRepository.findByRecipientId(recipientId)
+			?: throw ResourceNotFoundException("Recipient not found", recipientId)
+		recipientsRepository.delete(entity)
+	}
 }
