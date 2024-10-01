@@ -1,5 +1,6 @@
 package no.nav.forms.recipients
 
+import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.recipients.repository.RecipientEntity
 import no.nav.forms.recipients.repository.RecipientRepository
@@ -28,20 +29,47 @@ class RecipientsService(
 		userId: String,
 	): RecipientDto {
 		val now = LocalDateTime.now()
-		val db = RecipientEntity(
-			id = null,
-			recipientId = recipientId ?: UUID.randomUUID().toString(),
-			name = name,
-			poBoxAddress = poBoxAddress,
-			postalCode = postalCode,
-			postalName = postalName,
-			createdAt = now,
-			createdBy = userId,
-			changedAt = now,
-			changedBy = userId,
-			archiveSubjects = archiveSubjects,
+		val entity = recipientsRepository.save(
+			RecipientEntity(
+				recipientId = recipientId ?: UUID.randomUUID().toString(),
+				name = name,
+				poBoxAddress = poBoxAddress,
+				postalCode = postalCode,
+				postalName = postalName,
+				createdAt = now,
+				createdBy = userId,
+				changedAt = now,
+				changedBy = userId,
+				archiveSubjects = archiveSubjects,
+			)
 		)
-		val entity = recipientsRepository.save(db)
 		return convertRecipientToDto(entity)
+	}
+
+	fun updateRecipient(
+		recipientId: String,
+		name: String,
+		poBoxAddress: String,
+		postalCode: String,
+		postalName: String,
+		archiveSubjects: String?,
+		userId: String,
+	): RecipientDto {
+		val entity = recipientsRepository.findByRecipientId(recipientId)
+			?: throw ResourceNotFoundException("Recipient not found", recipientId)
+
+		val now = LocalDateTime.now()
+		val updatedEntity = recipientsRepository.save(
+			entity.copy(
+				name = name,
+				poBoxAddress = poBoxAddress,
+				postalCode = postalCode,
+				postalName = postalName,
+				archiveSubjects = archiveSubjects,
+				changedAt = now,
+				changedBy = userId,
+			)
+		)
+		return convertRecipientToDto(updatedEntity)
 	}
 }

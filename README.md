@@ -5,7 +5,13 @@ Skjemadefinisjoner, oversettelser og mottaksadresser.
 
 # Komme i gang
 
-TBD
+`mvn clean install`
+
+Kjør `no/nav/forms/FormsApiApplication.kt` med profil `local`.
+
+Swagger url: http://localhost:8082/swagger-ui/index.html
+
+OpenAPI descriptions: http://localhost:8082/v3/api-docs
 
 ---
 

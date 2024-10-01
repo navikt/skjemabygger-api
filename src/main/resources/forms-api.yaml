@@ -50,6 +50,40 @@ paths:
       tags:
         - recipients
 
+  /v1/recipients/{recipientId}:
+    put:
+      summary: Oppdater en mottaker
+      description: Oppdater en mottaker
+      operationId: updateRecipient
+      parameters:
+        - name: recipientId
+          in: path
+          description: Mottakerens id
+          required: true
+          schema:
+            $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRecipientRequest"
+        required: true
+      responses:
+        200:
+          description: Den oppdaterte mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecipientDto"
+        404:
+          description: Fant ikke mottakeren
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponseDto"
+      tags:
+        - recipients
+
 components:
   schemas:
     UUID:
@@ -143,3 +177,37 @@ components:
           $ref: "#/components/schemas/PostalName"
         archiveSubjects:
           $ref: "#/components/schemas/RecipientArchiveSubjects"
+
+    UpdateRecipientRequest:
+      type: object
+      description: Nødvendige data for å opprette en ny mottaker
+      required:
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
+      properties:
+        name:
+          $ref: "#/components/schemas/RecipientName"
+        poBoxAddress:
+          $ref: "#/components/schemas/PoBoxAddress"
+        postalCode:
+          $ref: "#/components/schemas/PostalCode"
+        postalName:
+          $ref: "#/components/schemas/PostalName"
+        archiveSubjects:
+          $ref: "#/components/schemas/RecipientArchiveSubjects"
+
+    ErrorResponseDto:
+      type: object
+      description: Informasjon om hva som gikk galt
+      required:
+      - errorMessage
+      properties:
+        errorMessage:
+          type: string
+        correlationId:
+          $ref: "#/components/schemas/UUID"
+      example:
+        message: Resource not found
+        correlationId: 2f9b8d25-1056-4827-8ddd-cedab7fafacc
