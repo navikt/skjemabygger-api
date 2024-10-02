@@ -8,7 +8,7 @@ import javax.sql.DataSource
 
 @Profile("test | local")
 @Configuration
-class LocalDb {
+class EmbeddedDb {
 
 	private var embeddedPostgres: EmbeddedPostgres = EmbeddedPostgres.builder().setTag("15").start()
 
