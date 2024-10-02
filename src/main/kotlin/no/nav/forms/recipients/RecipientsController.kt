@@ -4,14 +4,15 @@ import no.nav.forms.api.RecipientsApi
 import no.nav.forms.model.NewRecipientRequest
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.model.UpdateRecipientRequest
+import no.nav.forms.security.TokenHandler
 import org.springframework.http.HttpStatus
-import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class RecipientsController(
 	private val recipientsService: RecipientsService,
+	private val tokenHandler: TokenHandler,
 ) : RecipientsApi {
 
 	override fun getRecipients(): ResponseEntity<List<RecipientDto>> {
@@ -23,7 +24,7 @@ class RecipientsController(
 	}
 
 	override fun createRecipient(newRecipientRequest: NewRecipientRequest): ResponseEntity<RecipientDto> {
-		val userId = "testuser" // TODO user handler
+		val userId = tokenHandler.getUserIdFromToken()
 		val dto = recipientsService.createRecipient(
 			newRecipientRequest.recipientId,
 			newRecipientRequest.name,
@@ -37,7 +38,7 @@ class RecipientsController(
 	}
 
 	override fun updateRecipient(recipientId: String, updateRecipientRequest: UpdateRecipientRequest): ResponseEntity<RecipientDto> {
-		val userId = "testuser" // TODO user handler
+		val userId = tokenHandler.getUserIdFromToken()
 		val dto = recipientsService.updateRecipient(
 			recipientId,
 			updateRecipientRequest.name,
