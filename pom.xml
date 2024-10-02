@@ -36,8 +36,11 @@
 		<springdoc-openapi.version>2.6.0</springdoc-openapi.version>
 		<swagger-annotations.version>2.2.24</swagger-annotations.version>
 
-		<!--Database-->
+		<!-- Database -->
 		<otj-pg-embedded.version>1.1.0</otj-pg-embedded.version>
+
+		<!-- Logging -->
+		<logstash.version>8.0</logstash.version>
 	</properties>
 
 	<dependencies>
@@ -88,6 +91,12 @@
 			<version>${otj-pg-embedded.version}</version>
 		</dependency>
 		<!-- Database end -->
+
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash.version}</version>
+		</dependency>
 
 		<!-- OpenAPI / Swagger start -->
 		<dependency>

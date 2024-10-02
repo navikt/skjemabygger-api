@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: forms-api
+  main:
+    banner-mode: off
   jpa:
     open-in-view: false
   flyway:
