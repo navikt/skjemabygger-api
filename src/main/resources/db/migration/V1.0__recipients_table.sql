@@ -1,14 +1,14 @@
-CREATE TABLE recipients
+CREATE TABLE recipient
 (
-    id              INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    recipientid     VARCHAR(36) UNIQUE NOT NULL,
-    name            VARCHAR(100) NOT NULL,
-		poboxaddress    VARCHAR(100) NOT NULL,
-		postalcode      VARCHAR(4) NOT NULL,
-		postalname      VARCHAR(50) NOT NULL,
-		archivesubjects VARCHAR(255),
-		createdat       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
-		createdby       VARCHAR(20) NOT NULL,
-		changedat       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
-		changedby       VARCHAR(20) NOT NULL
+    id               INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    recipient_id     VARCHAR(36) UNIQUE NOT NULL,
+    name             VARCHAR(100) NOT NULL,
+		po_box_address   VARCHAR(100) NOT NULL,
+		postal_code      VARCHAR(4) NOT NULL,
+		postal_name      VARCHAR(50) NOT NULL,
+		archive_subjects VARCHAR(255),
+		created_at       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+		created_by       VARCHAR(20) NOT NULL,
+		changed_at       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+		changed_by       VARCHAR(20) NOT NULL
 );
