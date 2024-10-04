@@ -6,21 +6,6 @@ import no.nav.forms.recipients.repository.RecipientEntity
 import no.nav.forms.utils.mapDateTime
 import java.util.Collections
 
-fun convertRecipientToDto(source: RecipientEntity): RecipientDto {
-	return RecipientDto(
-		recipientId = source.recipientId,
-		name = source.name,
-		poBoxAddress = source.poBoxAddress,
-		postalCode = source.postalCode,
-		postalName = source.postalName,
-		createdAt = mapDateTime(source.createdAt),
-		createdBy = source.createdBy,
-		changedAt = mapDateTime(source.changedAt),
-		changedBy = source.changedBy,
-		archiveSubjects = convertArchiveSubjectsToDto(source.archiveSubjects),
-	)
-}
-
 private fun convertArchiveSubjectsToDto(jsonNode: JsonNode?): String? {
 	if (jsonNode == null || !jsonNode.isArray) return null
 	val result = mutableListOf<String>()
@@ -28,4 +13,19 @@ private fun convertArchiveSubjectsToDto(jsonNode: JsonNode?): String? {
 		result.add(node.asText())
 	}
 	return if (result.isEmpty()) null else Collections.unmodifiableList(result).joinToString(",")
+}
+
+fun RecipientEntity.toDto(): RecipientDto {
+	return RecipientDto(
+		recipientId = this.recipientId,
+		name = this.name,
+		poBoxAddress = this.poBoxAddress,
+		postalCode = this.postalCode,
+		postalName = this.postalName,
+		createdAt = mapDateTime(this.createdAt),
+		createdBy = this.createdBy,
+		changedAt = mapDateTime(this.changedAt),
+		changedBy = this.changedBy,
+		archiveSubjects = convertArchiveSubjectsToDto(this.archiveSubjects),
+	)
 }

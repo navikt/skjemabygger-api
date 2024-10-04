@@ -6,7 +6,7 @@ import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.recipients.repository.RecipientEntity
 import no.nav.forms.recipients.repository.RecipientRepository
-import no.nav.forms.recipients.utils.convertRecipientToDto
+import no.nav.forms.recipients.utils.toDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -17,13 +17,13 @@ class RecipientsService(
 ) {
 	fun getRecipients(): List<RecipientDto> {
 		val allRecipients = recipientsRepository.findAll()
-		return allRecipients.map(::convertRecipientToDto)
+		return allRecipients.map { it.toDto() }
 	}
 
 	fun getRecipient(recipientId: String): RecipientDto {
 		val entity = recipientsRepository.findByRecipientId(recipientId) ?:
 		  throw ResourceNotFoundException("Recipient not found", recipientId)
-		return convertRecipientToDto(entity)
+		return entity.toDto()
 	}
 
 	fun createRecipient(
@@ -50,7 +50,7 @@ class RecipientsService(
 				archiveSubjects = convertArchiveSubjectsToEntity(archiveSubjects),
 			)
 		)
-		return convertRecipientToDto(entity)
+		return entity.toDto()
 	}
 
 	fun convertArchiveSubjectsToEntity(source: String?): JsonNode? {
@@ -83,7 +83,7 @@ class RecipientsService(
 				changedBy = userId,
 			)
 		)
-		return convertRecipientToDto(updatedEntity)
+		return updatedEntity.toDto()
 	}
 
 	fun deleteRecipient(recipientId: String) {

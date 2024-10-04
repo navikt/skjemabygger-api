@@ -13,7 +13,7 @@ class RecipientConvertersKtTest {
 		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
 			archiveSubjects = null
 		).build()
-		val dto = convertRecipientToDto(entity)
+		val dto = entity.toDto()
 		assertNull(dto.archiveSubjects)
 	}
 
@@ -22,7 +22,7 @@ class RecipientConvertersKtTest {
 		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
 			archiveSubjects = listOf("PEN", "BIL")
 		).build()
-		val dto = convertRecipientToDto(entity)
+		val dto = entity.toDto()
 		assertEquals("PEN,BIL", dto.archiveSubjects)
 	}
 
@@ -31,7 +31,7 @@ class RecipientConvertersKtTest {
 		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
 			archiveSubjects = emptyList()
 		).build()
-		val dto = convertRecipientToDto(entity)
+		val dto = entity.toDto()
 		assertNull(dto.archiveSubjects)
 	}
 
