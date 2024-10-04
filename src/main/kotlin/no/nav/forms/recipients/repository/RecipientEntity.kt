@@ -20,7 +20,7 @@ data class RecipientEntity(
 	@Column(name = "changed_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val changedAt: LocalDateTime,
 	@Column(name = "changed_by", columnDefinition = "varchar") val changedBy: String,
 
-	@Convert(converter = JsonNodeConverter::class)
+	@Convert(converter = DbJsonArrayConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "archive_subjects", columnDefinition = "jsonb", nullable = true) val archiveSubjects: JsonNode? = null,
 )

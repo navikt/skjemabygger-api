@@ -6,7 +6,7 @@ import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 
 @Converter(autoApply = true)
-class JsonNodeConverter : AttributeConverter<JsonNode, String> {
+class DbJsonArrayConverter : AttributeConverter<JsonNode, String> {
 
 	private val mapper = ObjectMapper()
 
