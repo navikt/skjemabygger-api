@@ -1,5 +1,7 @@
 package no.nav.forms.recipients
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.recipients.repository.RecipientEntity
@@ -45,10 +47,16 @@ class RecipientsService(
 				createdBy = userId,
 				changedAt = now,
 				changedBy = userId,
-				archiveSubjects = archiveSubjects,
+				archiveSubjects = convertArchiveSubjectsToEntity(archiveSubjects),
 			)
 		)
 		return convertRecipientToDto(entity)
+	}
+
+	fun convertArchiveSubjectsToEntity(source: String?): JsonNode? {
+		if (source.isNullOrEmpty()) return null
+		val subjects = source.split(",").map { it.trim() }
+		return ObjectMapper().createArrayNode().apply { subjects.forEach { add(it) } }
 	}
 
 	fun updateRecipient(
@@ -70,7 +78,7 @@ class RecipientsService(
 				poBoxAddress = poBoxAddress,
 				postalCode = postalCode,
 				postalName = postalName,
-				archiveSubjects = archiveSubjects,
+				archiveSubjects = convertArchiveSubjectsToEntity(archiveSubjects),
 				changedAt = now,
 				changedBy = userId,
 			)

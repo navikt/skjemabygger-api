@@ -3,6 +3,7 @@ package no.nav.forms.recipients
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.NewRecipientRequest
 import no.nav.forms.model.RecipientDto
+import no.nav.forms.model.UpdateRecipientRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -38,7 +39,8 @@ class RecipientsControllerTest : ApplicationTest() {
 			"NAV Skanning",
 			"Postboks 1",
 			"0591",
-			"Oslo"
+			"Oslo",
+			archiveSubjects = "PEN"
 		)
 		val response = restTemplate.exchange(
 			uri,
@@ -48,5 +50,34 @@ class RecipientsControllerTest : ApplicationTest() {
 		)
 		assertNotNull(response.body?.recipientId)
 		assertEquals(requestBody.name, response.body?.name)
+		assertEquals(requestBody.archiveSubjects, response.body?.archiveSubjects)
+	}
+
+	@Test
+	fun testPutRecipient() {
+		val recipientId = "1"
+		val uri = UriComponentsBuilder.fromHttpUrl("$baseUrl/v1/recipients/$recipientId")
+			.build()
+			.toUri()
+		val responseType = object : ParameterizedTypeReference<RecipientDto>() {}
+		val requestBody = UpdateRecipientRequest(
+			"NAV Nytt navn",
+			"Postboks 99",
+			"6425",
+			"Molde",
+			archiveSubjects = "ITT, TIL,TOS "
+		)
+		val response = restTemplate.exchange(
+			uri,
+			HttpMethod.PUT,
+			HttpEntity(requestBody),
+			responseType
+		)
+		assertNotNull(response.body?.recipientId)
+		assertEquals(requestBody.name, response.body?.name)
+		assertEquals(requestBody.poBoxAddress, response.body?.poBoxAddress)
+		assertEquals(requestBody.postalCode, response.body?.postalCode)
+		assertEquals(requestBody.postalName, response.body?.postalName)
+		assertEquals("ITT,TIL,TOS", response.body?.archiveSubjects)
 	}
 }

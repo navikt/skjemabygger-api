@@ -137,8 +137,12 @@ components:
   schemas:
     UUID:
       type: string
-      description : A Universally Unique Identifier
+      description: A Universally Unique Identifier
       example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
+#    ArchiveSubjectCode:
+#      type: string
+#      description: Temakode
+#      example: PEN
     RecipientName:
       type: string
       example: NAV Økonomi Stønad
@@ -159,6 +163,12 @@ components:
       type: string
       example: PEN,BIL
       description: Kommaseparert liste med temakoder knyttet til denne mottakeren
+#      type: array
+#      items:
+#        $ref: "#/components/schemas/ArchiveSubjectCode"
+#      example:
+#        - PEN
+#        - BIL
     UserId:
       type: string
       example: A123456
