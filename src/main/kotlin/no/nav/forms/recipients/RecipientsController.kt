@@ -31,7 +31,6 @@ class RecipientsController(
 			newRecipientRequest.poBoxAddress,
 			newRecipientRequest.postalCode,
 			newRecipientRequest.postalName,
-			newRecipientRequest.archiveSubjects,
 			userId,
 		)
 		return ResponseEntity.status(HttpStatus.CREATED).body(dto)
@@ -45,7 +44,6 @@ class RecipientsController(
 			updateRecipientRequest.poBoxAddress,
 			updateRecipientRequest.postalCode,
 			updateRecipientRequest.postalName,
-			updateRecipientRequest.archiveSubjects,
 			userId,
 		)
 		return ResponseEntity.ok(dto)

@@ -40,7 +40,6 @@ class RecipientsControllerTest : ApplicationTest() {
 			"Postboks 1",
 			"0591",
 			"Oslo",
-			archiveSubjects = "PEN"
 		)
 		val response = restTemplate.exchange(
 			uri,
@@ -50,7 +49,6 @@ class RecipientsControllerTest : ApplicationTest() {
 		)
 		assertNotNull(response.body?.recipientId)
 		assertEquals(requestBody.name, response.body?.name)
-		assertEquals(requestBody.archiveSubjects, response.body?.archiveSubjects)
 	}
 
 	@Test
@@ -65,7 +63,6 @@ class RecipientsControllerTest : ApplicationTest() {
 			"Postboks 99",
 			"6425",
 			"Molde",
-			archiveSubjects = "ITT, TIL,TOS "
 		)
 		val response = restTemplate.exchange(
 			uri,
@@ -78,6 +75,5 @@ class RecipientsControllerTest : ApplicationTest() {
 		assertEquals(requestBody.poBoxAddress, response.body?.poBoxAddress)
 		assertEquals(requestBody.postalCode, response.body?.postalCode)
 		assertEquals(requestBody.postalName, response.body?.postalName)
-		assertEquals("ITT,TIL,TOS", response.body?.archiveSubjects)
 	}
 }

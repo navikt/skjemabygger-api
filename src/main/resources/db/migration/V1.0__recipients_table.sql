@@ -6,7 +6,6 @@ CREATE TABLE recipient
 		po_box_address   VARCHAR(100) NOT NULL,
 		postal_code      VARCHAR(4) NOT NULL,
 		postal_name      VARCHAR(50) NOT NULL,
-		archive_subjects JSONB,
 		created_at       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
 		created_by       VARCHAR(20) NOT NULL,
 		changed_at       TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),

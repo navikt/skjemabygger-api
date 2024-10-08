@@ -32,7 +32,6 @@ class RecipientsService(
 		poBoxAddress: String,
 		postalCode: String,
 		postalName: String,
-		archiveSubjects: String?,
 		userId: String,
 	): RecipientDto {
 		val now = LocalDateTime.now()
@@ -47,16 +46,9 @@ class RecipientsService(
 				createdBy = userId,
 				changedAt = now,
 				changedBy = userId,
-				archiveSubjects = convertArchiveSubjectsToEntity(archiveSubjects),
 			)
 		)
 		return entity.toDto()
-	}
-
-	fun convertArchiveSubjectsToEntity(source: String?): JsonNode? {
-		if (source.isNullOrEmpty()) return null
-		val subjects = source.split(",").map { it.trim() }
-		return ObjectMapper().createArrayNode().apply { subjects.forEach { add(it) } }
 	}
 
 	fun updateRecipient(
@@ -65,7 +57,6 @@ class RecipientsService(
 		poBoxAddress: String,
 		postalCode: String,
 		postalName: String,
-		archiveSubjects: String?,
 		userId: String,
 	): RecipientDto {
 		val entity = recipientsRepository.findByRecipientId(recipientId)
@@ -78,7 +69,6 @@ class RecipientsService(
 				poBoxAddress = poBoxAddress,
 				postalCode = postalCode,
 				postalName = postalName,
-				archiveSubjects = convertArchiveSubjectsToEntity(archiveSubjects),
 				changedAt = now,
 				changedBy = userId,
 			)

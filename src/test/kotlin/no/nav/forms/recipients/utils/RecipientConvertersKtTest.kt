@@ -2,37 +2,20 @@ package no.nav.forms.recipients.utils
 
 import no.nav.forms.builders.RecipientEntityTestdataBuilder
 import no.nav.forms.recipients.repository.RecipientEntity
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 
 class RecipientConvertersKtTest {
 
 	@Test
-	fun testDtoMappingOfArchiveSubjectsWhenNull() {
+	fun testDtoMappingOfCreatedAt() {
+		val now = LocalDateTime.now()
 		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
-			archiveSubjects = null
+			createdAt = now
 		).build()
 		val dto = entity.toDto()
-		assertNull(dto.archiveSubjects)
-	}
-
-	@Test
-	fun testDtoMappingOfArchiveSubjectsContainingTwoElements() {
-		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
-			archiveSubjects = listOf("PEN", "BIL")
-		).build()
-		val dto = entity.toDto()
-		assertEquals("PEN,BIL", dto.archiveSubjects)
-	}
-
-	@Test
-	fun testDtoMappingOfArchiveSubjectsEmptyList() {
-		val entity: RecipientEntity = RecipientEntityTestdataBuilder(
-			archiveSubjects = emptyList()
-		).build()
-		val dto = entity.toDto()
-		assertNull(dto.archiveSubjects)
+		assertNotNull(dto.createdAt)
 	}
 
 }
