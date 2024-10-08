@@ -7,6 +7,12 @@ Skjemadefinisjoner, oversettelser og mottaksadresser.
 
 `mvn clean install`
 
+Du må ha Docker kjørende for å kjøre testene
+
+Hvis du bruker colima kan det være nødvendig å sette følgende env-variabler for at testcontainers skal fungere
+
+      export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+      export DOCKER_HOST="unix://${HOME}/.colima/docker.sock"
 
 ## Kjøre opp applikasjonen lokalt
 
