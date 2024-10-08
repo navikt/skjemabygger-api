@@ -7,12 +7,16 @@ Skjemadefinisjoner, oversettelser og mottaksadresser.
 
 `mvn clean install`
 
-Du må ha Docker kjørende for å kjøre testene
+Du må ha Docker kjørende for å kjøre testene og for å starte applikasjonen.
 
-Hvis du bruker colima kan det være nødvendig å sette følgende env-variabler for at testcontainers skal fungere
+Hvis du bruker colima kan det være nødvendig å sette følgende env-variabler for at testcontainers skal fungere:
 
       export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
       export DOCKER_HOST="unix://${HOME}/.colima/docker.sock"
+
+For flere detaljer, se
+[Customizing Docker host detection](https://java.testcontainers.org/features/configuration/#customizing-docker-host-detection)
+i dokumentasjonen til [Testcontainers](https://java.testcontainers.org/).
 
 ## Kjøre opp applikasjonen lokalt
 
@@ -42,8 +46,8 @@ Starte databasen med docker compose:
 
 Deretter kjøres `no/nav/forms/FormsApiApplication.kt` med profil `docker` og `DATABASE_PORT=5442`.
 
-
 ## URLer lokalt
+
 Swagger url: http://localhost:8082/swagger-ui/index.html
 
 OpenAPI descriptions: http://localhost:8082/v3/api-docs
