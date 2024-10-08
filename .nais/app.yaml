@@ -1,0 +1,51 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: forms-api
+  namespace: fyllut-sendinn
+spec:
+  ingresses:
+  {{#each ingresses}}
+    - "{{this}}"
+  {{/each}}
+  image: {{ image }}
+  port: 8082
+  replicas:
+    max: 6
+    min: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 1Gi
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: true
+      claims:
+        groups:
+        {{#each azure.ad_groups}}
+          - id: "{{this.id}}"
+        {{/each}}
+        extra:
+          - NAVident
+    sidecar:
+      enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+      {{#each accessPolicy.inbound.rules}}
+        - application: "{{this.application}}"
+          namespace: "{{this.namespace}}"
+      {{/each}}
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_15
+        tier: {{ database.tier }}
+        diskType: SSD
+        highAvailability: true
+        diskAutoresize: true
+        databases:
+          - name: {{ database.name }}
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: {{ spring-profiles-active }}

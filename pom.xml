@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>no.nav.forms</groupId>
 	<artifactId>forms-api</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>forms-api</name>
 	<description>Forms API</description>
 	<url/>

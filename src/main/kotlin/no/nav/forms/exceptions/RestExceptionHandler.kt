@@ -20,6 +20,12 @@ class RestExceptionHandler {
 	}
 
 	@ExceptionHandler
+	fun handleNotImplementedError(error: NotImplementedError): ResponseEntity<ErrorResponseDto> {
+		logger.info(error.message, error)
+		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(ErrorResponseDto("Not implemented"))
+	}
+
+	@ExceptionHandler
 	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val responseErrorMessage = "Something went wrong"
 		logger.warn("$responseErrorMessage: ${exception.message}", exception)

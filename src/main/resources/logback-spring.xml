@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<springProfile name="dev,prod">
+	<springProfile name="preprod,prod">
 
 		<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
 			<encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
@@ -13,7 +13,7 @@
 
 	</springProfile>
 
-	<springProfile name="local,test">
+	<springProfile name="local,test,docker">
 
 		<appender name="STDOUT_JSON" class="ch.qos.logback.core.ConsoleAppender">
 			<layout class="ch.qos.logback.classic.PatternLayout">

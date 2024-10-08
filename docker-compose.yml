@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: forms-api-db
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '5442:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  forms-api:
+    depends_on:
+      - db
+    container_name: forms-api
+    mem_reservation: 4000M
+    build:
+        dockerfile: Dockerfile
+    ports:
+        - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_PORT: 5432 # porten i docker, bruk den eksponerte 5442 porten for å koble til utenfra
+      DATABASE_HOST: db
+
+volumes:
+  db:
+    driver: local

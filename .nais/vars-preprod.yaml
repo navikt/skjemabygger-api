@@ -1,0 +1,23 @@
+spring-profiles-active: preprod
+ingresses:
+  - https://forms-api.intern.dev.nav.no
+database:
+  name: forms-api-preprod-db
+  tier: db-g1-small
+accessPolicy:
+  inbound:
+    rules:
+      - application: skjemabygging-preprod
+        namespace: skjemadigitalisering
+      - application: skjemabygging-preprod-alt
+        namespace: skjemadigitalisering
+      - application: skjemautfylling-preprod
+        namespace: skjemadigitalisering
+      - application: skjemautfylling-preprod-alt
+        namespace: skjemadigitalisering
+azure:
+  ad_groups:
+    - id: b7012a89-90b9-4215-b7dc-988b929216e9
+      type: USER
+    - id: 5398ed9e-bb41-43f5-9434-120b0116953c
+      type: ADMIN

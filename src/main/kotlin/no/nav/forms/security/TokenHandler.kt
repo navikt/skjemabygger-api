@@ -8,7 +8,15 @@ interface TokenHandler {
 }
 
 @Component
-@Profile("test | local")
+@Profile("preprod | prod")
+class TokenHandlerImpl : TokenHandler {
+	override fun getUserIdFromToken(): String {
+		throw NotImplementedError("TokenHandler::getUserIdFromToken() is not implemented yet")
+	}
+}
+
+@Component
+@Profile("test | local | docker")
 class TokenHandlerTestImpl : TokenHandler {
 	override fun getUserIdFromToken(): String {
 		return "testuser"

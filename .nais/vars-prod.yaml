@@ -1,0 +1,19 @@
+spring-profiles-active: prod
+ingresses:
+  - https://forms-api.intern.nav.no
+database:
+  name: forms-api-db
+  tier: db-custom-1-3840
+accessPolicy:
+  inbound:
+    rules:
+      - application: skjemabygging
+        namespace: skjemadigitalisering
+      - application: skjemautfylling
+        namespace: skjemadigitalisering
+azure:
+  ad_groups:
+    - id: 1d12af59-d953-4f85-9f65-d8cbf6672deb
+      type: USER
+    - id: 0c0e4023-5fd3-4cfe-8b40-3b98645bb08f
+      type: ADMIN
