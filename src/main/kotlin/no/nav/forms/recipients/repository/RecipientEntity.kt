@@ -1,9 +1,6 @@
 package no.nav.forms.recipients.repository
 
-import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 
 @Entity

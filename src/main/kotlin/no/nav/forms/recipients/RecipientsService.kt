@@ -1,7 +1,5 @@
 package no.nav.forms.recipients
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.recipients.repository.RecipientEntity
