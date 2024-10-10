@@ -1,8 +1,10 @@
 package no.nav.forms.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.context.annotation.Profile
 
 @ConfigurationProperties("forms-api.azure")
+@Profile("preprod | prod | test")
 class AzureAdConfig {
 
 	lateinit var groups: AdGroupIds

@@ -9,3 +9,9 @@ no.nav.security.jwt:
     azuread:
       discoveryurl: http://localhost:${mock-oauth2-server.port}/azuread/.well-known/openid-configuration
       acceptedaudience: aud-localhost
+
+forms-api:
+  azure:
+    groups:
+      user-group-id: mock-user-group-id
+      admin-group-id: mock-admin-group-id

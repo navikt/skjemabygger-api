@@ -24,7 +24,7 @@ Det finnes ulike muligheter for hvordan man kan starte applikasjonen lokalt.
 
 ### 1. Spring Boot med profil `local`
 
-Kjøre `no/nav/forms/FormsApiApplication.kt` med profil `local`, f.eks. i IntelliJ.
+Kjøre `no/nav/forms/FormsApiApplication.kt` (profil `local` aktiveres default), f.eks. i IntelliJ.
 
 Dette er den raskeste måten, men med profil `local` brukes en inmemory database, så data mistes ved restart.
 

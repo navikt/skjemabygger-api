@@ -10,9 +10,12 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
-
-forms-api:
-  azure:
-    groups:
-      user-group-id: ${FORMS_API_AD_GROUP_USER:mock-user-group-id}
-      admin-group-id: ${FORMS_API_AD_GROUP_ADMIN:mock-admin-group-id}
+  profiles:
+    default: "local"
+    group:
+      prod:
+      - "gcpdb"
+      - "azure"
+      preprod:
+      - "gcpdb"
+      - "azure"
