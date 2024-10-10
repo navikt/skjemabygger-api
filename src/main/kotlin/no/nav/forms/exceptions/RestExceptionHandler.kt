@@ -36,14 +36,16 @@ class RestExceptionHandler {
 		]
 	)
 	fun handlJwtTokenUnauthorized(exception: Exception): ResponseEntity<ErrorResponseDto> {
-		logger.info(exception.message, exception)
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponseDto("Unauthorized"))
+		val status = HttpStatus.UNAUTHORIZED
+		logger.info(exception.message ?: status.reasonPhrase, exception)
+		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase))
 	}
 
 	@ExceptionHandler
 	fun handlJwtTokenInvalidClaimException(exception: JwtTokenInvalidClaimException): ResponseEntity<ErrorResponseDto> {
-		logger.info(exception.message, exception)
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponseDto("Forbidden"))
+		val status = HttpStatus.FORBIDDEN
+		logger.info(exception.message ?: status.reasonPhrase, exception)
+		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase))
 	}
 
 	@ExceptionHandler
