@@ -1,3 +1,9 @@
 spring:
   datasource:
     url: ${DB_JDBC_URL}
+
+no.nav.security.jwt:
+  issuer:
+    azuread:
+      discoveryurl: ${AZURE_APP_WELL_KNOWN_URL}
+      acceptedaudience: ${AZURE_APP_CLIENT_ID}

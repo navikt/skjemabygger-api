@@ -1,6 +1,9 @@
 package no.nav.forms.exceptions
 
 import no.nav.forms.model.ErrorResponseDto
+import no.nav.security.token.support.core.exceptions.JwtTokenInvalidClaimException
+import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
+import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -22,13 +25,31 @@ class RestExceptionHandler {
 	@ExceptionHandler
 	fun handleNotImplementedError(error: NotImplementedError): ResponseEntity<ErrorResponseDto> {
 		logger.info(error.message, error)
-		return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(ErrorResponseDto("Not implemented"))
+		val status = HttpStatus.NOT_IMPLEMENTED
+		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase))
+	}
+
+	@ExceptionHandler(
+		value = [
+			JwtTokenMissingException::class,
+			JwtTokenUnauthorizedException::class,
+		]
+	)
+	fun handlJwtTokenUnauthorized(exception: Exception): ResponseEntity<ErrorResponseDto> {
+		logger.info(exception.message, exception)
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponseDto("Unauthorized"))
+	}
+
+	@ExceptionHandler
+	fun handlJwtTokenInvalidClaimException(exception: JwtTokenInvalidClaimException): ResponseEntity<ErrorResponseDto> {
+		logger.info(exception.message, exception)
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponseDto("Forbidden"))
 	}
 
 	@ExceptionHandler
 	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val responseErrorMessage = "Something went wrong"
-		logger.warn("$responseErrorMessage: ${exception.message}", exception)
+		logger.error("$responseErrorMessage: ${exception.message}", exception)
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseDto(responseErrorMessage))
 	}
 

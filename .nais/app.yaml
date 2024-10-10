@@ -49,3 +49,7 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: {{ spring-profiles-active }}
+    {{#each azure.ad_groups}}
+    - name: "FORMS_API_AD_GROUP_{{this.type}}"
+      value: "{{this.id}}"
+    {{/each}}

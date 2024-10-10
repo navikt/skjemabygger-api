@@ -39,6 +39,9 @@
 		<springdoc-openapi.version>2.6.0</springdoc-openapi.version>
 		<swagger-annotations.version>2.2.24</swagger-annotations.version>
 
+		<!--Token-->
+		<token-validation.version>5.0.5</token-validation.version>
+
 		<!-- Database -->
 		<otj-pg-embedded.version>1.1.0</otj-pg-embedded.version>
 
@@ -63,6 +66,18 @@
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
 		</dependency>
+
+		<!-- Token support start -->
+		<dependency>
+			<groupId>no.nav.security</groupId>
+			<artifactId>token-validation-spring</artifactId>
+			<version>${token-validation.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+		</dependency>
+		<!-- Token support end -->
 
 		<!-- Kotlin start -->
 		<dependency>
@@ -145,6 +160,12 @@
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-test-junit5</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>no.nav.security</groupId>
+			<artifactId>token-validation-spring-test</artifactId>
+			<version>${token-validation.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- Test end -->
