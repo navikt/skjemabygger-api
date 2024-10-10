@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    url: ${NAIS_DATABASE_FORMS_API_FORMS_API_PREPROD_DB_JDBC_URL}

@@ -14,8 +14,6 @@ spring:
     default: "local"
     group:
       prod:
-      - "gcpdb"
       - "azure"
       preprod:
-      - "gcpdb"
       - "azure"
