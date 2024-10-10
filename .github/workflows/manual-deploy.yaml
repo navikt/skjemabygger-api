@@ -51,6 +51,6 @@ jobs:
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .nais/app.yml
+          RESOURCE: .nais/app.yaml
           VARS: .nais/vars-${{ github.event.inputs.environment }}.yaml
           VAR: image=${{needs.build-and-push.outputs.image}}
