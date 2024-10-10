@@ -11,7 +11,7 @@ no.nav.security.jwt:
       acceptedaudience: aud-localhost
 
 forms-api:
-  azure:
+  azuread:
     groups:
       user-group-id: mock-user-group-id
       admin-group-id: mock-admin-group-id

@@ -5,7 +5,7 @@ no.nav.security.jwt:
       acceptedaudience: ${AZURE_APP_CLIENT_ID}
 
 forms-api:
-  azure:
+  azuread:
     groups:
       user-group-id: ${FORMS_API_AD_GROUP_USER}
       admin-group-id: ${FORMS_API_AD_GROUP_ADMIN}
