@@ -52,6 +52,18 @@ Swagger url: http://localhost:8082/swagger-ui/index.html
 
 OpenAPI descriptions: http://localhost:8082/v3/api-docs
 
+# Autentisering
+
+Endepunkter som henter data er i utgangspunktet åpne, men de som endrer på data er sikret
+med [Entra ID](https://doc.nais.io/auth/entra-id/) (tidligere Azure AD). Det er to grupper brukeren må være medlem av
+for å få tilgang til alle funksjoner, og det er `Skjemabygging` og `Skjemabygging-Admin` (`SkjemabyggingPreprod` og
+`SkjemabyggingPreprod-Admin` i preprod).
+
+Access token for å teste api'et i preprod kan genereres på følgende
+side: [azure-token-generator](https://azure-token-generator.intern.dev.nav.no/api/obo?aud=dev-gcp.fyllut-sendinn.forms-api).
+Logg på med din personlige trygdeetaten-bruker. For mer informasjon,
+se [NAIS Doc - Generate a token](https://doc.nais.io/auth/entra-id/how-to/generate/).
+
 ---
 
 # Henvendelser
