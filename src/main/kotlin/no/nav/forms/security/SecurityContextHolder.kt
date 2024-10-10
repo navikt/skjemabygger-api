@@ -31,19 +31,21 @@ class SecurityContextHolderImpl(
 
 	override fun getNavIdent(): String {
 		val claims = ctxHolder.getTokenValidationContext().getClaims(AzureAdConfig.ISSUER)
-		return claims.getStringClaim("NAVIdent") ?: throw Exception("No NAVIdent claim found")
+		return claims.getStringClaim(AzureAdConfig.CLAIM_NAV_IDENT)
+			?: throw Exception("No ${AzureAdConfig.CLAIM_NAV_IDENT} claim found")
 	}
 
 	override fun getUserName(): String {
 		val claims = ctxHolder.getTokenValidationContext().getClaims(AzureAdConfig.ISSUER)
-		return claims.getStringClaim("name") ?: throw Exception("No user name claim found")
+		return claims.getStringClaim(AzureAdConfig.CLAIM_NAME)
+			?: throw Exception("No ${AzureAdConfig.CLAIM_NAME} claim found")
 	}
 
 	override fun isAdminUser(): Boolean = isMemberOfGroup(azureAdConfig.groups.adminGroupId)
 
 	private fun isMemberOfGroup(groupId: String): Boolean {
 		return ctxHolder.getTokenValidationContext().getJwtToken(AzureAdConfig.ISSUER)?.jwtTokenClaims?.containsClaim(
-			"groups",
+			AzureAdConfig.CLAIM_GROUPS,
 			groupId
 		) == true
 	}

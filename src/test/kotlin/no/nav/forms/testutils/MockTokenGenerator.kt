@@ -15,9 +15,9 @@ fun MockOAuth2Server.createTokenFor(navIdent: String = "A123456", userName: Stri
 			typeHeader = JOSEObjectType.JWT.type,
 			audience = listOf("aud-localhost"),
 			claims = mapOf(
-				"name" to userName,
-				"NAVIdent" to navIdent,
-				"groups" to listOf("mock-user-group-id", "mock-admin-group-id"),
+				AzureAdConfig.CLAIM_NAME to userName,
+				AzureAdConfig.CLAIM_NAV_IDENT to navIdent,
+				AzureAdConfig.CLAIM_GROUPS to listOf("mock-user-group-id", "mock-admin-group-id"),
 			),
 			expiry = (2 * 3600).toLong()
 		)

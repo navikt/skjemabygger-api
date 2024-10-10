@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@ProtectedWithClaims(issuer = AzureAdConfig.ISSUER, claimMap = ["NAVIdent=*"])
+@ProtectedWithClaims(issuer = AzureAdConfig.ISSUER, claimMap = ["${AzureAdConfig.CLAIM_NAV_IDENT}=*"])
 class RecipientsController(
 	private val recipientsService: RecipientsService,
 	private val securityContextHolder: SecurityContextHolder,

@@ -11,6 +11,9 @@ class AzureAdConfig {
 
 	companion object {
 		const val ISSUER = "azuread"
+		const val CLAIM_NAV_IDENT = "NAVident"
+		const val CLAIM_NAME = "name"
+		const val CLAIM_GROUPS = "groups"
 	}
 
 }
