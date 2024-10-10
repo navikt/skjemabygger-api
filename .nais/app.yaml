@@ -13,10 +13,6 @@ spec:
   replicas:
     max: 6
     min: 2
-  resources:
-    requests:
-      cpu: 200m
-      memory: 1Gi
   azure:
     application:
       enabled: true
