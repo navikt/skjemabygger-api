@@ -35,7 +35,7 @@
 		<kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
 
 		<!-- OpenAPI -->
-		<openapi-generator-maven-plugin.version>7.8.0</openapi-generator-maven-plugin.version>
+		<openapi-generator-maven-plugin.version>7.9.0</openapi-generator-maven-plugin.version>
 		<springdoc-openapi.version>2.6.0</springdoc-openapi.version>
 		<swagger-annotations.version>2.2.24</swagger-annotations.version>
 
