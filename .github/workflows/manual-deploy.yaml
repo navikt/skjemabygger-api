@@ -1,0 +1,56 @@
+name: Manually triggered deploy
+run-name: Manual deploy to ${{ inputs.environment }} [${{ github.ref_name }}]
+permissions:
+  contents: "read"
+  id-token: "write"
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'preprod'
+        type: choice
+        options:
+          - preprod
+
+jobs:
+  build-and-push:
+    name: Build and push docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          cache: 'maven'
+      - name: set timezone
+        uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: "Europe/Oslo"
+      - name: Build with maven
+        run: mvn install -DskipTests
+      - name: Build and push Docker image
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: fyllut-sendinn
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
+          image_suffix: ${{ github.event.inputs.environment }}
+    outputs:
+        image: ${{ steps.docker-build-push.outputs.image }}
+
+  deploy-to-dev-gcp:
+    name: Deploy to dev-gcp
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-gcp
+          RESOURCE: .nais/app.yml
+          VARS: .nais/vars-${{ github.event.inputs.environment }}.json
+          VAR: image=${{needs.build-and-push.outputs.image}}
