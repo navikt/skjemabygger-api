@@ -15,6 +15,8 @@ accessPolicy:
         namespace: skjemadigitalisering
       - application: skjemautfylling-preprod-alt
         namespace: skjemadigitalisering
+      - application: azure-token-generator
+        namespace: aura
 azure:
   ad_groups:
     - id: b7012a89-90b9-4215-b7dc-988b929216e9
