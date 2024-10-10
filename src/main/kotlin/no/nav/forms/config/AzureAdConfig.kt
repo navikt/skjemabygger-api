@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Profile
 
 @ConfigurationProperties("forms-api.azuread")
-@Profile("preprod | prod | test")
+@Profile("test | preprod | prod")
 class AzureAdConfig {
 
 	lateinit var groups: AdGroupIds
