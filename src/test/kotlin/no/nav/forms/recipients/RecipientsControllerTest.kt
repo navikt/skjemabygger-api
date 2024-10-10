@@ -17,7 +17,7 @@ import org.springframework.util.MultiValueMap
 
 class RecipientsControllerTest : ApplicationTest() {
 
-	private val testNavIdent = "A123456"
+	private val testUserName = "Navnesen, Navn"
 
 	@Test
 	fun testGetRecipients() {
@@ -38,12 +38,13 @@ class RecipientsControllerTest : ApplicationTest() {
 		val response = restTemplate.exchange(
 			url.toURI(),
 			HttpMethod.POST,
-			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(testNavIdent))),
+			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(userName = testUserName))),
 			RecipientDto::class.java
 		)
 		assertTrue(response.statusCode.is2xxSuccessful)
 		assertNotNull(response.body?.recipientId)
 		assertEquals(requestBody.name, response.body?.name)
+		assertEquals(testUserName, response.body?.createdBy)
 	}
 
 	@Test
@@ -58,7 +59,7 @@ class RecipientsControllerTest : ApplicationTest() {
 		val response = restTemplate.exchange(
 			url.toURI(),
 			HttpMethod.PUT,
-			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(testNavIdent))),
+			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(userName = testUserName))),
 			String::class.java
 		)
 		assertTrue(response.statusCode.is2xxSuccessful)
@@ -68,7 +69,7 @@ class RecipientsControllerTest : ApplicationTest() {
 		assertEquals(requestBody.poBoxAddress, getResponse.body?.poBoxAddress)
 		assertEquals(requestBody.postalCode, getResponse.body?.postalCode)
 		assertEquals(requestBody.postalName, getResponse.body?.postalName)
-		assertEquals(testNavIdent, getResponse.body?.changedBy)
+		assertEquals(testUserName, getResponse.body?.changedBy)
 	}
 
 	private fun httpHeaders(token: String): MultiValueMap<String, String> {

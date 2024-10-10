@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 interface SecurityContextHolder {
 	fun verifyWritePermission()
 	fun getNavIdent(): String
+	fun getUserName(): String
 	fun isAdminUser(): Boolean
 }
 
@@ -33,6 +34,11 @@ class SecurityContextHolderImpl(
 		return claims.getStringClaim("NAVIdent") ?: throw Exception("No NAVIdent claim found")
 	}
 
+	override fun getUserName(): String {
+		val claims = ctxHolder.getTokenValidationContext().getClaims(AzureAdConfig.ISSUER)
+		return claims.getStringClaim("name") ?: throw Exception("No user name claim found")
+	}
+
 	override fun isAdminUser(): Boolean = isMemberOfGroup(azureAdConfig.groups.adminGroupId)
 
 	private fun isMemberOfGroup(groupId: String): Boolean {
@@ -49,5 +55,6 @@ class SecurityContextHolderImpl(
 class SecurityContextHolderMock : SecurityContextHolder {
 	override fun verifyWritePermission() {}
 	override fun getNavIdent(): String = "testuser"
+	override fun getUserName(): String = "Testesen, Test"
 	override fun isAdminUser(): Boolean = true
 }

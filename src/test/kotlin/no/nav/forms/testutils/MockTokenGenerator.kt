@@ -5,16 +5,20 @@ import no.nav.forms.config.AzureAdConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 
-fun MockOAuth2Server.createTokenFor(userId: String): String {
+fun MockOAuth2Server.createTokenFor(navIdent: String = "A123456", userName: String = "Testesen, Test"): String {
 	return this.issueToken(
 		issuerId = AzureAdConfig.ISSUER,
 		clientId = "application",
 		tokenCallback = DefaultOAuth2TokenCallback(
 			issuerId = AzureAdConfig.ISSUER,
-			subject = userId,
+			subject = navIdent,
 			typeHeader = JOSEObjectType.JWT.type,
 			audience = listOf("aud-localhost"),
-			claims = mapOf("NAVIdent" to userId, "groups" to listOf("mock-user-group-id", "mock-admin-group-id")),
+			claims = mapOf(
+				"name" to userName,
+				"NAVIdent" to navIdent,
+				"groups" to listOf("mock-user-group-id", "mock-admin-group-id"),
+			),
 			expiry = (2 * 3600).toLong()
 		)
 	).serialize()

@@ -157,8 +157,8 @@ components:
       description: Norsk poststed
     UserId:
       type: string
-      example: A123456
-      description: User name
+      example: Navnesen, Navn
+      description: Navn på en bruker
 
     RecipientDto:
       type: object
