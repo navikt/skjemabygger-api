@@ -12,6 +12,8 @@ info:
 tags:
   - name: recipients
     description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
+  - name: health
+    description: Endepunkter for helsesjekk av applikasjonen.
 
 paths:
   /v1/recipients:
@@ -174,6 +176,12 @@ paths:
                 $ref: "#/components/schemas/ErrorResponseDto"
       tags:
         - recipients
+
+  /internal/health/isAlive:
+    $ref: "./health/is_alive.yaml"
+
+  /internal/health/isReady:
+    $ref: "./health/is_ready.yaml"
 
 components:
   securitySchemes:

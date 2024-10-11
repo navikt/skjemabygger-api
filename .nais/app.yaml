@@ -13,6 +13,10 @@ spec:
   replicas:
     max: 4
     min: 2
+  liveness:
+    path: /internal/health/isAlive
+  readiness:
+    path: /internal/health/isReady
   azure:
     application:
       enabled: true

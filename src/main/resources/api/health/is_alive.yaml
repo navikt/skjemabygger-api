@@ -1,0 +1,16 @@
+get:
+  summary: Is alive
+  description: Sjekker om applikasjonen er oppe
+  operationId: isAlive
+  security: []
+  responses:
+    '200':
+      description: Applikasjon er oppe
+      content:
+        text/plain:
+          schema:
+            type: string
+    '500':
+      description: Applikasjonen er ikke oppe
+  tags:
+    - health

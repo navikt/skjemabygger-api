@@ -1,0 +1,16 @@
+get:
+  summary: Is ready
+  description: Sjekker om applikasjonen er klar
+  operationId: isReady
+  security: []
+  responses:
+    '200':
+      description: Applikasjon er klar til å behandle forespørsler
+      content:
+        text/plain:
+          schema:
+            type: string
+    '500':
+      description: Applikasjonen er ikke klar til å behandle forespørsler
+  tags:
+    - health
