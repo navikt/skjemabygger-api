@@ -45,6 +45,9 @@
 		<!-- Database -->
 		<otj-pg-embedded.version>1.1.0</otj-pg-embedded.version>
 
+		<!-- Metrics -->
+		<micrometer.version>1.13.3</micrometer.version>
+
 		<!-- Logging -->
 		<logstash.version>8.0</logstash.version>
 	</properties>
@@ -56,16 +59,23 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-kotlin</artifactId>
 		</dependency>
+
+		<!-- Metrics start -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<!-- Metrics end -->
 
 		<!-- Token support start -->
 		<dependency>
