@@ -248,7 +248,7 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/forms-api.yaml</inputSpec>
+							<inputSpec>${project.basedir}/src/main/resources/api/forms-api.yaml</inputSpec>
 							<generatorName>kotlin-spring</generatorName>
 							<apiPackage>no.nav.forms.api</apiPackage>
 							<modelPackage>no.nav.forms.model</modelPackage>
