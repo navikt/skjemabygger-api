@@ -11,7 +11,7 @@ spec:
   image: {{ image }}
   port: 8082
   replicas:
-    max: 6
+    max: 4
     min: 2
   azure:
     application:

@@ -1,3 +1,5 @@
 spring:
   datasource:
     url: ${NAIS_DATABASE_FORMS_API_FORMS_API_DB_JDBC_URL}
+    hikari:
+      maximum-pool-size: 20
