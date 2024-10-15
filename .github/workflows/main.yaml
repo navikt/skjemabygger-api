@@ -6,6 +6,8 @@ on:
     paths-ignore:
       - '**.md'
       - '**/**.md'
+      - '.nais/alerts/**'
+      - '.github/workflows/alerts-deploy.yaml'
 
 jobs:
   build-and-test:

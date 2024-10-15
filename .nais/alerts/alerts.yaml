@@ -1,0 +1,25 @@
+apiVersion: "monitoring.coreos.com/v1"
+kind: PrometheusRule
+metadata:
+  name: alerts-forms-api
+  namespace: fyllut-sendinn
+  labels:
+    team: fyllut-sendinn
+spec:
+  groups:
+    - name: {{ env-name }}
+      rules:
+        - alert: Forms API is unavailable
+          expr: kube_deployment_status_replicas_available{deployment="forms-api"} == 0
+          for: 1m
+          annotations:
+            title: "Forms API is unavailable"
+            consequence: "Service is unavailable to users."
+            action: {{logs-url}}
+            sla: respond within 1h, during office hours
+          labels:
+            severity: danger
+            special_type_to_use_in_alertmanager_config: {{special-type-to-use-in-alertmanager-config}}
+            alert_type: custom
+            service: FormsAPI
+            namespace: fyllut-sendinn
