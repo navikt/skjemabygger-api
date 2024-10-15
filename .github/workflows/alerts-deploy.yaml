@@ -23,7 +23,7 @@ jobs:
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/alerts/alerts.yaml
-          VARS: .nais/alerts/vars-dev.yaml
+          VARS: .nais/alerts/vars-preprod.yaml
 
 #  prod-deploy:
 #    name: Deploy alerts to prod
