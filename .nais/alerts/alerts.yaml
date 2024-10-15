@@ -10,10 +10,10 @@ spec:
     - name: {{ env-name }}
       rules:
         - alert: Forms API is unavailable
-          expr: kube_deployment_status_replicas_available{deployment="forms-api"} == 0
+          expr: kube_deployment_status_replicas_available{deployment="forms-api"} == 2
           for: 1m
           annotations:
-            title: "Forms API is unavailable"
+            title: "KUN TEST - Forms API is unavailable"
             consequence: "Service is unavailable to users."
             action: {{logs-url}}
             sla: respond within 1h, during office hours
