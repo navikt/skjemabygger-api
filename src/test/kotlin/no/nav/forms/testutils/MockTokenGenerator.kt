@@ -5,7 +5,14 @@ import no.nav.forms.config.AzureAdConfig
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 
-fun MockOAuth2Server.createTokenFor(navIdent: String = "A123456", userName: String = "Testesen, Test"): String {
+const val MOCK_USER_GROUP_ID = "mock-user-group-id"
+const val MOCK_ADMIN_GROUP_ID = "mock-admin-group-id"
+
+fun MockOAuth2Server.createTokenFor(
+	navIdent: String = "A123456",
+	userName: String = "Testesen, Test",
+	groups: List<String> = listOf(MOCK_USER_GROUP_ID, MOCK_ADMIN_GROUP_ID)
+): String {
 	return this.issueToken(
 		issuerId = AzureAdConfig.ISSUER,
 		clientId = "application",
@@ -17,7 +24,7 @@ fun MockOAuth2Server.createTokenFor(navIdent: String = "A123456", userName: Stri
 			claims = mapOf(
 				AzureAdConfig.CLAIM_NAME to userName,
 				AzureAdConfig.CLAIM_NAV_IDENT to navIdent,
-				AzureAdConfig.CLAIM_GROUPS to listOf("mock-user-group-id", "mock-admin-group-id"),
+				AzureAdConfig.CLAIM_GROUPS to groups,
 			),
 			expiry = (2 * 3600).toLong()
 		)

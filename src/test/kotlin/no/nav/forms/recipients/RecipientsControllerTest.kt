@@ -4,6 +4,7 @@ import no.nav.forms.ApplicationTest
 import no.nav.forms.model.NewRecipientRequest
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.model.UpdateRecipientRequest
+import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createTokenFor
 import no.nav.forms.testutils.toURI
 import org.junit.jupiter.api.Assertions.*
@@ -72,12 +73,6 @@ class RecipientsControllerTest : ApplicationTest() {
 		assertEquals(testUserName, getResponse.body?.changedBy)
 	}
 
-	private fun httpHeaders(token: String): MultiValueMap<String, String> {
-		val headers = HttpHeaders()
-		headers.add("Authorization", "Bearer $token")
-		return headers;
-	}
-
 	@Test
 	fun testPutRecipientWithoutToken() {
 		val url = "$baseUrl/v1/recipients/1"
@@ -94,6 +89,31 @@ class RecipientsControllerTest : ApplicationTest() {
 			String::class.java
 		)
 		assertEquals(HttpStatus.UNAUTHORIZED.value(), response.statusCode.value())
+	}
+
+	@Test
+	fun testPutRecipientWithoutAdminRole() {
+		val url = "$baseUrl/v1/recipients/1"
+		val requestBody = UpdateRecipientRequest(
+			"NAV Nytt navn",
+			"Postboks 99",
+			"6425",
+			"Molde",
+		)
+		val tokenNotAdmin = mockOAuth2Server.createTokenFor(groups = listOf(MOCK_USER_GROUP_ID))
+		val response = restTemplate.exchange(
+			url.toURI(),
+			HttpMethod.PUT,
+			HttpEntity(requestBody, httpHeaders(tokenNotAdmin)),
+			String::class.java
+		)
+		assertEquals(HttpStatus.FORBIDDEN.value(), response.statusCode.value())
+	}
+
+	private fun httpHeaders(token: String): MultiValueMap<String, String> {
+		val headers = HttpHeaders()
+		headers.add("Authorization", "Bearer $token")
+		return headers
 	}
 
 }

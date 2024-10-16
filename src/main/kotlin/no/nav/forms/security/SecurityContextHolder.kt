@@ -9,9 +9,11 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 interface SecurityContextHolder {
-	fun verifyWritePermission()
+	fun requireValidUser()
+	fun requireAdminUser()
 	fun getNavIdent(): String
 	fun getUserName(): String
+	fun isValidUser(): Boolean
 	fun isAdminUser(): Boolean
 }
 
@@ -24,10 +26,9 @@ class SecurityContextHolderImpl(
 
 	val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-	override fun verifyWritePermission() {
-		val isMemberOfUserGroup = isMemberOfGroup(azureAdConfig.groups.userGroupId)
-		if (!isMemberOfUserGroup) throw JwtTokenInvalidClaimException("Missing claim with write permission")
-	}
+	override fun requireValidUser() = verifyClaim(isValidUser()) { "Invalid user" }
+
+	override fun requireAdminUser() = verifyClaim(isAdminUser()) { "User is not admin" }
 
 	override fun getNavIdent(): String {
 		val claims = ctxHolder.getTokenValidationContext().getClaims(AzureAdConfig.ISSUER)
@@ -41,6 +42,8 @@ class SecurityContextHolderImpl(
 			?: throw Exception("No ${AzureAdConfig.CLAIM_NAME} claim found")
 	}
 
+	override fun isValidUser(): Boolean = isMemberOfGroup(azureAdConfig.groups.userGroupId)
+
 	override fun isAdminUser(): Boolean = isMemberOfGroup(azureAdConfig.groups.adminGroupId)
 
 	private fun isMemberOfGroup(groupId: String): Boolean {
@@ -50,13 +53,19 @@ class SecurityContextHolderImpl(
 		) == true
 	}
 
+	private fun verifyClaim(bool: Boolean, getMessage: () -> String) {
+		if (!bool) throw JwtTokenInvalidClaimException(getMessage())
+	}
+
 }
 
 @Component
 @Profile("local | docker")
 class SecurityContextHolderMock : SecurityContextHolder {
-	override fun verifyWritePermission() {}
+	override fun requireValidUser() {}
+	override fun requireAdminUser() {}
 	override fun getNavIdent(): String = "testuser"
 	override fun getUserName(): String = "Testesen, Test"
+	override fun isValidUser(): Boolean = true
 	override fun isAdminUser(): Boolean = true
 }

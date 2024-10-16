@@ -33,7 +33,7 @@ class RecipientsController(
 	}
 
 	override fun createRecipient(newRecipientRequest: NewRecipientRequest): ResponseEntity<RecipientDto> {
-		securityContextHolder.verifyWritePermission()
+		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		val dto = recipientsService.createRecipient(
 			newRecipientRequest.recipientId,
@@ -50,7 +50,7 @@ class RecipientsController(
 		recipientId: String,
 		updateRecipientRequest: UpdateRecipientRequest
 	): ResponseEntity<RecipientDto> {
-		securityContextHolder.verifyWritePermission()
+		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		val dto = recipientsService.updateRecipient(
 			recipientId,
@@ -64,7 +64,7 @@ class RecipientsController(
 	}
 
 	override fun deleteRecipient(recipientId: String): ResponseEntity<Unit> {
-		securityContextHolder.verifyWritePermission()
+		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		recipientsService.deleteRecipient(recipientId)
 		logger.info("User $userId deleted recipient $recipientId")
