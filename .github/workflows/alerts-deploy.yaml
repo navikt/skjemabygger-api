@@ -25,15 +25,15 @@ jobs:
           RESOURCE: .nais/alerts/alerts.yaml
           VARS: .nais/alerts/vars-preprod.yaml
 
-#  prod-deploy:
-#    name: Deploy alerts to prod
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-#      - name: Deploy to prod
-#        uses: nais/deploy/actions/deploy@v2
-#        env:
-#          CLUSTER: prod-gcp
-#          RESOURCE: .nais/alerts/alerts.yaml
-#          VARS: .nais/alerts/vars-prod.yaml
+  prod-deploy:
+    name: Deploy alerts to prod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to prod
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: prod-gcp
+          RESOURCE: .nais/alerts/alerts.yaml
+          VARS: .nais/alerts/vars-prod.yaml
