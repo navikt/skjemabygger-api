@@ -19,7 +19,7 @@ data class GlobalTranslationRevisionEntity(
 	) val createdAt: LocalDateTime,
 	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false, cascade = [CascadeType.ALL])
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "global_translation_id", nullable = false)
 	val globalTranslation: GlobalTranslationEntity,
 ) {

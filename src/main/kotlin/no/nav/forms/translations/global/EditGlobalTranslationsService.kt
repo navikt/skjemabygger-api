@@ -65,9 +65,8 @@ class EditGlobalTranslationsService(
 			)
 		)
 		val updatedRevisions = globalTranslation.revisions?.plus(revisionEntity) ?: listOf(revisionEntity)
-		return globalTranslation.copy(
-			revisions = updatedRevisions
-		).toDto()
+		val updatedGlobalTranslation = globalTranslation.copy(revisions = updatedRevisions)
+		return globalTranslationRepository.save(updatedGlobalTranslation).toDto()
 	}
 
 }
