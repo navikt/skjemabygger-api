@@ -1,0 +1,62 @@
+get:
+  summary: Henter nyeste globale oversettelser
+  description: Henter
+  operationId: getLatestRevisions
+  security: []
+  responses:
+    '200':
+      description: Henter globale oversettelser som kan endres
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/GlobalTranslation"
+    '500':
+      description: En feil oppstod
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-global-translations
+
+post:
+  summary: Oppretter en ny global oversettelse
+  description: Oppretter
+  operationId: createGlobalTranslation
+  security:
+  - bearerAuth: []
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/NewGlobalTranslationRequest"
+   required: true
+  responses:
+    201:
+      description: Den nye globale oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/GlobalTranslation"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Oversettelsen eksisterer allerede
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-global-translations

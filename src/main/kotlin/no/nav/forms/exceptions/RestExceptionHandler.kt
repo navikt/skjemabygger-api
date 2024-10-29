@@ -8,6 +8,7 @@ import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnaut
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -46,6 +47,13 @@ class RestExceptionHandler {
 	@ExceptionHandler
 	fun handlJwtTokenInvalidClaimException(exception: JwtTokenInvalidClaimException): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.FORBIDDEN
+		logger.info(exception.message ?: status.reasonPhrase, exception)
+		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))
+	}
+
+	@ExceptionHandler
+	fun handleDataIntegrityViolationException(exception: DataIntegrityViolationException): ResponseEntity<ErrorResponseDto> {
+		val status = HttpStatus.CONFLICT
 		logger.info(exception.message ?: status.reasonPhrase, exception)
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))
 	}

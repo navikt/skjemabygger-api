@@ -14,6 +14,8 @@ tags:
     description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
   - name: health
     description: Endepunkter for helsesjekk av applikasjonen.
+  - name: edit-global-translations
+    description: Vedlikehold av globale oversettelser
 
 paths:
   /v1/recipients:
@@ -182,6 +184,12 @@ paths:
 
   /internal/health/isReady:
     $ref: "./health/is_ready.yaml"
+
+  /v1/global-translations:
+    $ref: "./global-translations/global_translations.yaml"
+
+  /v1/global-translations/{key}/revision/{revision}:
+    $ref: "./global-translations/global_translation.yaml"
 
 components:
   securitySchemes:

@@ -25,7 +25,7 @@ abstract class ApplicationTest {
 	@Autowired
 	private lateinit var flyway: Flyway
 
-	val baseUrl = "http://localhost:8082"
+	final val baseUrl = "http://localhost:8082"
 
 	@BeforeEach
 	fun setup() {

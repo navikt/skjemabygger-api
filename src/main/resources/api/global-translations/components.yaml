@@ -1,0 +1,78 @@
+components:
+  schemas:
+    GlobalTranslation:
+      type: object
+      description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
+      required:
+      - id
+      - key
+      - tag
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifikasjon av
+          example: 100
+        revision:
+          type: integer
+          format: int64
+          description: Revisjonsidentifikator
+          example: 147
+        key:
+          type: string
+          description: Unik key som identifiserer den globale oversettelsen
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+        en:
+          type: string
+          description: Oversettelse på engelsk
+        tag:
+          type: string
+          description: Hvilken type global oversettelse dette er
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsen sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          type: string
+          description: Oversettelse på engelsk
+    NewGlobalTranslationRequest:
+      type: object
+      description: En ny global oversettelse
+      required:
+      - key
+      - tag
+      properties:
+        key:
+          type: string
+          description: Key
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+        en:
+          type: string
+          description: Oversettelse på engelsk
+        tag:
+          type: string
+          description: Hvilken type global oversettelse dette er
+    UpdateGlobalTranslationRequest:
+      type: object
+      description: En ny global oversettelse
+      properties:
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+        en:
+          type: string
+          description: Oversettelse på engelsk
