@@ -1,5 +1,6 @@
 package no.nav.forms.translations.global
 
+import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.GlobalTranslation
@@ -14,7 +15,8 @@ import java.time.LocalDateTime
 @Service
 class EditGlobalTranslationsService(
 	val globalTranslationRevisionRepository: GlobalTranslationRevisionRepository,
-	val globalTranslationRepository: GlobalTranslationRepository
+	val globalTranslationRepository: GlobalTranslationRepository,
+	val entityManager: EntityManager,
 ) {
 
 	@Transactional
@@ -31,7 +33,7 @@ class EditGlobalTranslationsService(
 				tag = tag,
 			)
 		)
-		val revisionEntity = globalTranslationRevisionRepository.save(
+		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
 				nb = nb,
 				nn = nn,
@@ -42,9 +44,9 @@ class EditGlobalTranslationsService(
 				revision = 1,
 			)
 		)
-		return globalTranslation.copy(
-			revisions = listOf(revisionEntity)
-		).toDto()
+		entityManager.flush()
+		entityManager.refresh(globalTranslation)
+		return globalTranslation.toDto()
 	}
 
 	@Transactional
@@ -53,7 +55,7 @@ class EditGlobalTranslationsService(
 			?: throw ResourceNotFoundException("Global translation not found", key)
 
 		val latestRevision = globalTranslation.revisions?.lastOrNull()
-		val revisionEntity = globalTranslationRevisionRepository.save(
+		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
 				nb = nb,
 				nn = nn,
@@ -64,9 +66,8 @@ class EditGlobalTranslationsService(
 				revision = revision + 1,
 			)
 		)
-		val updatedRevisions = globalTranslation.revisions?.plus(revisionEntity) ?: listOf(revisionEntity)
-		val updatedGlobalTranslation = globalTranslation.copy(revisions = updatedRevisions)
-		return globalTranslationRepository.save(updatedGlobalTranslation).toDto()
+		entityManager.refresh(globalTranslation)
+		return globalTranslation.toDto()
 	}
 
 }
