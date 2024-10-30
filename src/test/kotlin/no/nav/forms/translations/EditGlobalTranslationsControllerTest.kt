@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatusCode
 
 class EditGlobalTranslationsControllerTest : ApplicationTest() {
 
-	val globalTranslationBaseUrl = "$baseUrl/v1/global-translations"
-
 	@Test
 	fun testPostGlobalTranslation() {
 		val authToken = mockOAuth2Server.createMockToken()
