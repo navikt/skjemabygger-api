@@ -43,7 +43,7 @@ components:
           example: 2021-12-03T14:10:00Z
         changedBy:
           type: string
-          description: Oversettelse på engelsk
+          description: Hvem endret denne oversettelsen sist
     NewGlobalTranslationRequest:
       type: object
       description: En ny global oversettelse
