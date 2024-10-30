@@ -11,15 +11,14 @@ put:
       required: true
       schema:
         type: string
-    - name: revision
-      in: path
-      description: Revision som skal endres
+    - name: Formsapi-Entity-Revision
+      in: header
+      description: Hvilken revisjon som skal endres
       required: true
       schema:
         type: integer
         format: int64
-        description: Revisjonsidentifikator
-        example: 147
+        example: 3
   requestBody:
    content:
      application/json:
@@ -46,7 +45,7 @@ put:
           schema:
             $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
     409:
-      description: Oversettelsen som er forsøkt oppdatert har allerede blitt endret
+      description: Oversettelsen som blir forsøkt oppdatert har allerede blitt endret
       content:
         application/json:
           schema:

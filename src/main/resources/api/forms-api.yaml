@@ -188,7 +188,7 @@ paths:
   /v1/global-translations:
     $ref: "./global-translations/global_translations.yaml"
 
-  /v1/global-translations/{key}/revision/{revision}:
+  /v1/global-translations/{key}:
     $ref: "./global-translations/global_translation.yaml"
 
 components:

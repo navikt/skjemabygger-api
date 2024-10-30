@@ -39,14 +39,14 @@ class EditGlobalTranslationsController(
 
 	override fun updateGlobalTranslation(
 		key: String,
-		revision: Long,
+		formsapiEntityRevision: Long,
 		updateGlobalTranslationRequest: UpdateGlobalTranslationRequest
 	): ResponseEntity<GlobalTranslation> {
 		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		val dto = editGlobalTranslationsService.updateGlobalTranslation(
 			key,
-			revision,
+			formsapiEntityRevision,
 			updateGlobalTranslationRequest.nb,
 			updateGlobalTranslationRequest.nn,
 			updateGlobalTranslationRequest.en,

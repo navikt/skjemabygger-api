@@ -218,18 +218,20 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		authToken: String,
 		expectFailure: Boolean = false
 	): ResponseEntity<out Any> {
+		val headers = mapOf("Formsapi-Entity-Revision" to revision.toString())
 		val response = restTemplate.exchange(
-			"$globalTranslationBaseUrl/$key/revision/${revision}",
+			"$globalTranslationBaseUrl/$key",
 			HttpMethod.PUT,
-			HttpEntity(request, httpHeaders(authToken)),
+			HttpEntity(request, httpHeaders(authToken, headers)),
 			if (expectFailure) ErrorResponseDto::class.java else GlobalTranslation::class.java
 		)
 		return response
 	}
 
-	private fun httpHeaders(token: String): MultiValueMap<String, String> {
+	private fun httpHeaders(token: String, additionalHeaders: Map<String, String> = emptyMap()): MultiValueMap<String, String> {
 		val headers = HttpHeaders()
 		headers.add("Authorization", "Bearer $token")
+		additionalHeaders.forEach { headers.add(it.key, it.value) }
 		return headers
 	}
 
