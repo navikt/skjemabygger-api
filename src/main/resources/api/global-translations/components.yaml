@@ -1,5 +1,14 @@
 components:
   schemas:
+    GlobalTranslationId:
+      type: integer
+      format: int64
+      description: Identifikasjon av en global oversettelse
+      example: 165
+    GlobalTranslationRevision:
+      type: integer
+      description: Revisjonsidentifikator. Hver endring av en global oversettelse gir en ny revisjon.
+      example: 3
     GlobalTranslation:
       type: object
       description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
@@ -9,15 +18,9 @@ components:
       - tag
       properties:
         id:
-          type: integer
-          format: int64
-          description: Identifikasjon av
-          example: 100
+          $ref: "#/components/schemas/GlobalTranslationId"
         revision:
-          type: integer
-          format: int64
-          description: Revisjonsidentifikator
-          example: 147
+          $ref: "#/components/schemas/GlobalTranslationRevision"
         key:
           type: string
           description: Unik key som identifiserer den globale oversettelsen

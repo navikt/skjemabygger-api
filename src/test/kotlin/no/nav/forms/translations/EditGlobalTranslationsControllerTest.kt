@@ -79,7 +79,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			nn = "Fornamn",
 			en = "Surname"
 		)
-		val putResponse = sendUpdateGlobalTranslationRequest(key, translationBody.revision!!, putRequest, adminToken)
+		val putResponse = sendUpdateGlobalTranslationRequest(translationBody.id, translationBody.revision!!, putRequest, adminToken)
 		val updatedTranslation = putResponse.body!! as GlobalTranslation
 		assertTrue(putResponse.statusCode.is2xxSuccessful)
 		assertEquals(2, updatedTranslation.revision)
@@ -104,7 +104,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals(1, revision1)
 
 		val firstPutResponse = sendUpdateGlobalTranslationRequest(
-			key, revision1, UpdateGlobalTranslationRequest(
+			translationBody.id, revision1, UpdateGlobalTranslationRequest(
 				nb = "Fornavn",
 				nn = "Fornamn",
 				en = "Surname"
@@ -115,7 +115,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals(2, updatedTranslation.revision)
 
 		val secondUpdateResponse = sendUpdateGlobalTranslationRequest(
-			key, revision1, UpdateGlobalTranslationRequest(
+			translationBody.id, revision1, UpdateGlobalTranslationRequest(
 				nb = "Fornavn",
 				nn = "Feil oversettelse",
 				en = "Wrong translation"
@@ -156,7 +156,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertTrue(createEtternavnResponse.statusCode.is2xxSuccessful)
 
 		val updateFornavnResponse = sendUpdateGlobalTranslationRequest(
-			createFornavnResponse.body?.key!!,
+			createFornavnResponse.body?.id!!,
 			createFornavnResponse.body?.revision!!,
 			UpdateGlobalTranslationRequest(
 				nb = "Fornavn",
@@ -167,7 +167,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertTrue(updateFornavnResponse.statusCode.is2xxSuccessful)
 
 		val updateEtternavnResponse = sendUpdateGlobalTranslationRequest(
-			createEtternavnResponse.body?.key!!,
+			createEtternavnResponse.body?.id!!,
 			createEtternavnResponse.body?.revision!!,
 			UpdateGlobalTranslationRequest(
 				nb = "Etternavn",
@@ -212,15 +212,15 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 	}
 
 	private fun sendUpdateGlobalTranslationRequest(
-		key: String,
-		revision: Long,
+		id: Long,
+		revision: Int,
 		request: UpdateGlobalTranslationRequest,
 		authToken: String,
 		expectFailure: Boolean = false
 	): ResponseEntity<out Any> {
 		val headers = mapOf("Formsapi-Entity-Revision" to revision.toString())
 		val response = restTemplate.exchange(
-			"$globalTranslationBaseUrl/$key",
+			"$globalTranslationBaseUrl/$id",
 			HttpMethod.PUT,
 			HttpEntity(request, httpHeaders(authToken, headers)),
 			if (expectFailure) ErrorResponseDto::class.java else GlobalTranslation::class.java

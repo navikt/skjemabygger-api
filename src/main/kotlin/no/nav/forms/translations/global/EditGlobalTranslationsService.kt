@@ -11,6 +11,7 @@ import no.nav.forms.translations.global.repository.entity.GlobalTranslationRevis
 import no.nav.forms.translations.global.utils.toDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class EditGlobalTranslationsService(
@@ -50,9 +51,9 @@ class EditGlobalTranslationsService(
 	}
 
 	@Transactional
-	fun updateGlobalTranslation(key: String, revision: Long, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
-		val globalTranslation = globalTranslationRepository.findByKey(key)
-			?: throw ResourceNotFoundException("Global translation not found", key)
+	fun updateGlobalTranslation(id: Long, revision: Int, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
+		val globalTranslation = globalTranslationRepository.findById(id)
+			.getOrElse { throw ResourceNotFoundException("Global translation not found", id.toString()) }
 
 		val latestRevision = globalTranslation.revisions?.lastOrNull()
 		globalTranslationRevisionRepository.save(

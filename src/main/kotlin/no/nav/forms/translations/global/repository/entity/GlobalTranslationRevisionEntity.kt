@@ -11,7 +11,7 @@ data class GlobalTranslationRevisionEntity(
 	@Column(name = "nb", columnDefinition = "varchar") val nb: String? = null,
 	@Column(name = "nn", columnDefinition = "varchar") val nn: String? = null,
 	@Column(name = "en", columnDefinition = "varchar") val en: String? = null,
-	@Column(name = "revision", columnDefinition = "int") val revision: Long,
+	@Column(name = "revision", columnDefinition = "int") val revision: Int,
 	@Column(
 		name = "created_at",
 		columnDefinition = "TIMESTAMP WITH TIME ZONE",

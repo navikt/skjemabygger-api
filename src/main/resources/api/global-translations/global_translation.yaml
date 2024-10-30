@@ -5,20 +5,18 @@ put:
   security:
   - bearerAuth: []
   parameters:
-    - name: key
+    - name: id
       in: path
-      description: Den globale oversettelsens key
+      description: Den globale oversettelsens id
       required: true
       schema:
-        type: string
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationId"
     - name: Formsapi-Entity-Revision
       in: header
       description: Hvilken revisjon som skal endres
       required: true
       schema:
-        type: integer
-        format: int64
-        example: 3
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationRevision"
   requestBody:
    content:
      application/json:
