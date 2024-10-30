@@ -54,8 +54,9 @@ class EditGlobalTranslationsService(
 	fun updateGlobalTranslation(id: Long, revision: Int, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
 		val globalTranslation = globalTranslationRepository.findById(id)
 			.getOrElse { throw ResourceNotFoundException("Global translation not found", id.toString()) }
-
-		val latestRevision = globalTranslation.revisions?.lastOrNull()
+		if (globalTranslation.revisions?.none { it.revision == revision } == true) {
+			throw IllegalArgumentException("Invalid revision: $revision")
+		}
 		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
 				nb = nb,

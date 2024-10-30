@@ -59,6 +59,13 @@ class RestExceptionHandler {
 	}
 
 	@ExceptionHandler
+	fun handleIllegalArgumentException(exception: IllegalArgumentException): ResponseEntity<ErrorResponseDto> {
+		val status = HttpStatus.BAD_REQUEST
+		logger.info(exception.message ?: status.reasonPhrase, exception)
+		return ResponseEntity.status(status).body(ErrorResponseDto(exception.message ?: status.reasonPhrase, getCorrelationId()))
+	}
+
+	@ExceptionHandler
 	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val responseErrorMessage = "Something went wrong"
 		logger.error("$responseErrorMessage: ${exception.message}", exception)

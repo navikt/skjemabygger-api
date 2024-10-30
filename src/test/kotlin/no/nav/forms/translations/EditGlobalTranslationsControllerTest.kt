@@ -54,10 +54,9 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 	@Test
 	fun testChangeOfGlobalTranslation() {
 		val adminToken = mockOAuth2Server.createMockToken()
-		val key = "Fornavn"
 
 		val createRequest = NewGlobalTranslationRequest(
-			key = key,
+			key = "Fornavn",
 			tag = "skjematekster",
 			nb = "Fornavn",
 			nn = "Fornamn"
@@ -84,10 +83,9 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 	@Test
 	fun testConflictWhenUpdatingGlobalTranslationOnSameRevision() {
 		val adminToken = mockOAuth2Server.createMockToken()
-		val key = "Fornavn"
 
 		val createRequest = NewGlobalTranslationRequest(
-			key = key,
+			key = "Fornavn",
 			tag = "skjematekster",
 			nb = "Fornavn",
 			nn = "Fornamn"
@@ -128,6 +126,41 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		val body = latestRevisionsResponse.body
 		assertEquals("Fornamn", body[0].nn)
 		assertEquals("Surname", body[0].en)
+	}
+
+	@Test
+	fun testUpdatingGlobalTranslationOnErroneousRevision() {
+		val adminToken = mockOAuth2Server.createMockToken()
+
+		val postResponse = testFormsApi.createGlobalTranslation(
+			NewGlobalTranslationRequest(
+				key = "Ja",
+				tag = "skjematekster",
+				nb = "Ja",
+			),
+			adminToken
+		)
+		assertTrue(postResponse.statusCode.is2xxSuccessful)
+		postResponse.body as GlobalTranslation
+		assertEquals(1, postResponse.body.revision)
+
+		val firstPutResponse = testFormsApi.putGlobalTranslation(
+			postResponse.body.id, 2,
+			UpdateGlobalTranslationRequest(
+				nb = "Ja",
+				en = "Yes"
+			),
+			adminToken
+		)
+		assertTrue(firstPutResponse.statusCode.is4xxClientError)
+		firstPutResponse.body as ErrorResponseDto
+		assertEquals("Invalid revision: 2", firstPutResponse.body.errorMessage)
+
+		val globalTranslationsResponse = testFormsApi.getGlobalTranslations()
+		assertTrue(globalTranslationsResponse.statusCode.is2xxSuccessful)
+		assertEquals(1, globalTranslationsResponse.body.size)
+		assertEquals("Ja", globalTranslationsResponse.body[0].nb)
+		assertNull(globalTranslationsResponse.body[0].en)
 	}
 
 	@Test
