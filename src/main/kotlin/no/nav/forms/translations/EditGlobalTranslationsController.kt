@@ -27,12 +27,14 @@ class EditGlobalTranslationsController(
 
 	override fun createGlobalTranslation(newGlobalTranslationRequest: NewGlobalTranslationRequest): ResponseEntity<GlobalTranslation> {
 		securityContextHolder.requireAdminUser()
+		val userId = securityContextHolder.getUserName()
 		val dto = editGlobalTranslationsService.createGlobalTranslation(
 			newGlobalTranslationRequest.key,
 			newGlobalTranslationRequest.tag,
 			newGlobalTranslationRequest.nb,
 			newGlobalTranslationRequest.nn,
-			newGlobalTranslationRequest.en
+			newGlobalTranslationRequest.en,
+			userId
 		)
 		return ResponseEntity.status(HttpStatus.CREATED).body(dto)
 	}

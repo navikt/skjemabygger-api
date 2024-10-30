@@ -27,7 +27,7 @@ class EditGlobalTranslationsService(
 	}
 
 	@Transactional
-	fun createGlobalTranslation(key: String, tag: String, nb: String?, nn: String?, en: String?): GlobalTranslation {
+	fun createGlobalTranslation(key: String, tag: String, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
 		val globalTranslation = globalTranslationRepository.save(
 			GlobalTranslationEntity(
 				key = key,
@@ -40,7 +40,7 @@ class EditGlobalTranslationsService(
 				nn = nn,
 				en = en,
 				createdAt = LocalDateTime.now(),
-				createdBy = "test",
+				createdBy = userId,
 				globalTranslation = globalTranslation,
 				revision = 1,
 			)
