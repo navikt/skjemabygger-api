@@ -48,10 +48,13 @@ CREATE TABLE published_global_translation_revision
 
 
 -- Trigger: Only allow inserts into form_translation? And allow DELETE if not published?
+-- form_path is temporary until we also migrate the forms to separate tables and replace form_path with a foreign key
 CREATE TABLE form_translation
 (
-	id  BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	key VARCHAR(1024) NOT NULL
+	id        BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_path VARCHAR(32),
+	key       VARCHAR(1024) NOT NULL,
+	UNIQUE (form_path, key)
 );
 
 -- Trigger: Only allow inserts into form_translation_revision? And possibly DELETE if not published?
@@ -60,12 +63,14 @@ CREATE TABLE form_translation_revision
 (
 	id                    BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	form_translation_id   BIGINT                   NOT NULL,
+	revision              INT                      NOT NULL,
 	global_translation_id BIGINT,
 	nb                    VARCHAR(1024),
 	nn                    VARCHAR(1024),
 	en                    VARCHAR(1024),
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
 	created_by            VARCHAR(128)             NOT NULL,
+	UNIQUE (form_translation_id, revision),
 	CONSTRAINT fk_form_translation
 		FOREIGN KEY (form_translation_id)
 			REFERENCES form_translation (id),

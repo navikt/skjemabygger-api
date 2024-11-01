@@ -1,0 +1,71 @@
+get:
+  summary: Henter oversettelser knyttet til gitt skjema
+  operationId: getFormTranslations
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjema-path
+      required: true
+      example: nav121415
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+  responses:
+    '200':
+      description: Henter oversettelser som kan endres
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/FormTranslationDto"
+    '500':
+      description: En feil oppstod
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-form-translations
+
+post:
+  summary: Oppretter en ny oversettelse knyttet til et gitt skjema
+  operationId: createFormTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjema-path
+      required: true
+      example: nav121415
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/NewFormTranslationRequestDto"
+   required: true
+  responses:
+    201:
+      description: Den nye globale oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormTranslationDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Oversettelsen eksisterer allerede
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-form-translations

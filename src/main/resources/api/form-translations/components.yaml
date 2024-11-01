@@ -1,29 +1,34 @@
 components:
   schemas:
-    GlobalTranslationId:
+    FormPath:
+      type: string
+      description: Skjemaets path basert på skjemanummer
+      example: nav123456
+    FormTranslationId:
       type: integer
       format: int64
-      description: Identifikasjon av en global oversettelse
+      description: Identifikasjon av en oversettelse
       example: 165
-    GlobalTranslationRevision:
+    FormTranslationRevision:
       type: integer
-      description: Revisjonsidentifikator. Hver endring av en global oversettelse gir en ny revisjon.
+      description: Revisjonsidentifikator. Hver endring av en oversettelse gir en ny revisjon.
       example: 3
-    GlobalTranslation:
+    FormTranslationDto:
       type: object
       description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
       required:
       - id
       - key
-      - tag
       properties:
         id:
-          $ref: "#/components/schemas/GlobalTranslationId"
+          $ref: "#/components/schemas/FormTranslationId"
         revision:
-          $ref: "#/components/schemas/GlobalTranslationRevision"
+          $ref: "#/components/schemas/FormTranslationRevision"
         key:
           type: string
-          description: Unik key som identifiserer den globale oversettelsen
+          description: Unik key som identifiserer oversettelsen
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
         nb:
           type: string
           description: Oversettelse på bokmål
@@ -33,9 +38,6 @@ components:
         en:
           type: string
           description: Oversettelse på engelsk
-        tag:
-          type: string
-          description: Hvilken type global oversettelse dette er
         changedAt:
           type: string
           format: date-time
@@ -44,16 +46,17 @@ components:
         changedBy:
           type: string
           description: Hvem endret denne oversettelsen sist
-    NewGlobalTranslationRequest:
+    NewFormTranslationRequestDto:
       type: object
-      description: En ny global oversettelse
+      description: Ny skjemaoversettelse
       required:
       - key
-      - tag
       properties:
         key:
           type: string
-          description: Key
+          description: Unik key som identifiserer oversettelsen
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
         nb:
           type: string
           description: Oversettelse på bokmål
@@ -63,13 +66,12 @@ components:
         en:
           type: string
           description: Oversettelse på engelsk
-        tag:
-          type: string
-          description: Hvilken type global oversettelse dette er
-    UpdateGlobalTranslationRequest:
+    UpdateFormTranslationRequest:
       type: object
-      description: Oppdaterte verdier for en global oversettelse
+      description: Oppdaterte verdier for en skjemaoversettelse
       properties:
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
         nb:
           type: string
           description: Oversettelse på bokmål

@@ -1,10 +1,7 @@
 package no.nav.forms
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.nav.forms.model.ErrorResponseDto
-import no.nav.forms.model.GlobalTranslation
-import no.nav.forms.model.NewGlobalTranslationRequest
-import no.nav.forms.model.UpdateGlobalTranslationRequest
+import no.nav.forms.model.*
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
@@ -15,8 +12,10 @@ data class FormsApiResponse<T>(
 	val body: T,
 )
 
+private const val formsapiEntityRevisionHeaderName = "Formsapi-Entity-Revision"
+
 class TestFormsApi(
-	baseUrl: String,
+	private val baseUrl: String,
 	private val restTemplate: TestRestTemplate,
 	private val objectMapper: ObjectMapper,
 ) {
@@ -45,7 +44,7 @@ class TestFormsApi(
 		authToken: String? = null,
 		additionalHeaders: Map<String, String> = emptyMap()
 	): FormsApiResponse<Any> {
-		val headers = mapOf("Formsapi-Entity-Revision" to revision.toString())
+		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
 		val response = restTemplate.exchange(
 			"$globalTranslationBaseUrl/$id",
 			HttpMethod.PUT,
@@ -59,7 +58,7 @@ class TestFormsApi(
 	fun getGlobalTranslations(): FormsApiResponse<List<GlobalTranslation>> {
 		val responseType = object : ParameterizedTypeReference<List<GlobalTranslation>>() {}
 		val response = restTemplate.exchange(globalTranslationBaseUrl, HttpMethod.GET, null, responseType)
-			return FormsApiResponse(response.statusCode, response.body!!)
+		return FormsApiResponse(response.statusCode, response.body!!)
 	}
 
 	private fun readGlobalTranslationBody(response: ResponseEntity<String>): Any {
@@ -80,6 +79,53 @@ class TestFormsApi(
 		}
 		additionalHeaders?.forEach { headers.add(it.key, it.value) }
 		return headers
+	}
+
+	fun createFormTranslation(
+		formPath: String,
+		request: NewFormTranslationRequestDto,
+		authToken: String
+	): FormsApiResponse<Any> {
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/forms/$formPath/translations",
+			HttpMethod.POST,
+			HttpEntity(request, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body: Any = readFormTranslationBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun updateFormTranslation(
+		formPath: String,
+		formTranslationId: Long,
+		revision: Int,
+		request: UpdateFormTranslationRequest,
+		authToken: String,
+	): FormsApiResponse<Any> {
+		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/forms/$formPath/translations/$formTranslationId",
+			HttpMethod.PUT,
+			HttpEntity(request, httpHeaders(authToken, headers)),
+			String::class.java
+		)
+		val body: Any = readFormTranslationBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	private fun readFormTranslationBody(response: ResponseEntity<String>): Any {
+		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
+			response.body,
+			FormTranslationDto::class.java
+		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
+		return body
+	}
+
+	fun getFormTranslations(formPath: String): FormsApiResponse<Any> {
+		val responseType = object : ParameterizedTypeReference<List<FormTranslationDto>>() {}
+		val response = restTemplate.exchange("$baseUrl/v1/forms/$formPath/translations", HttpMethod.GET, null, responseType)
+		return FormsApiResponse(response.statusCode, response.body!!)
 	}
 
 }

@@ -191,6 +191,12 @@ paths:
   /v1/global-translations/{id}:
     $ref: "./global-translations/global_translation.yaml"
 
+  /v1/forms/{formPath}/translations:
+    $ref: "./form-translations/form-translations.yaml"
+
+  /v1/forms/{formPath}/translations/{id}:
+    $ref: "./form-translations/form-translation.yaml"
+
 components:
   securitySchemes:
     bearerAuth:

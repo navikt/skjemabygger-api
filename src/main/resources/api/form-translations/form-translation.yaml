@@ -1,0 +1,51 @@
+put:
+  summary: Oppdaterer en oversettelse knyttet til gitt skjema
+  operationId: updateFormTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjema-path
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+    - name: id
+      in: path
+      description: Oversettelsens id
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormTranslationId"
+    - name: Formsapi-Entity-Revision
+      in: header
+      description: Hvilken revisjon som skal endres
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormTranslationRevision"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "./components.yaml#/components/schemas/UpdateFormTranslationRequest"
+    required: true
+  responses:
+    '200':
+      description: Den oppdaterte oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormTranslationDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    '500':
+      description: En feil oppstod
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-form-translations
