@@ -65,12 +65,10 @@ class EditFormTranslationsService(
 				formPath,
 				latestRevision?.id!!
 			)
-		val copy = currentFormTranslationRevisionEntity.copy(
-			formTranslationRevisionId = newFormTranslationRevision.id!!
-		)
-		formRevisionTranslationRevisionRepository.delete(currentFormTranslationRevisionEntity)
 		formRevisionTranslationRevisionRepository.save(
-			copy
+			currentFormTranslationRevisionEntity.copy(
+				formTranslationRevisionId = newFormTranslationRevision.id!!
+			)
 		)
 		return newFormTranslationRevision.toDto()
 	}

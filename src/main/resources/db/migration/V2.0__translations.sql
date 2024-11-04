@@ -82,6 +82,7 @@ CREATE TABLE form_translation_revision
 -- form_path is temporary until we also migrate the forms to separate tables and replace form_path with a foreign key to table form_revision
 CREATE TABLE form_revision_translation_revision
 (
+	id                           BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	form_path                    VARCHAR(32),
 	form_translation_revision_id BIGINT,
 	UNIQUE (form_path, form_translation_revision_id),
