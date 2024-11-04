@@ -155,6 +155,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(createResponse1.statusCode.is2xxSuccessful)
+		createResponse1.body as FormTranslationDto
 
 		val createResponse2 = testFormsApi.createFormTranslation(
 			formPath,
@@ -175,6 +176,18 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(createResponse3.statusCode.is2xxSuccessful)
+
+		val putResponse1 = testFormsApi.updateFormTranslation(
+			formPath,
+			createResponse1.body.id,
+			createResponse1.body.revision!!,
+			UpdateFormTranslationRequest(
+				nb = createResponse1.body.nb,
+				nn = "Nynorskfoo"
+			),
+			authToken
+		)
+		assertTrue(putResponse1.statusCode.is2xxSuccessful)
 
 		val response = testFormsApi.getFormTranslations(formPath)
 		assertTrue(response.statusCode.is2xxSuccessful)

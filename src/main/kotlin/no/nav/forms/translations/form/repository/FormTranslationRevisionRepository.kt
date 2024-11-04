@@ -5,8 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface FormTranslationRevisionRepository: JpaRepository<FormTranslationRevisionEntity, Long> {
-
-	fun findAllByFormTranslationIdIn(formTranslationId: List<Long>): List<FormTranslationRevisionEntity>
-
-}
+interface FormTranslationRevisionRepository: JpaRepository<FormTranslationRevisionEntity, Long>

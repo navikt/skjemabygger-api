@@ -25,7 +25,7 @@ class EditFormTranslationsService(
 	fun getTranslations(formPath: String): List<FormTranslationDto> {
 		val currentFormTranslationRevisions = formRevisionTranslationRevisionRepository.findAllByFormPath(formPath)
 		val revisionIds = currentFormTranslationRevisions.map(FormRevisionTranslationRevisionEntity::formTranslationRevisionId)
-		val revisions = formTranslationRevisionRepository.findAllByFormTranslationIdIn(revisionIds)
+		val revisions = formTranslationRevisionRepository.findAllById(revisionIds)
 		return revisions.map(FormTranslationRevisionEntity::toDto)
 	}
 
@@ -65,10 +65,12 @@ class EditFormTranslationsService(
 				formPath,
 				latestRevision?.id!!
 			)
+		val copy = currentFormTranslationRevisionEntity.copy(
+			formTranslationRevisionId = newFormTranslationRevision.id!!
+		)
+		formRevisionTranslationRevisionRepository.delete(currentFormTranslationRevisionEntity)
 		formRevisionTranslationRevisionRepository.save(
-			currentFormTranslationRevisionEntity.copy(
-				formTranslationRevisionId = newFormTranslationRevision.id!!
-			)
+			copy
 		)
 		return newFormTranslationRevision.toDto()
 	}
