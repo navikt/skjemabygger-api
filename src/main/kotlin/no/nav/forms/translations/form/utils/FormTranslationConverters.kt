@@ -1,7 +1,6 @@
 package no.nav.forms.translations.form.utils
 
 import no.nav.forms.model.FormTranslationDto
-import no.nav.forms.translations.form.repository.entity.FormRevisionTranslationRevisionEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationRevisionEntity
 import no.nav.forms.utils.mapDateTime
@@ -32,5 +31,3 @@ fun FormTranslationRevisionEntity.toDto(): FormTranslationDto {
 		changedBy = this.createdBy,
 	)
 }
-
-fun FormRevisionTranslationRevisionEntity.toDto(): FormTranslationDto = this.revision.toDto()

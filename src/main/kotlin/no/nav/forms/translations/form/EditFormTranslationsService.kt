@@ -1,11 +1,12 @@
 package no.nav.forms.translations.form
 
-import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.FormTranslationDto
+import no.nav.forms.translations.form.repository.FormRevisionTranslationRevisionRepository
 import no.nav.forms.translations.form.repository.FormTranslationRepository
 import no.nav.forms.translations.form.repository.FormTranslationRevisionRepository
+import no.nav.forms.translations.form.repository.entity.FormRevisionTranslationRevisionEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationRevisionEntity
 import no.nav.forms.translations.form.utils.toDto
@@ -17,13 +18,15 @@ import kotlin.jvm.optionals.getOrElse
 class EditFormTranslationsService(
 	val formTranslationRepository: FormTranslationRepository,
 	val formTranslationRevisionRepository: FormTranslationRevisionRepository,
-	val entityManager: EntityManager,
+	val formRevisionTranslationRevisionRepository: FormRevisionTranslationRevisionRepository,
 ) {
 
 	@Transactional
 	fun getTranslations(formPath: String): List<FormTranslationDto> {
-		val formRevisionTranslations = formTranslationRepository.findAllByFormPath(formPath)
-		return formRevisionTranslations.map(FormTranslationEntity::toDto)
+		val currentFormTranslationRevisions = formRevisionTranslationRevisionRepository.findAllByFormPath(formPath)
+		val revisionIds = currentFormTranslationRevisions.map(FormRevisionTranslationRevisionEntity::formTranslationRevisionId)
+		val revisions = formTranslationRevisionRepository.findAllByFormTranslationIdIn(revisionIds)
+		return revisions.map(FormTranslationRevisionEntity::toDto)
 	}
 
 	@Transactional
@@ -45,7 +48,8 @@ class EditFormTranslationsService(
 		if (formTranslation.revisions?.any { it.revision == revision } == false) {
 			throw IllegalArgumentException("Invalid revision: $revision")
 		}
-		formTranslationRevisionRepository.save(
+		val latestRevision = formTranslation.revisions?.lastOrNull()
+		val newFormTranslationRevision = formTranslationRevisionRepository.save(
 			FormTranslationRevisionEntity(
 				formTranslation = formTranslation,
 				revision = revision + 1,
@@ -56,8 +60,17 @@ class EditFormTranslationsService(
 				createdBy = userId,
 			)
 		)
-		entityManager.refresh(formTranslation)
-		return formTranslation.toDto()
+		val currentFormTranslationRevisionEntity =
+			formRevisionTranslationRevisionRepository.findOneByFormPathAndFormTranslationRevisionId(
+				formPath,
+				latestRevision?.id!!
+			)
+		formRevisionTranslationRevisionRepository.save(
+			currentFormTranslationRevisionEntity.copy(
+				formTranslationRevisionId = newFormTranslationRevision.id!!
+			)
+		)
+		return newFormTranslationRevision.toDto()
 	}
 
 	@Transactional
@@ -76,7 +89,7 @@ class EditFormTranslationsService(
 				key = key,
 			)
 		)
-		formTranslationRevisionRepository.save(
+		val formTranslationRevision = formTranslationRevisionRepository.save(
 			FormTranslationRevisionEntity(
 				revision = 1,
 				formTranslation = formTranslation,
@@ -87,9 +100,13 @@ class EditFormTranslationsService(
 				createdBy = userId,
 			)
 		)
-		entityManager.flush()
-		entityManager.refresh(formTranslation)
-		return formTranslation.toDto()
+		formRevisionTranslationRevisionRepository.save(
+			FormRevisionTranslationRevisionEntity(
+				formPath = formPath,
+				formTranslationRevisionId = formTranslationRevision.id!!,
+			)
+		)
+		return formTranslationRevision.toDto()
 	}
 
 }

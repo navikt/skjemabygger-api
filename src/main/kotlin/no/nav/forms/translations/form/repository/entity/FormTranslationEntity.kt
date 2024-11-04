@@ -10,7 +10,7 @@ data class FormTranslationEntity(
 	@Column(name = "form_path", columnDefinition = "varchar") val formPath: String,
 	@Column(name = "key", columnDefinition = "varchar") val key: String,
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formTranslation", cascade = [CascadeType.ALL])
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formTranslation")
 	@OrderBy("created_at asc")
 	val revisions: List<FormTranslationRevisionEntity>? = emptyList(),
 ) {
