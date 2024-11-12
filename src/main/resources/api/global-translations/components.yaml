@@ -24,18 +24,23 @@ components:
         key:
           type: string
           description: Unik key som identifiserer den globale oversettelsen
+          example: Et lite rødt hus
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Et lite rødt hus
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
         en:
           type: string
           description: Oversettelse på engelsk
+          example: A small red house
         tag:
           type: string
           description: Hvilken type global oversettelse dette er
+          example: skjematekster
         changedAt:
           type: string
           format: date-time
@@ -44,6 +49,7 @@ components:
         changedBy:
           type: string
           description: Hvem endret denne oversettelsen sist
+          example: Nilsen, Nils
     NewGlobalTranslationRequest:
       type: object
       description: En ny global oversettelse
@@ -54,18 +60,23 @@ components:
         key:
           type: string
           description: Key
+          example: Et lite rødt hus
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Et lite rødt hus
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
         en:
           type: string
           description: Oversettelse på engelsk
+          example: A small red house
         tag:
           type: string
           description: Hvilken type global oversettelse dette er
+          example: skjematekster
     UpdateGlobalTranslationRequest:
       type: object
       description: Oppdaterte verdier for en global oversettelse
@@ -73,9 +84,12 @@ components:
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Et lite rødt hus
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
         en:
           type: string
           description: Oversettelse på engelsk
+          example: A small red house

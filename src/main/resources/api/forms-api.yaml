@@ -313,8 +313,6 @@ components:
       properties:
         errorMessage:
           type: string
+          example: Resource not found
         correlationId:
           $ref: "#/components/schemas/UUID"
-      example:
-        message: Resource not found
-        correlationId: 2f9b8d25-1056-4827-8ddd-cedab7fafacc

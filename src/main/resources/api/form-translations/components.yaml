@@ -27,17 +27,21 @@ components:
         key:
           type: string
           description: Unik key som identifiserer oversettelsen
+          example: Dette er min røde bil
         globalTranslationId:
           $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Dette er min røde bil
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Dette er min raude bil
         en:
           type: string
           description: Oversettelse på engelsk
+          example: This is my red car
         changedAt:
           type: string
           format: date-time
@@ -46,6 +50,7 @@ components:
         changedBy:
           type: string
           description: Hvem endret denne oversettelsen sist
+          example: Nilsen, Nils
     NewFormTranslationRequestDto:
       type: object
       description: Ny skjemaoversettelse
@@ -55,17 +60,21 @@ components:
         key:
           type: string
           description: Unik key som identifiserer oversettelsen
+          example: Dette er min røde bil
         globalTranslationId:
           $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Dette er min røde bil
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Dette er min raude bil
         en:
           type: string
           description: Oversettelse på engelsk
+          example: This is my red car
     UpdateFormTranslationRequest:
       type: object
       description: Oppdaterte verdier for en skjemaoversettelse
@@ -75,9 +84,12 @@ components:
         nb:
           type: string
           description: Oversettelse på bokmål
+          example: Dette er min røde bil
         nn:
           type: string
           description: Oversettelse på nynorsk
+          example: Dette er min raude bil
         en:
           type: string
           description: Oversettelse på engelsk
+          example: This is my red car
