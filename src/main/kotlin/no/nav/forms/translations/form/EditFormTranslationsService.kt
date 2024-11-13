@@ -26,7 +26,8 @@ class EditFormTranslationsService(
 	@Transactional
 	fun getTranslations(formPath: String): List<FormTranslationDto> {
 		val currentFormTranslationRevisions = formRevisionTranslationRevisionRepository.findAllByFormPath(formPath)
-		val revisionIds = currentFormTranslationRevisions.map(FormRevisionTranslationRevisionEntity::formTranslationRevisionId)
+		val revisionIds =
+			currentFormTranslationRevisions.map(FormRevisionTranslationRevisionEntity::formTranslationRevisionId)
 		val revisions = formTranslationRevisionRepository.findAllById(revisionIds)
 		return revisions.map(FormTranslationRevisionEntity::toDto)
 	}
@@ -42,6 +43,11 @@ class EditFormTranslationsService(
 		en: String?,
 		userId: String,
 	): FormTranslationDto {
+		val globalTranslation = if (globalTranslationId != null) {
+			globalTranslationRepository.findById(globalTranslationId)
+				.getOrElse { throw IllegalArgumentException("Global translation not found") }
+		} else null
+
 		val formTranslation = formTranslationRepository.findById(id)
 			.getOrElse { throw ResourceNotFoundException("Form translation not found", id.toString()) }
 		if (formTranslation.formPath != formPath) {
@@ -55,6 +61,7 @@ class EditFormTranslationsService(
 			FormTranslationRevisionEntity(
 				formTranslation = formTranslation,
 				revision = revision + 1,
+				globalTranslation = globalTranslation,
 				nb = nb,
 				nn = nn,
 				en = en,

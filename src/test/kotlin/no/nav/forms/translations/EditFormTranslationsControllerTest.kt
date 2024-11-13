@@ -249,4 +249,120 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertEquals("Global translation not found", createResponse.body.errorMessage)
 	}
 
+	@Test
+	fun failsOnCreateWhenBothGlobalTranslationIdAndTranslationExistInRequest() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
+			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
+			authToken
+		)
+		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
+		globalTranslationResponse.body as GlobalTranslation
+		assertNotNull(globalTranslationResponse.body.id)
+
+		val createResponse = testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(
+				key = "Ja",
+				globalTranslationId = globalTranslationResponse.body.id,
+				nb = "Ja",
+				nn = "Ja",
+				en = "Yes",
+			),
+			authToken
+		)
+		assertTrue(createResponse.statusCode.is4xxClientError)
+		createResponse.body as ErrorResponseDto
+
+		assertEquals(HttpStatus.BAD_REQUEST.value(), createResponse.statusCode.value())
+		assertEquals(
+			"Do not provide local translations when linked to global translation",
+			createResponse.body.errorMessage
+		)
+	}
+
+	@Test
+	fun failsOnUpdateWhenBothGlobalTranslationAndLocalTranslationsAreProvided() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(
+			key = "Ja",
+			nb = "Ja",
+			nn = "Ja",
+		)
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as FormTranslationDto
+
+		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
+			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
+			authToken
+		)
+		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
+		globalTranslationResponse.body as GlobalTranslation
+		assertNotNull(globalTranslationResponse.body.id)
+
+		val updateRequest = UpdateFormTranslationRequest(
+			globalTranslationId = globalTranslationResponse.body.id,
+			nb = createResponse.body.nb,
+			nn = "Jauda",
+			en = "Yes",
+		)
+		val updateResponse = testFormsApi.updateFormTranslation(
+			formPath,
+			createResponse.body.id,
+			createResponse.body.revision!!,
+			updateRequest,
+			authToken,
+		)
+		assertTrue(updateResponse.statusCode.is4xxClientError)
+		updateResponse.body as ErrorResponseDto
+
+		assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.statusCode.value())
+		assertEquals(
+			"Do not provide local translations when linked to global translation",
+			updateResponse.body.errorMessage
+		)
+	}
+
+	@Test
+	fun testUpdateFormTranslationAndLinkToGlobalTranslation() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei", nn = "Nei")
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as FormTranslationDto
+
+		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
+			NewGlobalTranslationRequest(key = "Ja", tag = "skjematekster", nb = "Ja", nn = "Ja", en = "Yes"),
+			authToken
+		)
+		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
+		globalTranslationResponse.body as GlobalTranslation
+		assertNotNull(globalTranslationResponse.body.id)
+
+		val updateRequest = UpdateFormTranslationRequest(
+			globalTranslationId = globalTranslationResponse.body.id,
+		)
+		val updateResponse = testFormsApi.updateFormTranslation(
+			formPath,
+			createResponse.body.id,
+			createResponse.body.revision!!,
+			updateRequest,
+			authToken,
+		)
+		assertTrue(updateResponse.statusCode.is2xxSuccessful)
+		updateResponse.body as FormTranslationDto
+
+		assertEquals(globalTranslationResponse.body.nb, updateResponse.body.nb)
+		assertEquals(globalTranslationResponse.body.nn, updateResponse.body.nn)
+		assertEquals(globalTranslationResponse.body.en, updateResponse.body.en)
+
+	}
+
 }
