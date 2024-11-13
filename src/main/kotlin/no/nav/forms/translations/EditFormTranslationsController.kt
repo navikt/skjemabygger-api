@@ -7,7 +7,6 @@ import no.nav.forms.model.NewFormTranslationRequestDto
 import no.nav.forms.model.UpdateFormTranslationRequest
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.translations.form.EditFormTranslationsService
-import no.nav.forms.translations.form.validator.validate
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.ResponseEntity
@@ -32,7 +31,6 @@ class EditFormTranslationsController(
 		updateFormTranslationRequest: UpdateFormTranslationRequest
 	): ResponseEntity<FormTranslationDto> {
 		securityContextHolder.requireValidUser()
-		updateFormTranslationRequest.validate()
 		val userId = securityContextHolder.getUserName()
 		val dto = editFormTranslationsService.updateTranslation(
 			formPath,
@@ -52,7 +50,6 @@ class EditFormTranslationsController(
 		newFormTranslationRequestDto: NewFormTranslationRequestDto
 	): ResponseEntity<FormTranslationDto> {
 		securityContextHolder.requireValidUser()
-		newFormTranslationRequestDto.validate()
 		val userId = securityContextHolder.getUserName()
 		val dto = editFormTranslationsService.createTranslation(
 			formPath,

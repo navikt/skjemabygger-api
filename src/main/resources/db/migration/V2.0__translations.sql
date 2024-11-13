@@ -90,3 +90,23 @@ CREATE TABLE form_revision_translation_revision
 		FOREIGN KEY (form_translation_revision_id)
 			REFERENCES form_translation_revision (id)
 );
+
+CREATE FUNCTION form_translation_revision_check_link_to_global()
+	RETURNS TRIGGER
+	LANGUAGE PLPGSQL
+AS $$
+BEGIN
+IF
+NEW.nb IS NOT NULL || NEW.nn IS NOT NULL || NEW.en IS NOT NULL THEN
+     RAISE EXCEPTION 'DB.FORMSAPI.001';
+END IF;
+RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trigger_form_translation_revision_check_insert
+	BEFORE INSERT
+	ON form_translation_revision
+	FOR EACH ROW
+	WHEN ( NEW.global_translation_id IS NOT NULL )
+	EXECUTE FUNCTION form_translation_revision_check_link_to_global();

@@ -1,6 +1,7 @@
 package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
+import no.nav.forms.exceptions.db.DbError
 import no.nav.forms.model.*
 import no.nav.forms.testutils.createMockToken
 import org.junit.jupiter.api.Assertions.*
@@ -276,9 +277,9 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertTrue(createResponse.statusCode.is4xxClientError)
 		createResponse.body as ErrorResponseDto
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), createResponse.statusCode.value())
+		assertEquals(DbError.FORMSAPI_001.httpStatus.value(), createResponse.statusCode.value())
 		assertEquals(
-			"Do not provide local translations when linked to global translation",
+			DbError.FORMSAPI_001.message,
 			createResponse.body.errorMessage
 		)
 	}
@@ -321,9 +322,9 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertTrue(updateResponse.statusCode.is4xxClientError)
 		updateResponse.body as ErrorResponseDto
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), updateResponse.statusCode.value())
+		assertEquals(DbError.FORMSAPI_001.httpStatus.value(), updateResponse.statusCode.value())
 		assertEquals(
-			"Do not provide local translations when linked to global translation",
+			DbError.FORMSAPI_001.message,
 			updateResponse.body.errorMessage
 		)
 	}
