@@ -20,13 +20,15 @@ fun FormTranslationEntity.toDto(): FormTranslationDto {
 }
 
 fun FormTranslationRevisionEntity.toDto(): FormTranslationDto {
+	val latestGlobalRevision = if (this.globalTranslation?.id != null) this.globalTranslation.revisions?.lastOrNull() else null
 	return FormTranslationDto(
 		id = this.formTranslation.id!!,
 		key = this.formTranslation.key,
 		revision = this.revision,
-		nb = this.nb,
-		nn = this.nn,
-		en = this.en,
+		globalTranslationId = this.globalTranslation?.id,
+		nb = if (latestGlobalRevision != null) latestGlobalRevision.nb else this.nb,
+		nn = if (latestGlobalRevision != null) latestGlobalRevision.nn else this.nn,
+		en = if (latestGlobalRevision != null) latestGlobalRevision.en else this.en,
 		changedAt = mapDateTime(this.createdAt),
 		changedBy = this.createdBy,
 	)

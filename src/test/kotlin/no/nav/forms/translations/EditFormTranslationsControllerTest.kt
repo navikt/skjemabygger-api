@@ -1,9 +1,7 @@
 package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
-import no.nav.forms.model.FormTranslationDto
-import no.nav.forms.model.NewFormTranslationRequestDto
-import no.nav.forms.model.UpdateFormTranslationRequest
+import no.nav.forms.model.*
 import no.nav.forms.testutils.createMockToken
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -194,6 +192,61 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		response.body as List<*>
 
 		assertEquals(3, response.body.size)
+	}
+
+	@Test
+	fun testCreateFormTranslationWithGlobalValue() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
+			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
+			authToken
+		)
+		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
+		globalTranslationResponse.body as GlobalTranslation
+		assertNotNull(globalTranslationResponse.body.id)
+
+		val createResponse1 = testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(
+				key = "Ja",
+				globalTranslationId = globalTranslationResponse.body.id,
+			),
+			authToken
+		)
+		assertTrue(createResponse1.statusCode.is2xxSuccessful)
+		createResponse1.body as FormTranslationDto
+
+		val response = testFormsApi.getFormTranslations(formPath)
+		assertTrue(response.statusCode.is2xxSuccessful)
+		response.body as List<*>
+		assertEquals(1, response.body.size)
+		val formTranslation = response.body.firstOrNull() as FormTranslationDto
+		assertEquals(globalTranslationResponse.body.id, formTranslation.globalTranslationId)
+		assertEquals(globalTranslationResponse.body.nb, formTranslation.nb)
+		assertEquals(globalTranslationResponse.body.nn, formTranslation.nn)
+		assertEquals(globalTranslationResponse.body.en, formTranslation.en)
+	}
+
+	@Test
+	fun failsOnCreateWhenGlobalTranslationDoesNotExist() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createResponse = testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(
+				key = "Ja",
+				globalTranslationId = 37,
+			),
+			authToken
+		)
+		assertTrue(createResponse.statusCode.is4xxClientError)
+		createResponse.body as ErrorResponseDto
+
+		assertEquals(HttpStatus.BAD_REQUEST.value(), createResponse.statusCode.value())
+		assertEquals("Global translation not found", createResponse.body.errorMessage)
 	}
 
 }

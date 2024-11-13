@@ -1,6 +1,7 @@
 package no.nav.forms.translations.form.repository.entity
 
 import jakarta.persistence.*
+import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
 
@@ -22,6 +23,10 @@ data class FormTranslationRevisionEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_translation_id", nullable = false)
 	val formTranslation: FormTranslationEntity,
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "global_translation_id", nullable = true)
+	val globalTranslation: GlobalTranslationEntity? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {

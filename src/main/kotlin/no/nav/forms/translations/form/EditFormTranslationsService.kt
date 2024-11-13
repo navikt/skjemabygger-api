@@ -10,6 +10,7 @@ import no.nav.forms.translations.form.repository.entity.FormRevisionTranslationR
 import no.nav.forms.translations.form.repository.entity.FormTranslationEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationRevisionEntity
 import no.nav.forms.translations.form.utils.toDto
+import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrElse
@@ -19,6 +20,7 @@ class EditFormTranslationsService(
 	val formTranslationRepository: FormTranslationRepository,
 	val formTranslationRevisionRepository: FormTranslationRevisionRepository,
 	val formRevisionTranslationRevisionRepository: FormRevisionTranslationRevisionRepository,
+	val globalTranslationRepository: GlobalTranslationRepository,
 ) {
 
 	@Transactional
@@ -83,6 +85,11 @@ class EditFormTranslationsService(
 		en: String?,
 		userId: String
 	): FormTranslationDto {
+		val globalTranslation = if (globalTranslationId != null) {
+			globalTranslationRepository.findById(globalTranslationId)
+				.getOrElse { throw IllegalArgumentException("Global translation not found") }
+		} else null
+
 		val formTranslation = formTranslationRepository.save(
 			FormTranslationEntity(
 				formPath = formPath,
@@ -93,6 +100,7 @@ class EditFormTranslationsService(
 			FormTranslationRevisionEntity(
 				revision = 1,
 				formTranslation = formTranslation,
+				globalTranslation = globalTranslation,
 				nb = nb,
 				nn = nn,
 				en = en,
