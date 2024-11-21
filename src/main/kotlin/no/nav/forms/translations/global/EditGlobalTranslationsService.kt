@@ -22,18 +22,35 @@ class EditGlobalTranslationsService(
 
 	@Transactional
 	fun getLatestRevisions(): List<GlobalTranslation> {
-		val all = globalTranslationRepository.findAll()
+		val all = globalTranslationRepository.findAllByDeletedAtIsNull()
 		return all.map(GlobalTranslationEntity::toDto)
 	}
 
 	@Transactional
-	fun createGlobalTranslation(key: String, tag: String, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
-		val globalTranslation = globalTranslationRepository.save(
+	fun createGlobalTranslation(
+		key: String,
+		tag: String,
+		nb: String?,
+		nn: String?,
+		en: String?,
+		userId: String
+	): GlobalTranslation {
+		val globalTranslation = globalTranslationRepository.findByKey(key) ?: globalTranslationRepository.save(
 			GlobalTranslationEntity(
 				key = key,
 				tag = tag,
 			)
 		)
+		if (globalTranslation.deletedAt != null) {
+			globalTranslationRepository.save(
+				globalTranslation.copy(
+					deletedAt = null,
+					deletedBy = null,
+					tag = tag,
+				)
+			)
+		}
+		val latestRevision = globalTranslation.revisions?.lastOrNull()
 		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
 				nb = nb,
@@ -42,7 +59,7 @@ class EditGlobalTranslationsService(
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
 				globalTranslation = globalTranslation,
-				revision = 1,
+				revision = (latestRevision?.revision?.plus(1)) ?: 1,
 			)
 		)
 		entityManager.flush()
@@ -51,9 +68,16 @@ class EditGlobalTranslationsService(
 	}
 
 	@Transactional
-	fun updateGlobalTranslation(id: Long, revision: Int, nb: String?, nn: String?, en: String?, userId: String): GlobalTranslation {
-		val globalTranslation = globalTranslationRepository.findById(id)
-			.getOrElse { throw ResourceNotFoundException("Global translation not found", id.toString()) }
+	fun updateGlobalTranslation(
+		id: Long,
+		revision: Int,
+		nb: String?,
+		nn: String?,
+		en: String?,
+		userId: String
+	): GlobalTranslation {
+		val globalTranslation = globalTranslationRepository.findByIdAndDeletedAtIsNull(id)
+			?: throw ResourceNotFoundException("Global translation not found", id.toString())
 		if (globalTranslation.revisions?.any { it.revision == revision } == false) {
 			throw IllegalArgumentException("Invalid revision: $revision")
 		}
@@ -70,6 +94,18 @@ class EditGlobalTranslationsService(
 		)
 		entityManager.refresh(globalTranslation)
 		return globalTranslation.toDto()
+	}
+
+	fun deleteGlobalTranslation(id: Long, userId: String) {
+		val globalTranslation = globalTranslationRepository.findById(id)
+			.getOrElse { throw ResourceNotFoundException("Global translation not found", id.toString()) }
+
+		globalTranslationRepository.save(
+			globalTranslation.copy(
+				deletedAt = LocalDateTime.now(),
+				deletedBy = userId,
+			)
+		)
 	}
 
 }

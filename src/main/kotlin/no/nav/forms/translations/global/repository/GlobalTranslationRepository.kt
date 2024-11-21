@@ -9,4 +9,8 @@ interface GlobalTranslationRepository : JpaRepository<GlobalTranslationEntity, L
 
 	fun findByKey(key: String): GlobalTranslationEntity?
 
+	fun findAllByDeletedAtIsNull(): List<GlobalTranslationEntity>
+
+	fun findByIdAndDeletedAtIsNull(id: Long): GlobalTranslationEntity?
+
 }

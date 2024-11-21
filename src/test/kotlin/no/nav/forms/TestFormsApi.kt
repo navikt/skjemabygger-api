@@ -9,7 +9,7 @@ import org.springframework.util.MultiValueMap
 
 data class FormsApiResponse<T>(
 	val statusCode: HttpStatusCode,
-	val body: T,
+	val body: T? = null,
 )
 
 private const val formsapiEntityRevisionHeaderName = "Formsapi-Entity-Revision"
@@ -52,6 +52,20 @@ class TestFormsApi(
 			String::class.java
 		)
 		val body: Any = readGlobalTranslationBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun deleteGlobalTranslation(
+		id: Long,
+		authToken: String? = null,
+	): FormsApiResponse<Any> {
+		val response = restTemplate.exchange(
+			"$globalTranslationBaseUrl/$id",
+			HttpMethod.DELETE,
+			HttpEntity(null, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body: Any? = if (!response.statusCode.is2xxSuccessful) readGlobalTranslationBody(response) else null
 		return FormsApiResponse(response.statusCode, body)
 	}
 

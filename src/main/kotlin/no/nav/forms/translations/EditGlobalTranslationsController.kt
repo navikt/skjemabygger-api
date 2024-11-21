@@ -57,4 +57,13 @@ class EditGlobalTranslationsController(
 		return ResponseEntity.ok(dto)
 	}
 
+	override fun deleteGlobalTranslation(id: Long): ResponseEntity<Unit> {
+		securityContextHolder.requireAdminUser()
+		val userId = securityContextHolder.getUserName()
+		editGlobalTranslationsService.deleteGlobalTranslation(
+			id,
+			userId,
+		)
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+	}
 }

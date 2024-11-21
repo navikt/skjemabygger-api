@@ -9,6 +9,7 @@ import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 
 
@@ -119,7 +120,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals("Conflict", errorResponseDto.errorMessage)
 
 		val latestRevisionsResponse = testFormsApi.getGlobalTranslations()
-		assertEquals(1, latestRevisionsResponse.body.size)
+		assertEquals(1, latestRevisionsResponse.body!!.size)
 
 		val body = latestRevisionsResponse.body
 		assertEquals("Fornamn", body[0].nn)
@@ -156,7 +157,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 
 		val globalTranslationsResponse = testFormsApi.getGlobalTranslations()
 		assertTrue(globalTranslationsResponse.statusCode.is2xxSuccessful)
-		assertEquals(1, globalTranslationsResponse.body.size)
+		assertEquals(1, globalTranslationsResponse.body!!.size)
 		assertEquals("Ja", globalTranslationsResponse.body[0].nb)
 		assertNull(globalTranslationsResponse.body[0].en)
 	}
@@ -208,7 +209,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertTrue(updateEtternavnResponse.statusCode.is2xxSuccessful)
 
 		val latestRevisionsResponse = testFormsApi.getGlobalTranslations()
-		assertEquals(2, latestRevisionsResponse.body.size)
+		assertEquals(2, latestRevisionsResponse.body!!.size)
 
 		val givenNameLatestRevision =
 			latestRevisionsResponse.body.firstOrNull { it.key == createFornavnResponse.body.key }
@@ -220,6 +221,128 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 
 		assertEquals("Given name", givenNameLatestRevision!!.en)
 		assertEquals("Surname", surnameLatestRevision!!.en)
+	}
+
+	@Test
+	fun testDeleteOk() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslation
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+
+		val getResponse = testFormsApi.getGlobalTranslations()
+		assertTrue(getResponse.statusCode.is2xxSuccessful)
+		val translation = getResponse.body!!.firstOrNull { it.key == createResponse.body.key }
+		assertNull(translation)
+		assertEquals(0, getResponse.body.size)
+	}
+
+	@Test
+	fun testDeleteFailsWhenNoToken() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val request = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(request, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslation
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id)
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteResponse.statusCode.value())
+	}
+
+	@Test
+	fun testDeleteFailsWhenNoAdminToken() {
+		val adminAuthToken = mockOAuth2Server.createMockToken()
+		val userAuthToken = mockOAuth2Server.createMockToken(groups = listOf(MOCK_USER_GROUP_ID))
+		val request = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(request, adminAuthToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslation
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, userAuthToken)
+		assertEquals(HttpStatus.FORBIDDEN.value(), deleteResponse.statusCode.value())
+	}
+
+	@Test
+	fun testUpdateOfDeletedTranslation() {
+		val adminToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+			nb = "Fornavn",
+			nn = "Fornamn"
+		)
+		val postResponse = testFormsApi.createGlobalTranslation(createRequest, adminToken)
+		assertTrue(postResponse.statusCode.is2xxSuccessful)
+		postResponse.body as GlobalTranslation
+
+		val translationBody = postResponse.body
+		assertEquals(1, translationBody.revision)
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(postResponse.body.id, adminToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+
+		val putRequest = UpdateGlobalTranslationRequest(
+			nb = "Fornavn",
+			nn = "Fornamn",
+			en = "Surname"
+		)
+		val putResponse =
+			testFormsApi.putGlobalTranslation(translationBody.id, translationBody.revision!!, putRequest, adminToken)
+		assertEquals(HttpStatus.NOT_FOUND.value(), putResponse.statusCode.value())
+	}
+
+	@Test
+	fun testRecreateAfterDelete() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+			en = "Given name"
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslation
+		assertEquals(1, createResponse.body.revision)
+		assertEquals(createRequest.tag, createResponse.body.tag)
+		assertEquals(createRequest.nb, createResponse.body.nb)
+		assertEquals(createRequest.nn, createResponse.body.nn)
+		assertEquals(createRequest.en, createResponse.body.en)
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+
+		val recreateRequest = createRequest.copy(nb = "Fornavn på bokmål", tag = "grensesnitt", en = null, nn = null)
+		val recreateResponse = testFormsApi.createGlobalTranslation(recreateRequest, authToken)
+		assertTrue(recreateResponse.statusCode.is2xxSuccessful)
+		recreateResponse.body as GlobalTranslation
+		assertEquals(2, recreateResponse.body.revision)
+		assertEquals(recreateRequest.tag, recreateResponse.body.tag)
+		assertEquals(recreateRequest.nb, recreateResponse.body.nb)
+		assertEquals(recreateRequest.nn, recreateResponse.body.nn)
+		assertEquals(recreateRequest.en, recreateResponse.body.en)
+
+		val getResponse = testFormsApi.getGlobalTranslations()
+		assertTrue(getResponse.statusCode.is2xxSuccessful)
+		val translation = getResponse.body!!.firstOrNull { it.key == createResponse.body.key }
+		assertNotNull(translation)
+		assertEquals(recreateRequest.nb, translation!!.nb)
+		assertEquals(recreateRequest.nn, translation.nn)
+		assertEquals(recreateRequest.en, translation.en)
+		assertEquals(recreateRequest.tag, translation.tag)
 	}
 
 }

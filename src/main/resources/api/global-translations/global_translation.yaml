@@ -50,3 +50,39 @@ put:
             $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-global-translations
+delete:
+  summary: Slette en global oversettelse
+  description: Den globale oversettelsen blir slettemerket
+  operationId: deleteGlobalTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Den globale oversettelsens id
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationId"
+  responses:
+    204:
+      description: Oversettelsen har blitt slettet
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    404:
+      description: Fant ikke oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-global-translations
