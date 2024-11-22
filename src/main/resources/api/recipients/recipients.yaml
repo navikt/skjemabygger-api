@@ -1,0 +1,48 @@
+get:
+  summary: Hent mottakere av papirsøknad
+  description: Henter alle mulige mottakere av søknader som sendes inn på papir i posten.
+  operationId: getRecipients
+  responses:
+    '200':
+      description: Alle mulige mottakere returneres
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/RecipientDto"
+  tags:
+    - recipients
+post:
+  summary: Opprett en ny mottaker
+  description: Oppretter en ny mottaker.
+  operationId: createRecipient
+  security:
+  - bearerAuth: []
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "./components.yaml#/components/schemas/NewRecipientRequest"
+    required: true
+  responses:
+    201:
+      description: Den nye mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/RecipientDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - recipients
