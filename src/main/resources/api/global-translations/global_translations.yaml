@@ -11,7 +11,7 @@ get:
           schema:
             type: array
             items:
-              $ref: "./components.yaml#/components/schemas/GlobalTranslation"
+              $ref: "./components.yaml#/components/schemas/GlobalTranslationDto"
     '500':
       description: En feil oppstod
       content:
@@ -39,7 +39,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: "./components.yaml#/components/schemas/GlobalTranslation"
+            $ref: "./components.yaml#/components/schemas/GlobalTranslationDto"
     401:
       description: Bruker er ikke autentisert
       content:

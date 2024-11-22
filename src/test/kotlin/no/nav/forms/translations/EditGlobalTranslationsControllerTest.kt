@@ -2,7 +2,7 @@ package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.ErrorResponseDto
-import no.nav.forms.model.GlobalTranslation
+import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.model.NewGlobalTranslationRequest
 import no.nav.forms.model.UpdateGlobalTranslationRequest
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
@@ -26,7 +26,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val response = testFormsApi.createGlobalTranslation(request, authToken)
 		assertTrue(response.statusCode.is2xxSuccessful)
-		response.body as GlobalTranslation
+		response.body as GlobalTranslationDto
 		assertEquals(request.key, response.body.key)
 		assertEquals(request.nb, response.body.nb)
 		assertEquals(request.nn, response.body.nn)
@@ -62,7 +62,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val postResponse = testFormsApi.createGlobalTranslation(createRequest, adminToken)
 		assertTrue(postResponse.statusCode.is2xxSuccessful)
-		postResponse.body as GlobalTranslation
+		postResponse.body as GlobalTranslationDto
 
 		val translationBody = postResponse.body
 		assertEquals(1, translationBody.revision)
@@ -75,7 +75,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		val putResponse =
 			testFormsApi.putGlobalTranslation(translationBody.id, translationBody.revision!!, putRequest, adminToken)
 		assertTrue(putResponse.statusCode.is2xxSuccessful)
-		val updatedTranslation = putResponse.body as GlobalTranslation
+		val updatedTranslation = putResponse.body as GlobalTranslationDto
 		assertEquals(2, updatedTranslation.revision)
 	}
 
@@ -91,7 +91,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val postResponse = testFormsApi.createGlobalTranslation(createRequest, adminToken)
 		assertTrue(postResponse.statusCode.is2xxSuccessful)
-		postResponse.body as GlobalTranslation
+		postResponse.body as GlobalTranslationDto
 
 		val translationBody = postResponse.body
 		val revision1 = translationBody.revision!!
@@ -105,7 +105,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			), adminToken
 		)
 		assertTrue(firstPutResponse.statusCode.is2xxSuccessful)
-		val updatedTranslation = firstPutResponse.body as GlobalTranslation
+		val updatedTranslation = firstPutResponse.body as GlobalTranslationDto
 		assertEquals(2, updatedTranslation.revision)
 
 		val secondUpdateResponse = testFormsApi.putGlobalTranslation(
@@ -140,7 +140,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			adminToken
 		)
 		assertTrue(postResponse.statusCode.is2xxSuccessful)
-		postResponse.body as GlobalTranslation
+		postResponse.body as GlobalTranslationDto
 		assertEquals(1, postResponse.body.revision)
 
 		val firstPutResponse = testFormsApi.putGlobalTranslation(
@@ -174,7 +174,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			), authToken
 		)
 		assertTrue(createFornavnResponse.statusCode.is2xxSuccessful)
-		createFornavnResponse.body as GlobalTranslation
+		createFornavnResponse.body as GlobalTranslationDto
 
 		val createEtternavnResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest(
@@ -184,7 +184,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			), authToken
 		)
 		assertTrue(createEtternavnResponse.statusCode.is2xxSuccessful)
-		createEtternavnResponse.body as GlobalTranslation
+		createEtternavnResponse.body as GlobalTranslationDto
 
 		val updateFornavnResponse = testFormsApi.putGlobalTranslation(
 			createFornavnResponse.body.id,
@@ -232,7 +232,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(createRequest, authToken)
 		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslation
+		createResponse.body as GlobalTranslationDto
 
 		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
 		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
@@ -253,7 +253,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(request, authToken)
 		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslation
+		createResponse.body as GlobalTranslationDto
 
 		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id)
 		assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteResponse.statusCode.value())
@@ -269,7 +269,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(request, adminAuthToken)
 		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslation
+		createResponse.body as GlobalTranslationDto
 
 		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, userAuthToken)
 		assertEquals(HttpStatus.FORBIDDEN.value(), deleteResponse.statusCode.value())
@@ -287,7 +287,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val postResponse = testFormsApi.createGlobalTranslation(createRequest, adminToken)
 		assertTrue(postResponse.statusCode.is2xxSuccessful)
-		postResponse.body as GlobalTranslation
+		postResponse.body as GlobalTranslationDto
 
 		val translationBody = postResponse.body
 		assertEquals(1, translationBody.revision)
@@ -315,7 +315,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(createRequest, authToken)
 		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslation
+		createResponse.body as GlobalTranslationDto
 		assertEquals(1, createResponse.body.revision)
 		assertEquals(createRequest.tag, createResponse.body.tag)
 		assertEquals(createRequest.nb, createResponse.body.nb)
@@ -328,7 +328,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		val recreateRequest = createRequest.copy(nb = "Fornavn på bokmål", tag = "grensesnitt", en = null, nn = null)
 		val recreateResponse = testFormsApi.createGlobalTranslation(recreateRequest, authToken)
 		assertTrue(recreateResponse.statusCode.is2xxSuccessful)
-		recreateResponse.body as GlobalTranslation
+		recreateResponse.body as GlobalTranslationDto
 		assertEquals(2, recreateResponse.body.revision)
 		assertEquals(recreateRequest.tag, recreateResponse.body.tag)
 		assertEquals(recreateRequest.nb, recreateResponse.body.nb)

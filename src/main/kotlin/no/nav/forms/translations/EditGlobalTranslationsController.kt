@@ -2,7 +2,7 @@ package no.nav.forms.translations
 
 import no.nav.forms.api.EditGlobalTranslationsApi
 import no.nav.forms.config.AzureAdConfig
-import no.nav.forms.model.GlobalTranslation
+import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.model.NewGlobalTranslationRequest
 import no.nav.forms.model.UpdateGlobalTranslationRequest
 import no.nav.forms.security.SecurityContextHolder
@@ -21,11 +21,11 @@ class EditGlobalTranslationsController(
 ) : EditGlobalTranslationsApi {
 
 	@Unprotected
-	override fun getLatestRevisions(): ResponseEntity<List<GlobalTranslation>> {
+	override fun getLatestRevisions(): ResponseEntity<List<GlobalTranslationDto>> {
 		return ResponseEntity.ok(editGlobalTranslationsService.getLatestRevisions())
 	}
 
-	override fun createGlobalTranslation(newGlobalTranslationRequest: NewGlobalTranslationRequest): ResponseEntity<GlobalTranslation> {
+	override fun createGlobalTranslation(newGlobalTranslationRequest: NewGlobalTranslationRequest): ResponseEntity<GlobalTranslationDto> {
 		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		val dto = editGlobalTranslationsService.createGlobalTranslation(
@@ -43,7 +43,7 @@ class EditGlobalTranslationsController(
 		id: Long,
 		formsapiEntityRevision: Int,
 		updateGlobalTranslationRequest: UpdateGlobalTranslationRequest
-	): ResponseEntity<GlobalTranslation> {
+	): ResponseEntity<GlobalTranslationDto> {
 		securityContextHolder.requireAdminUser()
 		val userId = securityContextHolder.getUserName()
 		val dto = editGlobalTranslationsService.updateGlobalTranslation(

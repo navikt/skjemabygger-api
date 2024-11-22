@@ -3,7 +3,7 @@ package no.nav.forms.translations.global
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.ResourceNotFoundException
-import no.nav.forms.model.GlobalTranslation
+import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRevisionRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
@@ -21,7 +21,7 @@ class EditGlobalTranslationsService(
 ) {
 
 	@Transactional
-	fun getLatestRevisions(): List<GlobalTranslation> {
+	fun getLatestRevisions(): List<GlobalTranslationDto> {
 		val all = globalTranslationRepository.findAllByDeletedAtIsNull()
 		return all.map(GlobalTranslationEntity::toDto)
 	}
@@ -34,7 +34,7 @@ class EditGlobalTranslationsService(
 		nn: String?,
 		en: String?,
 		userId: String
-	): GlobalTranslation {
+	): GlobalTranslationDto {
 		val globalTranslation = globalTranslationRepository.findByKey(key) ?: globalTranslationRepository.save(
 			GlobalTranslationEntity(
 				key = key,
@@ -75,7 +75,7 @@ class EditGlobalTranslationsService(
 		nn: String?,
 		en: String?,
 		userId: String
-	): GlobalTranslation {
+	): GlobalTranslationDto {
 		val globalTranslation = globalTranslationRepository.findByIdAndDeletedAtIsNull(id)
 			?: throw ResourceNotFoundException("Global translation not found", id.toString())
 		if (globalTranslation.revisions?.any { it.revision == revision } == false) {

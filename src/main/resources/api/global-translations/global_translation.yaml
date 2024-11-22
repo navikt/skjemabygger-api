@@ -29,7 +29,7 @@ put:
       content:
         application/json:
           schema:
-            $ref: "./components.yaml#/components/schemas/GlobalTranslation"
+            $ref: "./components.yaml#/components/schemas/GlobalTranslationDto"
     401:
       description: Bruker er ikke autentisert
       content:

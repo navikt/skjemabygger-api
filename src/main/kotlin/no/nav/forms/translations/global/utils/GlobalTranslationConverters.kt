@@ -1,14 +1,14 @@
 package no.nav.forms.translations.global.utils
 
-import no.nav.forms.model.GlobalTranslation
+import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationRevisionEntity
 import no.nav.forms.utils.LanguageCode
 import no.nav.forms.utils.mapDateTime
 
-fun GlobalTranslationEntity.toDto(): GlobalTranslation {
+fun GlobalTranslationEntity.toDto(): GlobalTranslationDto {
 	val latestRevision = this.getLatestRevision()
-	return GlobalTranslation(
+	return GlobalTranslationDto(
 		id = this.id!!,
 		key = this.key,
 		tag = this.tag,

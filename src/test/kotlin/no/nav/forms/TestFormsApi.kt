@@ -69,8 +69,8 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getGlobalTranslations(): FormsApiResponse<List<GlobalTranslation>> {
-		val responseType = object : ParameterizedTypeReference<List<GlobalTranslation>>() {}
+	fun getGlobalTranslations(): FormsApiResponse<List<GlobalTranslationDto>> {
+		val responseType = object : ParameterizedTypeReference<List<GlobalTranslationDto>>() {}
 		val response = restTemplate.exchange(globalTranslationBaseUrl, HttpMethod.GET, null, responseType)
 		return FormsApiResponse(response.statusCode, response.body!!)
 	}
@@ -78,7 +78,7 @@ class TestFormsApi(
 	private fun readGlobalTranslationBody(response: ResponseEntity<String>): Any {
 		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
 			response.body,
-			GlobalTranslation::class.java
+			GlobalTranslationDto::class.java
 		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
 		return body
 	}

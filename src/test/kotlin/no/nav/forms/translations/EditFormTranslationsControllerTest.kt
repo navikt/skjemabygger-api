@@ -205,7 +205,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslation
+		globalTranslationResponse.body as GlobalTranslationDto
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val createResponse1 = testFormsApi.createFormTranslation(
@@ -260,7 +260,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslation
+		globalTranslationResponse.body as GlobalTranslationDto
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val createResponse = testFormsApi.createFormTranslation(
@@ -303,7 +303,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslation
+		globalTranslationResponse.body as GlobalTranslationDto
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val updateRequest = UpdateFormTranslationRequest(
@@ -344,7 +344,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			authToken
 		)
 		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslation
+		globalTranslationResponse.body as GlobalTranslationDto
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val updateRequest = UpdateFormTranslationRequest(

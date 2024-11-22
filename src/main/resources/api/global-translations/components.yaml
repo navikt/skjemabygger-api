@@ -9,7 +9,7 @@ components:
       type: integer
       description: Revisjonsidentifikator. Hver endring av en global oversettelse gir en ny revisjon.
       example: 3
-    GlobalTranslation:
+    GlobalTranslationDto:
       type: object
       description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
       required:

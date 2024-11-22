@@ -1,7 +1,7 @@
 package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
-import no.nav.forms.model.GlobalTranslation
+import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.model.NewGlobalTranslationRequest
 import no.nav.forms.model.PublishedGlobalTranslationDto
 import no.nav.forms.model.UpdateGlobalTranslationRequest
@@ -70,7 +70,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 	@Test
 	fun testChangeAndPublish() {
 		val authToken = mockOAuth2Server.createMockToken()
-		val globalTranslations = testFormsApi.getGlobalTranslations().body as List<GlobalTranslation>
+		val globalTranslations = testFormsApi.getGlobalTranslations().body as List<GlobalTranslationDto>
 		val tFornavn = globalTranslations.find { it.key == "Fornavn" }!!
 
 		val updatedEnTranslation = "${tFornavn.en}postfix"
@@ -116,7 +116,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		nn: String?,
 		en: String?,
 		authToken: String
-	): GlobalTranslation {
+	): GlobalTranslationDto {
 		val createResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest(
 				key = key,
@@ -128,7 +128,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 			authToken,
 		)
 		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslation
+		createResponse.body as GlobalTranslationDto
 		return createResponse.body
 	}
 
