@@ -1,0 +1,34 @@
+get:
+  summary: Henter publiserte globale oversettelser for et språk
+  description: Henter
+  operationId: getPublishedGlobalTranslations
+  security: []
+  parameters:
+    - name: languageCode
+      in: path
+      required: true
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/LanguageCode"
+  responses:
+    '200':
+      description: Alle publiserte globale oversettelser for et språk
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/PublishedGlobalTranslationDto"
+    '400':
+      description: Feil i forespørsel
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+    '500':
+      description: En feil oppstod
+      content:
+        application/json:
+          schema:
+            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - publish-global-translations

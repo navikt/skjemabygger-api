@@ -36,7 +36,7 @@ data class GlobalTranslationRevisionEntity(
 
 	@Override
 	override fun toString(): String {
-		return this::class.simpleName + "(id = $id , createdAt = $createdAt , createdBy = $createdBy)"
+		return this::class.simpleName + "(id = $id , createdAt = $createdAt , createdBy = $createdBy, nb = $nb, nn = $nn, en = $en, revision = $revision)"
 	}
 
 }

@@ -191,6 +191,12 @@ paths:
   /v1/global-translations/{id}:
     $ref: "./global-translations/global_translation.yaml"
 
+  /v1/global-translations/publish:
+    $ref: "./global-translations/publish_global_translations.yaml"
+
+  /v1/published-global-translations/{languageCode}:
+    $ref: "./global-translations/published_global_translations.yaml"
+
   /v1/forms/{formPath}/translations:
     $ref: "./form-translations/form-translations.yaml"
 

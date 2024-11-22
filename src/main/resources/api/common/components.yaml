@@ -1,0 +1,6 @@
+components:
+  schemas:
+    LanguageCode:
+      type: string
+      description: Språkkode (nb, nn, en)
+      example: en

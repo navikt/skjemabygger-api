@@ -93,3 +93,18 @@ components:
           type: string
           description: Oversettelse på engelsk
           example: A small red house
+    PublishedGlobalTranslationDto:
+      type: object
+      description: Publisert global oversettelse
+      required:
+      - key
+      - value
+      properties:
+        key:
+          type: string
+          description: Unik key som identifiserer den globale oversettelsen
+          example: Etternavn
+        value:
+          type: string
+          description: Oversettelse
+          example: Last name
