@@ -16,6 +16,10 @@ tags:
     description: Endepunkter for helsesjekk av applikasjonen.
   - name: edit-global-translations
     description: Vedlikehold av globale oversettelser
+  - name: edit-form-translations
+    description: Vedlikehold av oversettelser knyttet til et skjema
+  - name: publish-global-translations
+    description: Endepunkter for publisering av globale oversettelser
 
 paths:
   /v1/recipients:
