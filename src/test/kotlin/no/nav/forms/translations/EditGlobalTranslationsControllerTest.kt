@@ -1,10 +1,7 @@
 package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
-import no.nav.forms.model.ErrorResponseDto
-import no.nav.forms.model.GlobalTranslationDto
-import no.nav.forms.model.NewGlobalTranslationRequest
-import no.nav.forms.model.UpdateGlobalTranslationRequest
+import no.nav.forms.model.*
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
 import org.junit.jupiter.api.Assertions.*
@@ -273,6 +270,71 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 
 		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, userAuthToken)
 		assertEquals(HttpStatus.FORBIDDEN.value(), deleteResponse.statusCode.value())
+	}
+
+	@Test
+	fun testDeleteFailsWhenFormTranslationReferencesIt() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val request = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(request, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslationDto
+
+		val createFormTranslationResponse = testFormsApi.createFormTranslation(
+			"nav123456",
+			NewFormTranslationRequestDto(
+				"Fornavn",
+				globalTranslationId = createResponse.body.id
+			),
+			authToken
+		)
+		assertTrue(createFormTranslationResponse.statusCode.is2xxSuccessful)
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
+		assertFalse(deleteResponse.statusCode.is2xxSuccessful)
+		assertTrue(deleteResponse.statusCode.is4xxClientError)
+	}
+
+	@Test
+	fun testDeleteDoesNotFailWhenFormTranslationOnlyReferencedItInThePast() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val request = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(request, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslationDto
+
+		val createFormTranslationResponse = testFormsApi.createFormTranslation(
+			"nav123456",
+			NewFormTranslationRequestDto(
+				"Fornavn",
+				globalTranslationId = createResponse.body.id
+			),
+			authToken
+		)
+		assertTrue(createFormTranslationResponse.statusCode.is2xxSuccessful)
+		createFormTranslationResponse.body as FormTranslationDto
+		val updateFormTranslationResponse = testFormsApi.updateFormTranslation(
+			"nav123456",
+			createFormTranslationResponse.body.id,
+			createFormTranslationResponse.body.revision!!,
+			UpdateFormTranslationRequest(
+				globalTranslationId = null,
+				nb = "Fornavn",
+				nn = "Fornamn",
+				en = "Given name"
+			),
+			authToken
+		)
+		assertTrue(updateFormTranslationResponse.statusCode.is2xxSuccessful)
+
+		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
 	}
 
 	@Test

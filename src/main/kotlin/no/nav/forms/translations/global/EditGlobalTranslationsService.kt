@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.GlobalTranslationDto
+import no.nav.forms.translations.form.repository.FormTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRevisionRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
@@ -17,6 +18,7 @@ import kotlin.jvm.optionals.getOrElse
 class EditGlobalTranslationsService(
 	val globalTranslationRevisionRepository: GlobalTranslationRevisionRepository,
 	val globalTranslationRepository: GlobalTranslationRepository,
+	val formTranslationRepository: FormTranslationRepository,
 	val entityManager: EntityManager,
 ) {
 
@@ -96,9 +98,16 @@ class EditGlobalTranslationsService(
 		return globalTranslation.toDto()
 	}
 
+	@Transactional
 	fun deleteGlobalTranslation(id: Long, userId: String) {
 		val globalTranslation = globalTranslationRepository.findById(id)
 			.getOrElse { throw ResourceNotFoundException("Global translation not found", id.toString()) }
+
+		val isCurrentlyReferenced = formTranslationRepository.findAllByRevisionsGlobalTranslationId(globalTranslation.id!!)
+			.any { it.revisions?.lastOrNull()?.globalTranslation?.id == id }
+		if (isCurrentlyReferenced) {
+			throw IllegalArgumentException("Cannot delete global translation since it is referenced by one or more form translations")
+		}
 
 		globalTranslationRepository.save(
 			globalTranslation.copy(

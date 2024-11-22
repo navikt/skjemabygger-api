@@ -3,6 +3,7 @@ package no.nav.forms.translations.form.utils
 import no.nav.forms.model.FormTranslationDto
 import no.nav.forms.translations.form.repository.entity.FormTranslationEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationRevisionEntity
+import no.nav.forms.translations.global.utils.getLatestRevision
 import no.nav.forms.utils.mapDateTime
 
 fun FormTranslationEntity.toDto(): FormTranslationDto {
@@ -20,7 +21,7 @@ fun FormTranslationEntity.toDto(): FormTranslationDto {
 }
 
 fun FormTranslationRevisionEntity.toDto(): FormTranslationDto {
-	val latestGlobalRevision = if (this.globalTranslation?.id != null) this.globalTranslation.revisions?.lastOrNull() else null
+	val latestGlobalRevision = this.globalTranslation?.getLatestRevision()
 	return FormTranslationDto(
 		id = this.formTranslation.id!!,
 		key = this.formTranslation.key,
