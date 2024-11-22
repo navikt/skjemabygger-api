@@ -40,12 +40,12 @@ put:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     '500':
       description: En feil oppstod
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-form-translations

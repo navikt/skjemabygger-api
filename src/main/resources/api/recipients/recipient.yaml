@@ -8,7 +8,7 @@ get:
       description: Mottakerens id
       required: true
       schema:
-        $ref: "../forms-api.yaml#/components/schemas/UUID"
+        $ref: "../common/components.yaml#/components/schemas/UUID"
   responses:
     200:
       description: Mottakeren
@@ -21,7 +21,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - recipients
 
@@ -37,7 +37,7 @@ put:
       description: Mottakerens id
       required: true
       schema:
-        $ref: "../forms-api.yaml#/components/schemas/UUID"
+        $ref: "../common/components.yaml#/components/schemas/UUID"
   requestBody:
     content:
       application/json:
@@ -56,19 +56,19 @@ put:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     403:
       description: Bruker er ikke autorisert for denne handlingen
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     404:
       description: Fant ikke mottakeren
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - recipients
 delete:
@@ -83,7 +83,7 @@ delete:
       description: Mottakerens id
       required: true
       schema:
-        $ref: "../forms-api.yaml#/components/schemas/UUID"
+        $ref: "../common/components.yaml#/components/schemas/UUID"
   responses:
     204:
       description: Mottakeren har blitt slettet
@@ -92,18 +92,18 @@ delete:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     403:
       description: Bruker er ikke autorisert for denne handlingen
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     404:
       description: Fant ikke mottakeren
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - recipients

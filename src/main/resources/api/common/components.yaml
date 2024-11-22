@@ -1,5 +1,28 @@
 components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"
   schemas:
+    UUID:
+      type: string
+      description: A Universally Unique Identifier
+      example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
+    UserId:
+      type: string
+      example: Navnesen, Navn
+      description: Navn på en bruker
+    ErrorResponseDto:
+      type: object
+      description: Informasjon om hva som gikk galt
+      required:
+        - errorMessage
+      properties:
+        errorMessage:
+          type: string
+          example: Resource not found
+        correlationId:
+          $ref: "#/components/schemas/UUID"
     LanguageCode:
       type: string
       description: Språkkode (nb, nn, en)

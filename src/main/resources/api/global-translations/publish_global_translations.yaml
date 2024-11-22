@@ -11,12 +11,12 @@ post:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     403:
       description: Bruker er ikke autorisert for denne handlingen
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - publish-global-translations

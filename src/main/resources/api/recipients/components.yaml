@@ -31,7 +31,7 @@ components:
       - changedBy
       properties:
         recipientId:
-          $ref: "../forms-api.yaml#/components/schemas/UUID"
+          $ref: "../common/components.yaml#/components/schemas/UUID"
         name:
           $ref: "#/components/schemas/RecipientName"
         poBoxAddress:
@@ -46,14 +46,14 @@ components:
           description: Dato og tid for når mottakeren ble opprettet
           example: 2021-12-03T14:10:00Z
         createdBy:
-          $ref: "../forms-api.yaml#/components/schemas/UserId"
+          $ref: "../common/components.yaml#/components/schemas/UserId"
         changedAt:
           type: string
           format: date-time
           description: Dato og tid for når mottakeren sist ble endret
           example: 2021-12-03T14:10:00Z
         changedBy:
-          $ref: "../forms-api.yaml#/components/schemas/UserId"
+          $ref: "../common/components.yaml#/components/schemas/UserId"
     NewRecipientRequest:
       type: object
       description: Nødvendige data for å opprette en ny mottaker
@@ -64,7 +64,7 @@ components:
       - postalName
       properties:
         recipientId:
-          $ref: "../forms-api.yaml#/components/schemas/UUID"
+          $ref: "../common/components.yaml#/components/schemas/UUID"
         name:
           $ref: "#/components/schemas/RecipientName"
         poBoxAddress:

@@ -25,7 +25,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-form-translations
 
@@ -60,12 +60,12 @@ post:
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
     409:
       description: Oversettelsen eksisterer allerede
       content:
         application/json:
           schema:
-            $ref: "../forms-api.yaml#/components/schemas/ErrorResponseDto"
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-form-translations
