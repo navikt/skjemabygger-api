@@ -32,6 +32,21 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 	}
 
 	@Test
+	fun testDuplicatePostGlobalTranslationIsRejected() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val request = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+			nb = "Fornavn",
+			nn = "Fornamn"
+		)
+		val response = testFormsApi.createGlobalTranslation(request, authToken)
+		assertTrue(response.statusCode.is2xxSuccessful)
+		val responseDuplicate = testFormsApi.createGlobalTranslation(request, authToken)
+		assertTrue(responseDuplicate.statusCode.is4xxClientError)
+	}
+
+	@Test
 	fun onlyAdminUsersAreAllowedToCreateGlobalTranslation() {
 		val tokenNotAdmin = mockOAuth2Server.createMockToken(groups = listOf(MOCK_USER_GROUP_ID))
 		val response = testFormsApi.createGlobalTranslation(

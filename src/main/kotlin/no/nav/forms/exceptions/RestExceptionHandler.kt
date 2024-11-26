@@ -53,8 +53,13 @@ class RestExceptionHandler {
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))
 	}
 
-	@ExceptionHandler
-	fun handleDataIntegrityViolationException(exception: DataIntegrityViolationException): ResponseEntity<ErrorResponseDto> {
+	@ExceptionHandler(
+		value = [
+			DataIntegrityViolationException::class,
+			DuplicateResourceException::class,
+		]
+	)
+	fun handleDataIntegrityViolationException(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.CONFLICT
 		logger.info(exception.message ?: status.reasonPhrase, exception)
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))

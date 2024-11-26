@@ -2,6 +2,7 @@ package no.nav.forms.translations.global
 
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import no.nav.forms.exceptions.DuplicateResourceException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.form.repository.FormTranslationRepository
@@ -9,6 +10,8 @@ import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRevisionRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationRevisionEntity
+import no.nav.forms.translations.global.utils.getLatestRevision
+import no.nav.forms.translations.global.utils.isDeleted
 import no.nav.forms.translations.global.utils.toDto
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -37,13 +40,17 @@ class EditGlobalTranslationsService(
 		en: String?,
 		userId: String
 	): GlobalTranslationDto {
-		val globalTranslation = globalTranslationRepository.findByKey(key) ?: globalTranslationRepository.save(
+		val existingGlobalTranslation = globalTranslationRepository.findByKey(key).also {
+			if (it != null && !it.isDeleted())
+				throw DuplicateResourceException("Global translation already exists", it.id.toString())
+		}
+		val globalTranslation = existingGlobalTranslation ?: globalTranslationRepository.save(
 			GlobalTranslationEntity(
 				key = key,
 				tag = tag,
 			)
 		)
-		if (globalTranslation.deletedAt != null) {
+		if (globalTranslation.isDeleted()) {
 			globalTranslationRepository.save(
 				globalTranslation.copy(
 					deletedAt = null,
@@ -52,7 +59,7 @@ class EditGlobalTranslationsService(
 				)
 			)
 		}
-		val latestRevision = globalTranslation.revisions?.lastOrNull()
+		val latestRevision = globalTranslation.getLatestRevision()
 		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
 				nb = nb,

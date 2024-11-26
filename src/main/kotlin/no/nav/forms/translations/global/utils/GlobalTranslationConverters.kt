@@ -21,6 +21,8 @@ fun GlobalTranslationEntity.toDto(): GlobalTranslationDto {
 	)
 }
 
+fun GlobalTranslationEntity.isDeleted() = this.deletedAt != null
+
 fun GlobalTranslationEntity.getLatestRevision(): GlobalTranslationRevisionEntity? = this.revisions?.lastOrNull()
 
 fun GlobalTranslationRevisionEntity.getTranslation(languageCode: LanguageCode): String? {
