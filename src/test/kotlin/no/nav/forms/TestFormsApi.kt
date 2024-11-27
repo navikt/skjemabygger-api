@@ -163,4 +163,15 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, response.body!!)
 	}
 
+	fun deleteFormTranslation(formPath: String, formTranslationId: Long, authToken: String? = null): FormsApiResponse<Any> {
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/forms/$formPath/translations/$formTranslationId",
+			HttpMethod.DELETE,
+			HttpEntity(null, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body: ErrorResponseDto? = if (!response.statusCode.is2xxSuccessful) readErrorBody(response) else null
+		return FormsApiResponse(response.statusCode, body)
+	}
+
 }

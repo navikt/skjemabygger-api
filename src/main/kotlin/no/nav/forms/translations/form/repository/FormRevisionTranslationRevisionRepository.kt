@@ -7,6 +7,10 @@ interface FormRevisionTranslationRevisionRepository: JpaRepository<FormRevisionT
 
 	fun findAllByFormPath(formPath: String): List<FormRevisionTranslationRevisionEntity>
 
+	fun findByFormPathAndFormTranslationRevisionFormTranslationId(formPath: String, formTranslationId: Long): FormRevisionTranslationRevisionEntity?
+
+	fun findByFormPathAndFormTranslationRevisionFormTranslationKey(formPath: String, key: String): FormRevisionTranslationRevisionEntity?
+
 	fun findOneByFormPathAndFormTranslationRevisionId(formPath: String, formTranslationRevisionId: Long): FormRevisionTranslationRevisionEntity
 
 }

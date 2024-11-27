@@ -1,6 +1,7 @@
 package no.nav.forms.translations.form
 
 import jakarta.transaction.Transactional
+import no.nav.forms.exceptions.DuplicateResourceException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.FormTranslationDto
 import no.nav.forms.translations.form.repository.FormRevisionTranslationRevisionRepository
@@ -26,9 +27,7 @@ class EditFormTranslationsService(
 	@Transactional
 	fun getTranslations(formPath: String): List<FormTranslationDto> {
 		val currentFormTranslationRevisions = formRevisionTranslationRevisionRepository.findAllByFormPath(formPath)
-		val revisionIds =
-			currentFormTranslationRevisions.map(FormRevisionTranslationRevisionEntity::formTranslationRevisionId)
-		val revisions = formTranslationRevisionRepository.findAllById(revisionIds)
+		val revisions = currentFormTranslationRevisions.map { it.formTranslationRevision }
 		return revisions.map(FormTranslationRevisionEntity::toDto)
 	}
 
@@ -76,7 +75,7 @@ class EditFormTranslationsService(
 			)
 		formRevisionTranslationRevisionRepository.save(
 			currentFormTranslationRevisionEntity.copy(
-				formTranslationRevisionId = newFormTranslationRevision.id!!
+				formTranslationRevision = newFormTranslationRevision
 			)
 		)
 		return newFormTranslationRevision.toDto()
@@ -92,20 +91,31 @@ class EditFormTranslationsService(
 		en: String?,
 		userId: String
 	): FormTranslationDto {
+		formRevisionTranslationRevisionRepository.findByFormPathAndFormTranslationRevisionFormTranslationKey(formPath, key)
+			.also {
+				if (it != null) throw DuplicateResourceException(
+					"Translation with key is already associated with $formPath",
+					it.formTranslationRevision.formTranslation.id.toString()
+				)
+			}
+
 		val globalTranslation = if (globalTranslationId != null) {
 			globalTranslationRepository.findById(globalTranslationId)
 				.getOrElse { throw IllegalArgumentException("Global translation not found") }
 		} else null
 
-		val formTranslation = formTranslationRepository.save(
-			FormTranslationEntity(
-				formPath = formPath,
-				key = key,
+		val formTranslation =
+			formTranslationRepository.findByFormPathAndKey(formPath, key) ?: formTranslationRepository.save(
+				FormTranslationEntity(
+					formPath = formPath,
+					key = key,
+				)
 			)
-		)
+
+		val latestRevision = formTranslation.revisions?.lastOrNull()
 		val formTranslationRevision = formTranslationRevisionRepository.save(
 			FormTranslationRevisionEntity(
-				revision = 1,
+				revision = latestRevision?.revision?.plus(1) ?: 1,
 				formTranslation = formTranslation,
 				globalTranslation = globalTranslation,
 				nb = nb,
@@ -118,10 +128,18 @@ class EditFormTranslationsService(
 		formRevisionTranslationRevisionRepository.save(
 			FormRevisionTranslationRevisionEntity(
 				formPath = formPath,
-				formTranslationRevisionId = formTranslationRevision.id!!,
+				formTranslationRevision = formTranslationRevision,
 			)
 		)
 		return formTranslationRevision.toDto()
+	}
+
+	@Transactional
+	fun deleteFormTranslation(formPath: String, id: Long, userId: String) {
+		val row =
+			formRevisionTranslationRevisionRepository.findByFormPathAndFormTranslationRevisionFormTranslationId(formPath, id)
+				?: throw ResourceNotFoundException("Translation revision $id does not exist for $formPath", "($formPath:$id)")
+		formRevisionTranslationRevisionRepository.delete(row)
 	}
 
 }

@@ -9,4 +9,6 @@ interface FormTranslationRepository: JpaRepository<FormTranslationEntity, Long> 
 
 	fun findAllByRevisionsGlobalTranslationId(globalTranslationId: Long): List<FormTranslationEntity>
 
+	fun findByFormPathAndKey(formPath: String, key: String): FormTranslationEntity?
+
 }

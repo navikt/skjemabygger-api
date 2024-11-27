@@ -49,3 +49,39 @@ put:
             $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-form-translations
+
+delete:
+  summary: Sletter en oversettelse knyttet til et skjema
+  operationId: deleteFormTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjema-path
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+    - name: id
+      in: path
+      description: Oversettelsens id
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormTranslationId"
+  responses:
+    204:
+      description: Oversettelsen har blitt slettet
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    500:
+      description: En feil oppstod
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-form-translations

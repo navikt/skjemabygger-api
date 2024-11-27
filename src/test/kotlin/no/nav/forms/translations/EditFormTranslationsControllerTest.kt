@@ -363,7 +363,78 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertEquals(globalTranslationResponse.body.nb, updateResponse.body.nb)
 		assertEquals(globalTranslationResponse.body.nn, updateResponse.body.nn)
 		assertEquals(globalTranslationResponse.body.en, updateResponse.body.en)
+	}
 
+	@Test
+	fun testDeleteFormTranslationWithoutAuthToken() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as FormTranslationDto
+
+		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse.body.id)
+		assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteResponse.statusCode.value())
+	}
+
+	@Test
+	fun testDeleteNonExistingFormTranslation() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, 123L, authToken)
+		assertEquals(HttpStatus.NOT_FOUND.value(), deleteResponse.statusCode.value())
+	}
+
+	@Test
+	fun testDeleteFormTranslation() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as FormTranslationDto
+
+		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse.body.id, authToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+
+		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath)
+		assertTrue(formTranslationsResponse.statusCode.is2xxSuccessful)
+		formTranslationsResponse.body as List<*>
+		assertEquals(0, formTranslationsResponse.body.size)
+	}
+
+	@Test
+	fun testRecreateFormTranslationAfterDelete() {
+		val formPath = "nav123456"
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest1 = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
+		val createResponse1 = testFormsApi.createFormTranslation(formPath, createRequest1, authToken)
+		assertTrue(createResponse1.statusCode.is2xxSuccessful)
+		createResponse1.body as FormTranslationDto
+
+		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse1.body.id, authToken)
+		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+
+		val createRequest2 = NewFormTranslationRequestDto(key = "Nei", nb = "Nei", en = "No")
+		val createResponse2 = testFormsApi.createFormTranslation(formPath, createRequest2, authToken)
+		assertTrue(createResponse2.statusCode.is2xxSuccessful)
+		createResponse2.body as FormTranslationDto
+
+		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath)
+		assertTrue(formTranslationsResponse.statusCode.is2xxSuccessful)
+		formTranslationsResponse.body as List<*>
+		assertEquals(1, formTranslationsResponse.body.size)
+		val formTranslation = formTranslationsResponse.body[0] as FormTranslationDto
+		assertEquals(2, formTranslation.revision)
+		assertEquals(createRequest2.key, formTranslation.key)
+		assertEquals(createRequest2.nb, formTranslation.nb)
+		assertEquals(createRequest2.nn, formTranslation.nn)
+		assertEquals(createRequest2.en, formTranslation.en)
 	}
 
 }

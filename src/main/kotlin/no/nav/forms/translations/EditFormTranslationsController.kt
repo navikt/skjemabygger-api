@@ -9,6 +9,7 @@ import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.translations.form.EditFormTranslationsService
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
@@ -61,6 +62,13 @@ class EditFormTranslationsController(
 			userId,
 		)
 		return ResponseEntity.ok(dto)
+	}
+
+	override fun deleteFormTranslation(formPath: String, id: Long): ResponseEntity<Unit> {
+		securityContextHolder.requireValidUser()
+		val userId = securityContextHolder.getUserName()
+		editFormTranslationsService.deleteFormTranslation(formPath, id, userId)
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
 	}
 
 }
