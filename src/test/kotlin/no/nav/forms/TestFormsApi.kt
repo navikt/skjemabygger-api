@@ -163,6 +163,21 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, response.body!!)
 	}
 
+	fun getPublishedGlobalTranslationsInformation(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<Any> {
+		val queryString = if (languageCodeValues != null && !languageCodeValues.isEmpty()) "?languageCodes=${languageCodeValues.joinToString(",")}" else ""
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/published-global-translations$queryString",
+			HttpMethod.GET,
+			HttpEntity(null, httpHeaders(null)),
+			String::class.java
+		)
+		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
+			response.body,
+			PublishedGlobalTranslationsDto::class.java
+		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
 	fun deleteFormTranslation(formPath: String, formTranslationId: Long, authToken: String? = null): FormsApiResponse<Any> {
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations/$formTranslationId",

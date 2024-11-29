@@ -3,6 +3,7 @@ package no.nav.forms.translations
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.model.NewGlobalTranslationRequest
+import no.nav.forms.model.PublishedGlobalTranslationsDto
 import no.nav.forms.model.UpdateGlobalTranslationRequest
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 
@@ -40,6 +43,55 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		}
 		val publishResponse = testFormsApi.publishGlobalTranslations(authToken)
 		assertTrue(publishResponse.statusCode.is2xxSuccessful)
+	}
+
+	@Test
+	fun testPublishInformationWithoutTranslations() {
+		val response = testFormsApi.getPublishedGlobalTranslationsInformation()
+		assertTrue(response.statusCode.is2xxSuccessful)
+		response.body as PublishedGlobalTranslationsDto
+
+		assertNotNull(response.body.publishedAt)
+		assertNotNull(response.body.publishedBy)
+		assertNull(response.body.translations)
+	}
+
+	@Test
+	fun testPublishInformation() {
+		val response = testFormsApi.getPublishedGlobalTranslationsInformation(listOf("en", "nn"))
+		assertTrue(response.statusCode.is2xxSuccessful)
+		response.body as PublishedGlobalTranslationsDto
+
+		assertNotNull(response.body.publishedAt)
+		assertNotNull(response.body.publishedBy)
+		assertNotNull(response.body.translations)
+
+		val translationsInResponse: Map<String, Map<String, String>> = response.body.translations as Map<String, Map<String, String>>
+		assertEquals(setOf("en","nn"), translationsInResponse.keys)
+		assertNotNull(translationsInResponse["en"])
+		assertNotNull(translationsInResponse["nn"])
+		assertNull(translationsInResponse["nb"])
+
+		val tFornavn = translations.values.find { it.key == "Fornavn" }!!
+		val tRequired = translations.values.find { it.key == "required" }!!
+
+		val nynorsk = translationsInResponse["nn"]
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.nn,
+				tFornavn.key to tFornavn.nn
+			),
+			nynorsk
+		)
+
+		val english = translationsInResponse["en"]
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.en,
+				tFornavn.key to tFornavn.en
+			),
+			english
+		)
 	}
 
 	@Test

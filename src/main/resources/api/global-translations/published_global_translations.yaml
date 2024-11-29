@@ -7,7 +7,7 @@ get:
     - name: languageCodes
       description: Språkkode, kommaseparert hvis flere
       example: nn,en
-      in: header
+      in: query
       required: false
       schema:
         $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
