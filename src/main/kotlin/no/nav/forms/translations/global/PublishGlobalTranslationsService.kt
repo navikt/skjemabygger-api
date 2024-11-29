@@ -1,14 +1,15 @@
 package no.nav.forms.translations.global
 
 import jakarta.transaction.Transactional
-import no.nav.forms.model.PublishedGlobalTranslationDto
+import no.nav.forms.model.PublishedGlobalTranslationsDto
 import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.PublishedGlobalTranslationsRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
 import no.nav.forms.translations.global.repository.entity.PublishedGlobalTranslationsEntity
 import no.nav.forms.translations.global.utils.getLatestRevision
-import no.nav.forms.translations.global.utils.getTranslation
+import no.nav.forms.translations.global.utils.mapToDictionary
 import no.nav.forms.utils.LanguageCode
+import no.nav.forms.utils.mapDateTime
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -18,13 +19,10 @@ class PublishGlobalTranslationsService(
 	private val globalTranslationRepository: GlobalTranslationRepository,
 ) {
 
-	fun getPublishedGlobalTranslations(languageCode: LanguageCode): List<PublishedGlobalTranslationDto> {
+	fun getPublishedGlobalTranslations(languageCode: LanguageCode): Map<String, String> {
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")
-		return publishedGlobalTranslations.globalTranslations
-			.associate { it.globalTranslation.key to it.getTranslation(languageCode) }
-			.filter { it.value != null }
-			.map { PublishedGlobalTranslationDto(it.key, it.value!!) }
+		return publishedGlobalTranslations.globalTranslations.mapToDictionary(languageCode)
 	}
 
 	@Transactional
@@ -37,6 +35,19 @@ class PublishGlobalTranslationsService(
 				createdBy = userId,
 				globalTranslations = latestRevisions
 			)
+		)
+	}
+
+	fun getPublishedGlobalTranslationsV2(languageCodes: List<LanguageCode>?): PublishedGlobalTranslationsDto {
+		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
+			?: throw Exception("No published global translations found")
+		val translations = languageCodes?.associate {
+			it.value to publishedGlobalTranslations.globalTranslations.mapToDictionary(it)
+		}
+		return PublishedGlobalTranslationsDto(
+			publishedAt = mapDateTime(publishedGlobalTranslations.createdAt),
+			publishedBy = publishedGlobalTranslations.createdBy,
+			translations = translations
 		)
 	}
 

@@ -93,18 +93,27 @@ components:
           type: string
           description: Oversettelse på engelsk
           example: A small red house
-    PublishedGlobalTranslationDto:
+    PublishedGlobalTranslationsDto:
       type: object
-      description: Publisert global oversettelse
       required:
-      - key
-      - value
+      - publishedAt
+      - publishedBy
       properties:
-        key:
+        publishedAt:
           type: string
-          description: Unik key som identifiserer den globale oversettelsen
-          example: Etternavn
-        value:
-          type: string
-          description: Oversettelse
-          example: Last name
+          format: date-time
+          description: Dato og tid for når globale oversettelser ble publisert
+          example: 2021-12-03T14:10:00Z
+        publishedBy:
+          $ref: "../common/components.yaml#/components/schemas/UserId"
+        translations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/GlobalTranslationsMap"
+    GlobalTranslationsMap:
+      description: Publiserte global oversettelser
+      type: object
+      additionalProperties:
+        type: string
+      example:
+        Fornavn: Fornamn

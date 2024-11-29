@@ -157,8 +157,8 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getPublishedGlobalTranslations(languageCodeValue: String): FormsApiResponse<List<PublishedGlobalTranslationDto>> {
-		val responseType = object : ParameterizedTypeReference<List<PublishedGlobalTranslationDto>>() {}
+	fun getPublishedGlobalTranslations(languageCodeValue: String): FormsApiResponse<Map<String, String>> {
+		val responseType = object : ParameterizedTypeReference<Map<String, String>>() {}
 		val response = restTemplate.exchange("$baseUrl/v1/published-global-translations/$languageCodeValue", HttpMethod.GET, null, responseType)
 		return FormsApiResponse(response.statusCode, response.body!!)
 	}

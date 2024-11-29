@@ -2,7 +2,7 @@ package no.nav.forms.translations
 
 import no.nav.forms.api.PublishGlobalTranslationsApi
 import no.nav.forms.config.AzureAdConfig
-import no.nav.forms.model.PublishedGlobalTranslationDto
+import no.nav.forms.model.PublishedGlobalTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.translations.global.PublishGlobalTranslationsService
 import no.nav.forms.utils.LanguageCode
@@ -20,10 +20,15 @@ class PublishGlobalTranslationsController(
 ) : PublishGlobalTranslationsApi {
 
 	@Unprotected
-	override fun getPublishedGlobalTranslations(languageCode: String): ResponseEntity<List<PublishedGlobalTranslationDto>> {
-		val lang: LanguageCode = LanguageCode.forValue(languageCode)
-			?: throw IllegalArgumentException("Language code '$languageCode' is not supported")
+	override fun getPublishedGlobalTranslations(languageCode: String): ResponseEntity<Map<String, String>> {
+		val lang: LanguageCode = LanguageCode.validate(languageCode)
 		return ResponseEntity.ok(publishGlobalTranslationsService.getPublishedGlobalTranslations(lang))
+	}
+
+	@Unprotected
+	override fun getPublishedGlobalTranslationsInformation(languageCodes: String?): ResponseEntity<PublishedGlobalTranslationsDto> {
+		val langs: List<LanguageCode>? = languageCodes?.split(",")?.map { LanguageCode.validate(it.trim()) }
+		return ResponseEntity.ok(publishGlobalTranslationsService.getPublishedGlobalTranslationsV2(langs))
 	}
 
 	override fun publishGlobalTranslations(): ResponseEntity<Unit> {

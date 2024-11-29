@@ -11,5 +11,9 @@ enum class LanguageCode(val value: String) {
 		@JvmStatic
 		@JsonCreator
 		fun forValue(value: String): LanguageCode? = entries.firstOrNull { it.value == value.lowercase() }
+
+		fun validate(lang: String): LanguageCode {
+			return forValue(lang) ?: throw IllegalArgumentException("Language code '$lang' is not supported")
+		}
 	}
 }

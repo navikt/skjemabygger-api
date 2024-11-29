@@ -3,7 +3,6 @@ package no.nav.forms.translations
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.model.NewGlobalTranslationRequest
-import no.nav.forms.model.PublishedGlobalTranslationDto
 import no.nav.forms.model.UpdateGlobalTranslationRequest
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
@@ -49,22 +48,36 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		val tRequired = translations.values.find { it.key == "required" }!!
 
 		val publishedGlobalTranslationsBokmal = testFormsApi.getPublishedGlobalTranslations(LanguageCode.NB.value)
-		val bokmal = publishedGlobalTranslationsBokmal.body as List<PublishedGlobalTranslationDto>
-		assertEquals(1, bokmal.size)
-		bokmal.none { it.key == tFornavn.key }
-		bokmal.find { it.key == tRequired.key }.also { assertEquals(tRequired.nb, it?.value) }
+		val bokmal = publishedGlobalTranslationsBokmal.body as Map<String, String>
+		assertEquals(1, bokmal.keys.size)
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.nb
+			),
+			bokmal
+		)
+		bokmal.keys.none { it == tFornavn.key }
+		bokmal.keys.find { it == tRequired.key }.also { assertEquals(tRequired.nb, bokmal[it])}
 
 		val publishedGlobalTranslationsNynorsk = testFormsApi.getPublishedGlobalTranslations(LanguageCode.NN.value)
-		val nynorsk = publishedGlobalTranslationsNynorsk.body as List<PublishedGlobalTranslationDto>
-		assertEquals(1, bokmal.size)
-		nynorsk.find { it.key == tFornavn.key }.also { assertEquals(tFornavn.nn, it?.value) }
-		nynorsk.find { it.key == tRequired.key }.also { assertEquals(tRequired.nn, it?.value) }
+		val nynorsk = publishedGlobalTranslationsNynorsk.body as Map<String, String>
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.nn,
+				tFornavn.key to tFornavn.nn
+			),
+			nynorsk
+		)
 
 		val publishedGlobalTranslationsEnglish = testFormsApi.getPublishedGlobalTranslations(LanguageCode.EN.value)
-		val english = publishedGlobalTranslationsEnglish.body as List<PublishedGlobalTranslationDto>
-		assertEquals(2, english.size)
-		english.find { it.key == tFornavn.key }.also { assertEquals(tFornavn.en, it?.value) }
-		english.find { it.key == tRequired.key }.also { assertEquals(tRequired.en, it?.value) }
+		val english = publishedGlobalTranslationsEnglish.body as Map<String, String>
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.en,
+				tFornavn.key to tFornavn.en
+			),
+			english
+		)
 	}
 
 	@Test
@@ -72,6 +85,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken()
 		val globalTranslations = testFormsApi.getGlobalTranslations().body as List<GlobalTranslationDto>
 		val tFornavn = globalTranslations.find { it.key == "Fornavn" }!!
+		val tRequired = translations.values.find { it.key == "required" }!!
 
 		val updatedEnTranslation = "${tFornavn.en}postfix"
 		val putResponse = testFormsApi.putGlobalTranslation(
@@ -90,9 +104,15 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		assertTrue(publishResponse.statusCode.is2xxSuccessful)
 
 		val publishedGlobalTranslationsEnglish = testFormsApi.getPublishedGlobalTranslations(LanguageCode.EN.value)
-		val english = publishedGlobalTranslationsEnglish.body as List<PublishedGlobalTranslationDto>
-		assertEquals(2, english.size)
-		english.find { it.key == tFornavn.key }.also { assertEquals(updatedEnTranslation, it?.value) }
+		val english = publishedGlobalTranslationsEnglish.body as Map<String,String>
+		assertEquals(2, english.keys.size)
+		assertEquals(
+			mapOf(
+				tRequired.key to tRequired.en,
+				tFornavn.key to updatedEnTranslation
+			),
+			english
+		)
 	}
 
 	@Test
@@ -107,29 +127,6 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken(groups = listOf(MOCK_USER_GROUP_ID))
 		val publishResponse = testFormsApi.publishGlobalTranslations(authToken)
 		assertTrue(publishResponse.statusCode.is4xxClientError)
-	}
-
-	private fun create(
-		key: String,
-		tag: String,
-		nb: String?,
-		nn: String?,
-		en: String?,
-		authToken: String
-	): GlobalTranslationDto {
-		val createResponse = testFormsApi.createGlobalTranslation(
-			NewGlobalTranslationRequest(
-				key = key,
-				tag = tag,
-				nb = nb,
-				nn = nn,
-				en = en,
-			),
-			authToken,
-		)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as GlobalTranslationDto
-		return createResponse.body
 	}
 
 }

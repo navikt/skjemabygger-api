@@ -1,23 +1,21 @@
 get:
-  summary: Henter publiserte globale oversettelser
+  summary: Henter publiserte globale oversettelser for et språk
   description: Henter
-  operationId: getPublishedGlobalTranslationsInformation
+  operationId: getPublishedGlobalTranslations
   security: []
   parameters:
-    - name: languageCodes
-      description: Språkkode, kommaseparert hvis flere
-      example: nn,en
-      in: header
-      required: false
+    - name: languageCode
+      in: path
+      required: true
       schema:
-        $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
+        $ref: "../common/components.yaml#/components/schemas/LanguageCode"
   responses:
     '200':
-      description: Informasjon om forrige publiserte globale oversettelser
+      description: Alle publiserte globale oversettelser for et språk
       content:
         application/json:
           schema:
-            $ref: "./components.yaml#/components/schemas/PublishedGlobalTranslationsDto"
+            $ref: "./components.yaml#/components/schemas/GlobalTranslationsMap"
     '400':
       description: Feil i forespørsel
       content:

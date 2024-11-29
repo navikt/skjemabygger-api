@@ -27,3 +27,7 @@ components:
       type: string
       description: Språkkode (nb, nn, en)
       example: en
+    LanguageCodes:
+      type: string
+      description: Språkkode, kommaseparert hvis flere
+      example: nb,en

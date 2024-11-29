@@ -44,6 +44,9 @@ paths:
     $ref: "./global-translations/publish_global_translations.yaml"
 
   /v1/published-global-translations/{languageCode}:
+    $ref: "./global-translations/published_global_translations_lang.yaml"
+
+  /v1/published-global-translations:
     $ref: "./global-translations/published_global_translations.yaml"
 
   /v1/forms/{formPath}/translations:

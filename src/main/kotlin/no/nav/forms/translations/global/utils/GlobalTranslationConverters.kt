@@ -32,3 +32,8 @@ fun GlobalTranslationRevisionEntity.getTranslation(languageCode: LanguageCode): 
 		LanguageCode.EN -> en
 	}
 }
+
+fun List<GlobalTranslationRevisionEntity>.mapToDictionary(languageCode: LanguageCode): Map<String, String> {
+	return associate { it.globalTranslation.key to it.getTranslation(languageCode) }
+		.filter { it.value != null } as Map<String, String>
+}
