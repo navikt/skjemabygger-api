@@ -399,6 +399,8 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals(createRequest.nn, createResponse.body.nn)
 		assertEquals(createRequest.en, createResponse.body.en)
 
+		testFormsApi.publishGlobalTranslations(authToken)
+
 		val deleteResponse = testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
 		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
 
@@ -411,6 +413,8 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals(recreateRequest.nb, recreateResponse.body.nb)
 		assertEquals(recreateRequest.nn, recreateResponse.body.nn)
 		assertEquals(recreateRequest.en, recreateResponse.body.en)
+		assertNotNull(recreateResponse.body.publishedAt)
+		assertNotNull(recreateResponse.body.publishedBy)
 
 		val getResponse = testFormsApi.getGlobalTranslations()
 		assertTrue(getResponse.statusCode.is2xxSuccessful)
@@ -420,6 +424,53 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		assertEquals(recreateRequest.nn, translation.nn)
 		assertEquals(recreateRequest.en, translation.en)
 		assertEquals(recreateRequest.tag, translation.tag)
+		assertNotNull(translation.publishedAt)
+		assertNotNull(translation.publishedBy)
 	}
 
+	@Test
+	fun testPublishedAtIsCorrectAfterUpdate() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+			en = "Given name"
+		)
+		val createResponse = testFormsApi.createGlobalTranslation(createRequest, authToken)
+		assertTrue(createResponse.statusCode.is2xxSuccessful)
+		createResponse.body as GlobalTranslationDto
+
+		// Publish all global translations
+		testFormsApi.publishGlobalTranslations(authToken)
+		val publishedResponse = testFormsApi.getPublishedGlobalTranslationsInformation(listOf("en"))
+		assertTrue(publishedResponse.statusCode.is2xxSuccessful)
+		publishedResponse.body as PublishedGlobalTranslationsDto
+		val englishMap = publishedResponse.body.translations?.get("en")
+		assertEquals(createRequest.en, englishMap?.get(createRequest.key))
+
+		// Update the translation after publish
+		val putRequest = UpdateGlobalTranslationRequest(
+			nb = "Fornavn",
+			nn = "Fornamn",
+			en = "Given name with change"
+		)
+		val putResponse =
+			testFormsApi.putGlobalTranslation(createResponse.body.id, createResponse.body.revision!!, putRequest, authToken)
+		assertTrue(putResponse.statusCode.is2xxSuccessful)
+		putResponse.body as GlobalTranslationDto
+
+		val globalTranslationsResponse = testFormsApi.getGlobalTranslations()
+		assertTrue(globalTranslationsResponse.statusCode.is2xxSuccessful)
+		globalTranslationsResponse.body as List<GlobalTranslationDto>
+
+		// Verify updated translation data with published information
+		val globalTranslationCurrentState = globalTranslationsResponse.body.firstOrNull()
+		assertNotNull(globalTranslationCurrentState)
+		assertEquals(putRequest.en, globalTranslationCurrentState?.en, "Should contain the updated translated text")
+		assertEquals(publishedResponse.body.publishedAt, globalTranslationCurrentState?.publishedAt, "Should still show published timestamp")
+		assertNotNull(globalTranslationCurrentState?.publishedBy, "Should show who published this last time")
+		assertTrue(globalTranslationCurrentState?.changedAt?.isAfter(publishedResponse.body.publishedAt) == true, "Changed at timestamp should be after published at")
+
+		assertEquals(publishedResponse.body.publishedAt, putResponse.body.publishedAt)
+	}
 }

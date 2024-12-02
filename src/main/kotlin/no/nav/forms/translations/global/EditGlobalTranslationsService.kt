@@ -8,8 +8,11 @@ import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.form.repository.FormTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.GlobalTranslationRevisionRepository
+import no.nav.forms.translations.global.repository.PublishedGlobalTranslationsRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationRevisionEntity
+import no.nav.forms.translations.global.repository.entity.PublishedGlobalTranslationsEntity
+import no.nav.forms.translations.global.utils.containsGlobalTranslation
 import no.nav.forms.translations.global.utils.getLatestRevision
 import no.nav.forms.translations.global.utils.isDeleted
 import no.nav.forms.translations.global.utils.toDto
@@ -22,13 +25,18 @@ class EditGlobalTranslationsService(
 	val globalTranslationRevisionRepository: GlobalTranslationRevisionRepository,
 	val globalTranslationRepository: GlobalTranslationRepository,
 	val formTranslationRepository: FormTranslationRepository,
+	val publishedGlobalTranslationsRepository: PublishedGlobalTranslationsRepository,
 	val entityManager: EntityManager,
 ) {
 
 	@Transactional
 	fun getLatestRevisions(): List<GlobalTranslationDto> {
-		val all = globalTranslationRepository.findAllByDeletedAtIsNull()
-		return all.map(GlobalTranslationEntity::toDto)
+		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
+		return globalTranslationRepository.findAllByDeletedAtIsNull()
+			.map {
+				val (publishedAt, publishedBy) = getIfPublished(publishedGlobalTranslations, it)
+				it.toDto(publishedAt, publishedBy)
+			}
 	}
 
 	@Transactional
@@ -73,7 +81,11 @@ class EditGlobalTranslationsService(
 		)
 		entityManager.flush()
 		entityManager.refresh(globalTranslation)
-		return globalTranslation.toDto()
+
+		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
+		val (publishedAt, publishedBy) = getIfPublished(publishedGlobalTranslations, globalTranslation)
+
+		return globalTranslation.toDto(publishedAt, publishedBy)
 	}
 
 	@Transactional
@@ -102,7 +114,22 @@ class EditGlobalTranslationsService(
 			)
 		)
 		entityManager.refresh(globalTranslation)
-		return globalTranslation.toDto()
+
+		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
+		val (publishedAt, publishedBy) = getIfPublished(publishedGlobalTranslations, globalTranslation)
+
+		return globalTranslation.toDto(publishedAt, publishedBy)
+	}
+
+	private fun getIfPublished(
+		publishedTranslations: PublishedGlobalTranslationsEntity?,
+		globalTranslation: GlobalTranslationEntity
+	): Pair<LocalDateTime?, String?> {
+		val currentlyPublished = publishedTranslations?.containsGlobalTranslation(globalTranslation) == true
+		if (currentlyPublished) {
+			return Pair(publishedTranslations.createdAt, publishedTranslations.createdBy)
+		}
+		return Pair(null, null)
 	}
 
 	@Transactional
