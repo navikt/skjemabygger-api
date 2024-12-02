@@ -22,6 +22,15 @@ data class GlobalTranslationRevisionEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "global_translation_id", nullable = false)
 	val globalTranslation: GlobalTranslationEntity,
+
+	@ManyToMany(cascade = [], fetch = FetchType.LAZY)
+	@JoinTable(
+		name = "published_global_translation_revision",
+		joinColumns = [JoinColumn(name = "global_translation_revision_id", referencedColumnName = "id")],
+		inverseJoinColumns = [JoinColumn(name = "published_global_translation_id", referencedColumnName = "id")]
+	)
+	@OrderBy("created_at asc")
+	val publications: List<PublishedGlobalTranslationsEntity>? = emptyList(),
 ) {
 
 	override fun equals(other: Any?): Boolean {
