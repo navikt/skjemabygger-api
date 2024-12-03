@@ -2,6 +2,7 @@ package no.nav.forms
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.model.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
@@ -10,7 +11,17 @@ import org.springframework.util.MultiValueMap
 data class FormsApiResponse<T>(
 	val statusCode: HttpStatusCode,
 	val body: T? = null,
-)
+) {
+	fun <B> successBody(): B {
+		assertTrue(statusCode.is2xxSuccessful, "Expected successful response code")
+		return body!! as B
+	}
+
+	fun isSuccess(): FormsApiResponse<T> {
+		assertTrue(statusCode.is2xxSuccessful, "Expected successful response code")
+		return this
+	}
+}
 
 private const val formsapiEntityRevisionHeaderName = "Formsapi-Entity-Revision"
 
@@ -163,7 +174,7 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, response.body!!)
 	}
 
-	fun getPublishedGlobalTranslationsInformation(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<Any> {
+	fun getGlobalTranslationPublication(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<Any> {
 		val queryString = if (languageCodeValues != null && !languageCodeValues.isEmpty()) "?languageCodes=${languageCodeValues.joinToString(",")}" else ""
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/published-global-translations$queryString",
@@ -171,11 +182,16 @@ class TestFormsApi(
 			HttpEntity(null, httpHeaders(null)),
 			String::class.java
 		)
+		val body: Any = parsePublishedGlobalTranslationsResponse(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	private fun parsePublishedGlobalTranslationsResponse(response: ResponseEntity<String>): Any {
 		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
 			response.body,
 			PublishedGlobalTranslationsDto::class.java
 		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
-		return FormsApiResponse(response.statusCode, body)
+		return body
 	}
 
 	fun deleteFormTranslation(formPath: String, formTranslationId: Long, authToken: String? = null): FormsApiResponse<Any> {

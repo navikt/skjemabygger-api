@@ -30,7 +30,7 @@ fun GlobalTranslationEntity.isDeleted() = this.deletedAt != null
 fun GlobalTranslationEntity.getLatestRevision(): GlobalTranslationRevisionEntity? = this.revisions?.lastOrNull()
 
 fun GlobalTranslationEntity.getLatestPublication(): PublishedGlobalTranslationsEntity? {
-	val latestPublishedRevision = this.revisions?.firstOrNull { revision -> revision.publications?.isEmpty() == false }
+	val latestPublishedRevision = this.revisions?.lastOrNull { revision -> revision.publications?.isEmpty() == false }
 	return latestPublishedRevision?.publications?.last()
 }
 
