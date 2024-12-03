@@ -20,9 +20,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			nb = "Opplysninger om søker",
 			nn = "Opppplysningar om søkjaren",
 		)
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
 		assertEquals(createRequest.key, createResponse.body.key)
 		assertEquals(1, createResponse.body.revision)
@@ -41,9 +39,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			createResponse.body.revision!!,
 			updateRequest,
 			authToken,
-		)
-		assertTrue(updateResponse.statusCode.is2xxSuccessful)
-		updateResponse.body as FormTranslationDto
+		).assertSuccess()
 
 		assertEquals(createRequest.key, updateResponse.body.key)
 		assertEquals(2, updateResponse.body.revision)
@@ -62,11 +58,11 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			nb = "Opplysninger om søker",
 			nn = "Opppplysningar om søkjaren",
 		)
-		val createResponse1 = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse1.statusCode.is2xxSuccessful)
+		testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+			.assertSuccess()
 
-		val createResponse2 = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertEquals(HttpStatus.CONFLICT.value(), createResponse2.statusCode.value())
+		testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+			.assertHttpStatus(HttpStatus.CONFLICT)
 	}
 
 	@Test
@@ -78,9 +74,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			key = "Tester",
 			nb = "Tester",
 		)
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 		val formTranslationId = createResponse.body.id
 
 		assertEquals(1, createResponse.body.revision)
@@ -89,23 +83,21 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			nb = createResponse.body.nb,
 			nn = "Testar",
 		)
-		val updateResponse1 = testFormsApi.updateFormTranslation(
+		testFormsApi.updateFormTranslation(
 			formPath,
 			formTranslationId,
 			1,
 			updateRequest,
 			authToken,
-		)
-		assertTrue(updateResponse1.statusCode.is2xxSuccessful)
+		).assertSuccess()
 
-		val updateResponse2 = testFormsApi.updateFormTranslation(
+		testFormsApi.updateFormTranslation(
 			formPath,
 			formTranslationId,
 			1,
 			updateRequest,
 			authToken,
-		)
-		assertEquals(HttpStatus.CONFLICT.value(), updateResponse2.statusCode.value())
+		).assertHttpStatus(HttpStatus.CONFLICT)
 	}
 
 	@Test
@@ -118,13 +110,9 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			key = "Tester",
 			nb = "Tester",
 		)
-		val createResponse1 = testFormsApi.createFormTranslation(nav111111, createRequest, authToken)
-		assertTrue(createResponse1.statusCode.is2xxSuccessful)
-		createResponse1.body as FormTranslationDto
+		val createResponse1 = testFormsApi.createFormTranslation(nav111111, createRequest, authToken).assertSuccess()
 
-		val createResponse2 = testFormsApi.createFormTranslation(nav222222, createRequest, authToken)
-		assertTrue(createResponse2.statusCode.is2xxSuccessful)
-		createResponse2.body as FormTranslationDto
+		val createResponse2 = testFormsApi.createFormTranslation(nav222222, createRequest, authToken).assertSuccess()
 
 		val updateRequest = UpdateFormTranslationRequest(
 			nb = createResponse1.body.nb,
@@ -152,31 +140,27 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 				nb = "Foo",
 			),
 			authToken
-		)
-		assertTrue(createResponse1.statusCode.is2xxSuccessful)
-		createResponse1.body as FormTranslationDto
+		).assertSuccess()
 
-		val createResponse2 = testFormsApi.createFormTranslation(
+		testFormsApi.createFormTranslation(
 			formPath,
 			NewFormTranslationRequestDto(
 				key = "Bar",
 				nb = "Bar",
 			),
 			authToken
-		)
-		assertTrue(createResponse2.statusCode.is2xxSuccessful)
+		).assertSuccess()
 
-		val createResponse3 = testFormsApi.createFormTranslation(
+		testFormsApi.createFormTranslation(
 			formPath,
 			NewFormTranslationRequestDto(
 				key = "Foobar",
 				nb = "Foobar",
 			),
 			authToken
-		)
-		assertTrue(createResponse3.statusCode.is2xxSuccessful)
+		).assertSuccess()
 
-		val putResponse1 = testFormsApi.updateFormTranslation(
+		testFormsApi.updateFormTranslation(
 			formPath,
 			createResponse1.body.id,
 			createResponse1.body.revision!!,
@@ -185,13 +169,9 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 				nn = "Nynorskfoo"
 			),
 			authToken
-		)
-		assertTrue(putResponse1.statusCode.is2xxSuccessful)
+		).assertSuccess()
 
-		val response = testFormsApi.getFormTranslations(formPath)
-		assertTrue(response.statusCode.is2xxSuccessful)
-		response.body as List<*>
-
+		val response = testFormsApi.getFormTranslations(formPath).assertSuccess()
 		assertEquals(3, response.body.size)
 	}
 
@@ -203,25 +183,19 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
 			authToken
-		)
-		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslationDto
+		).assertSuccess()
 		assertNotNull(globalTranslationResponse.body.id)
 
-		val createResponse1 = testFormsApi.createFormTranslation(
+		testFormsApi.createFormTranslation(
 			formPath,
 			NewFormTranslationRequestDto(
 				key = "Ja",
 				globalTranslationId = globalTranslationResponse.body.id,
 			),
 			authToken
-		)
-		assertTrue(createResponse1.statusCode.is2xxSuccessful)
-		createResponse1.body as FormTranslationDto
+		).assertSuccess()
 
-		val response = testFormsApi.getFormTranslations(formPath)
-		assertTrue(response.statusCode.is2xxSuccessful)
-		response.body as List<*>
+		val response = testFormsApi.getFormTranslations(formPath).assertSuccess()
 		assertEquals(1, response.body.size)
 		val formTranslation = response.body.firstOrNull() as FormTranslationDto
 		assertEquals(globalTranslationResponse.body.id, formTranslation.globalTranslationId)
@@ -242,12 +216,9 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 				globalTranslationId = 37,
 			),
 			authToken
-		)
-		assertTrue(createResponse.statusCode.is4xxClientError)
-		createResponse.body as ErrorResponseDto
+		).assertHttpStatus(HttpStatus.BAD_REQUEST)
 
-		assertEquals(HttpStatus.BAD_REQUEST.value(), createResponse.statusCode.value())
-		assertEquals("Global translation not found", createResponse.body.errorMessage)
+		assertEquals("Global translation not found", createResponse.errorBody.errorMessage)
 	}
 
 	@Test
@@ -258,9 +229,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
 			authToken
-		)
-		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslationDto
+		).assertSuccess()
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val createResponse = testFormsApi.createFormTranslation(
@@ -273,14 +242,10 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 				en = "Yes",
 			),
 			authToken
-		)
-		assertTrue(createResponse.statusCode.is4xxClientError)
-		createResponse.body as ErrorResponseDto
-
-		assertEquals(DbError.FORMSAPI_001.httpStatus.value(), createResponse.statusCode.value())
+		).assertHttpStatus(DbError.FORMSAPI_001.httpStatus)
 		assertEquals(
 			DbError.FORMSAPI_001.message,
-			createResponse.body.errorMessage
+			createResponse.errorBody.errorMessage
 		)
 	}
 
@@ -294,16 +259,12 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			nb = "Ja",
 			nn = "Ja",
 		)
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest("Ja", "skjematekster", "Ja", "Ja", "Yes"),
 			authToken
-		)
-		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslationDto
+		).assertSuccess()
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val updateRequest = UpdateFormTranslationRequest(
@@ -318,14 +279,10 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			createResponse.body.revision!!,
 			updateRequest,
 			authToken,
-		)
-		assertTrue(updateResponse.statusCode.is4xxClientError)
-		updateResponse.body as ErrorResponseDto
-
-		assertEquals(DbError.FORMSAPI_001.httpStatus.value(), updateResponse.statusCode.value())
+		).assertHttpStatus(DbError.FORMSAPI_001.httpStatus)
 		assertEquals(
 			DbError.FORMSAPI_001.message,
-			updateResponse.body.errorMessage
+			updateResponse.errorBody.errorMessage
 		)
 	}
 
@@ -335,16 +292,12 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei", nn = "Nei")
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
 			NewGlobalTranslationRequest(key = "Ja", tag = "skjematekster", nb = "Ja", nn = "Ja", en = "Yes"),
 			authToken
-		)
-		assertTrue(globalTranslationResponse.statusCode.is2xxSuccessful)
-		globalTranslationResponse.body as GlobalTranslationDto
+		).assertSuccess()
 		assertNotNull(globalTranslationResponse.body.id)
 
 		val updateRequest = UpdateFormTranslationRequest(
@@ -356,9 +309,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 			createResponse.body.revision!!,
 			updateRequest,
 			authToken,
-		)
-		assertTrue(updateResponse.statusCode.is2xxSuccessful)
-		updateResponse.body as FormTranslationDto
+		).assertSuccess()
 
 		assertEquals(globalTranslationResponse.body.nb, updateResponse.body.nb)
 		assertEquals(globalTranslationResponse.body.nn, updateResponse.body.nn)
@@ -371,12 +322,10 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
-		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse.body.id)
-		assertEquals(HttpStatus.UNAUTHORIZED.value(), deleteResponse.statusCode.value())
+		testFormsApi.deleteFormTranslation(formPath, createResponse.body.id)
+			.assertHttpStatus(HttpStatus.UNAUTHORIZED)
 	}
 
 	@Test
@@ -384,8 +333,8 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
-		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, 123L, authToken)
-		assertEquals(HttpStatus.NOT_FOUND.value(), deleteResponse.statusCode.value())
+		testFormsApi.deleteFormTranslation(formPath, 123L, authToken)
+			.assertHttpStatus(HttpStatus.NOT_FOUND)
 	}
 
 	@Test
@@ -394,16 +343,11 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
-		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
-		assertTrue(createResponse.statusCode.is2xxSuccessful)
-		createResponse.body as FormTranslationDto
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
-		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse.body.id, authToken)
-		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+		testFormsApi.deleteFormTranslation(formPath, createResponse.body.id, authToken).assertSuccess()
 
-		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath)
-		assertTrue(formTranslationsResponse.statusCode.is2xxSuccessful)
-		formTranslationsResponse.body as List<*>
+		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath).assertSuccess()
 		assertEquals(0, formTranslationsResponse.body.size)
 	}
 
@@ -413,23 +357,16 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest1 = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
-		val createResponse1 = testFormsApi.createFormTranslation(formPath, createRequest1, authToken)
-		assertTrue(createResponse1.statusCode.is2xxSuccessful)
-		createResponse1.body as FormTranslationDto
+		val createResponse1 = testFormsApi.createFormTranslation(formPath, createRequest1, authToken).assertSuccess()
 
-		val deleteResponse = testFormsApi.deleteFormTranslation(formPath, createResponse1.body.id, authToken)
-		assertTrue(deleteResponse.statusCode.is2xxSuccessful)
+		testFormsApi.deleteFormTranslation(formPath, createResponse1.body.id, authToken).assertSuccess()
 
 		val createRequest2 = NewFormTranslationRequestDto(key = "Nei", nb = "Nei", en = "No")
-		val createResponse2 = testFormsApi.createFormTranslation(formPath, createRequest2, authToken)
-		assertTrue(createResponse2.statusCode.is2xxSuccessful)
-		createResponse2.body as FormTranslationDto
+		testFormsApi.createFormTranslation(formPath, createRequest2, authToken).assertSuccess()
 
-		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath)
-		assertTrue(formTranslationsResponse.statusCode.is2xxSuccessful)
-		formTranslationsResponse.body as List<*>
+		val formTranslationsResponse = testFormsApi.getFormTranslations(formPath).assertSuccess()
 		assertEquals(1, formTranslationsResponse.body.size)
-		val formTranslation = formTranslationsResponse.body[0] as FormTranslationDto
+		val formTranslation = formTranslationsResponse.body[0]
 		assertEquals(2, formTranslation.revision)
 		assertEquals(createRequest2.key, formTranslation.key)
 		assertEquals(createRequest2.nb, formTranslation.nb)

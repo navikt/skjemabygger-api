@@ -3,22 +3,41 @@ package no.nav.forms
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.model.*
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.util.MultiValueMap
+import kotlin.test.assertEquals
 
 data class FormsApiResponse<T>(
 	val statusCode: HttpStatusCode,
-	val body: T? = null,
+	private val response: Pair<T?, ErrorResponseDto?>,
 ) {
-	fun <B> successBody(): B {
+	val body: T
+		get() {
+			assertTrue(statusCode.is2xxSuccessful, "Expected success")
+			return response.first!!
+		}
+
+	val errorBody: ErrorResponseDto
+		get() {
+			assertFalse(statusCode.is2xxSuccessful, "Expected failure")
+			return response.second!!
+		}
+
+	fun assertSuccess(): FormsApiResponse<T> {
 		assertTrue(statusCode.is2xxSuccessful, "Expected successful response code")
-		return body!! as B
+		return this
 	}
 
-	fun isSuccess(): FormsApiResponse<T> {
-		assertTrue(statusCode.is2xxSuccessful, "Expected successful response code")
+	fun assertClientError(): FormsApiResponse<T> {
+		assertTrue(statusCode.is4xxClientError, "Expected client error")
+		return this
+	}
+
+	fun assertHttpStatus(status: HttpStatus): FormsApiResponse<T> {
+		assertEquals(statusCode.value(), status.value())
 		return this
 	}
 }
@@ -37,14 +56,14 @@ class TestFormsApi(
 		request: NewGlobalTranslationRequest,
 		authToken: String? = null,
 		additionalHeaders: Map<String, String> = emptyMap()
-	): FormsApiResponse<Any> {
+	): FormsApiResponse<GlobalTranslationDto> {
 		val response = restTemplate.exchange(
 			globalTranslationBaseUrl,
 			HttpMethod.POST,
 			HttpEntity(request, httpHeaders(authToken, additionalHeaders)),
 			String::class.java
 		)
-		val body: Any = readGlobalTranslationBody(response)
+		val body = readGlobalTranslationBodyV2(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
@@ -54,7 +73,7 @@ class TestFormsApi(
 		request: UpdateGlobalTranslationRequest,
 		authToken: String? = null,
 		additionalHeaders: Map<String, String> = emptyMap()
-	): FormsApiResponse<Any> {
+	): FormsApiResponse<GlobalTranslationDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
 		val response = restTemplate.exchange(
 			"$globalTranslationBaseUrl/$id",
@@ -62,36 +81,39 @@ class TestFormsApi(
 			HttpEntity(request, httpHeaders(authToken, headers.plus(additionalHeaders))),
 			String::class.java
 		)
-		val body: Any = readGlobalTranslationBody(response)
+		val body = readGlobalTranslationBodyV2(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
 	fun deleteGlobalTranslation(
 		id: Long,
 		authToken: String? = null,
-	): FormsApiResponse<Any> {
+	): FormsApiResponse<Unit> {
 		val response = restTemplate.exchange(
 			"$globalTranslationBaseUrl/$id",
 			HttpMethod.DELETE,
 			HttpEntity(null, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body: ErrorResponseDto? = if (!response.statusCode.is2xxSuccessful) readErrorBody(response) else null
+		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
 	fun getGlobalTranslations(): FormsApiResponse<List<GlobalTranslationDto>> {
 		val responseType = object : ParameterizedTypeReference<List<GlobalTranslationDto>>() {}
 		val response = restTemplate.exchange(globalTranslationBaseUrl, HttpMethod.GET, null, responseType)
-		return FormsApiResponse(response.statusCode, response.body!!)
+		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
-	private fun readGlobalTranslationBody(response: ResponseEntity<String>): Any {
-		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
-			response.body,
-			GlobalTranslationDto::class.java
-		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
-		return body
+	private fun readGlobalTranslationBodyV2(response: ResponseEntity<String>): Pair<GlobalTranslationDto?, ErrorResponseDto?> {
+		if (response.statusCode.is2xxSuccessful) {
+			val body = objectMapper.readValue(
+				response.body,
+				GlobalTranslationDto::class.java
+			)!!
+			return Pair(body, null)
+		}
+		return Pair(null, objectMapper.readValue(response.body, ErrorResponseDto::class.java)!!)
 	}
 
 	private fun readErrorBody(response: ResponseEntity<String>): ErrorResponseDto {
@@ -114,15 +136,15 @@ class TestFormsApi(
 		formPath: String,
 		request: NewFormTranslationRequestDto,
 		authToken: String
-	): FormsApiResponse<Any> {
+	): FormsApiResponse<FormTranslationDto> {
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations",
 			HttpMethod.POST,
 			HttpEntity(request, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body: Any = readFormTranslationBody(response)
-		return FormsApiResponse(response.statusCode, body)
+		val body = readFormTranslationBody(response)
+		return FormsApiResponse<FormTranslationDto>(response.statusCode, body)
 	}
 
 	fun updateFormTranslation(
@@ -131,7 +153,7 @@ class TestFormsApi(
 		revision: Int,
 		request: UpdateFormTranslationRequest,
 		authToken: String,
-	): FormsApiResponse<Any> {
+	): FormsApiResponse<FormTranslationDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations/$formTranslationId",
@@ -139,69 +161,88 @@ class TestFormsApi(
 			HttpEntity(request, httpHeaders(authToken, headers)),
 			String::class.java
 		)
-		val body: Any = readFormTranslationBody(response)
-		return FormsApiResponse(response.statusCode, body)
+		val body = readFormTranslationBody(response)
+		return FormsApiResponse<FormTranslationDto>(response.statusCode, body)
 	}
 
-	private fun readFormTranslationBody(response: ResponseEntity<String>): Any {
-		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
-			response.body,
-			FormTranslationDto::class.java
-		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
-		return body
+	private fun readFormTranslationBody(response: ResponseEntity<String>): Pair<FormTranslationDto?, ErrorResponseDto?> {
+		if (response.statusCode.is2xxSuccessful) {
+			val body = objectMapper.readValue(
+				response.body,
+				FormTranslationDto::class.java
+			)
+			return Pair(body, null)
+		}
+		val errorBody = objectMapper.readValue(response.body, ErrorResponseDto::class.java)
+		return Pair(null, errorBody)
 	}
 
-	fun getFormTranslations(formPath: String): FormsApiResponse<Any> {
+	fun getFormTranslations(formPath: String): FormsApiResponse<List<FormTranslationDto>> {
 		val responseType = object : ParameterizedTypeReference<List<FormTranslationDto>>() {}
 		val response = restTemplate.exchange("$baseUrl/v1/forms/$formPath/translations", HttpMethod.GET, null, responseType)
-		return FormsApiResponse(response.statusCode, response.body!!)
+		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
-	fun publishGlobalTranslations(authToken: String?): FormsApiResponse<Any> {
+	fun publishGlobalTranslations(authToken: String?): FormsApiResponse<Unit> {
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/global-translations/publish",
 			HttpMethod.POST,
 			HttpEntity(null, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body: ErrorResponseDto? = if (!response.statusCode.is2xxSuccessful) readErrorBody(response) else null
+		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
 	fun getPublishedGlobalTranslations(languageCodeValue: String): FormsApiResponse<Map<String, String>> {
 		val responseType = object : ParameterizedTypeReference<Map<String, String>>() {}
-		val response = restTemplate.exchange("$baseUrl/v1/published-global-translations/$languageCodeValue", HttpMethod.GET, null, responseType)
-		return FormsApiResponse(response.statusCode, response.body!!)
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/published-global-translations/$languageCodeValue",
+			HttpMethod.GET,
+			null,
+			responseType
+		)
+		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
-	fun getGlobalTranslationPublication(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<Any> {
-		val queryString = if (languageCodeValues != null && !languageCodeValues.isEmpty()) "?languageCodes=${languageCodeValues.joinToString(",")}" else ""
+	fun getGlobalTranslationPublication(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<PublishedGlobalTranslationsDto> {
+		val queryString = if (languageCodeValues != null && !languageCodeValues.isEmpty()) "?languageCodes=${
+			languageCodeValues.joinToString(",")
+		}" else ""
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/published-global-translations$queryString",
 			HttpMethod.GET,
 			HttpEntity(null, httpHeaders(null)),
 			String::class.java
 		)
-		val body: Any = parsePublishedGlobalTranslationsResponse(response)
+		val body = parsePublishedGlobalTranslationsResponse(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	private fun parsePublishedGlobalTranslationsResponse(response: ResponseEntity<String>): Any {
-		val body: Any = if (response.statusCode.is2xxSuccessful) objectMapper.readValue(
-			response.body,
-			PublishedGlobalTranslationsDto::class.java
-		) else objectMapper.readValue(response.body, ErrorResponseDto::class.java)
-		return body
+	private fun parsePublishedGlobalTranslationsResponse(response: ResponseEntity<String>): Pair<PublishedGlobalTranslationsDto?, ErrorResponseDto?> {
+		if (response.statusCode.is2xxSuccessful) {
+			val body = objectMapper.readValue(
+				response.body,
+				PublishedGlobalTranslationsDto::class.java
+			)
+			return Pair(body, null)
+		}
+		val errorBody = objectMapper.readValue(response.body, ErrorResponseDto::class.java)
+		return Pair(null, errorBody)
 	}
 
-	fun deleteFormTranslation(formPath: String, formTranslationId: Long, authToken: String? = null): FormsApiResponse<Any> {
+	fun deleteFormTranslation(
+		formPath: String,
+		formTranslationId: Long,
+		authToken: String? = null
+	): FormsApiResponse<Unit> {
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations/$formTranslationId",
 			HttpMethod.DELETE,
 			HttpEntity(null, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body: ErrorResponseDto? = if (!response.statusCode.is2xxSuccessful) readErrorBody(response) else null
+		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
