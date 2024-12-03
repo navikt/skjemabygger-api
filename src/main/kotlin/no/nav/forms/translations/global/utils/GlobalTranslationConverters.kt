@@ -18,7 +18,7 @@ fun GlobalTranslationEntity.toDto(): GlobalTranslationDto {
 		nb = latestRevision.nb,
 		nn = latestRevision.nn,
 		en = latestRevision.en,
-		changedAt = latestRevision.run { mapDateTime(this.createdAt) },
+		changedAt = mapDateTime(latestRevision.createdAt),
 		changedBy = latestRevision.createdBy,
 		publishedAt = if (latestPublication != null) mapDateTime(latestPublication.createdAt) else null,
 		publishedBy = latestPublication?.createdBy,
