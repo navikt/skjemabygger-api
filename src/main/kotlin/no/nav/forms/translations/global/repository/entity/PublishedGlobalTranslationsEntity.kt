@@ -17,7 +17,7 @@ data class PublishedGlobalTranslationsEntity(
 		joinColumns = [JoinColumn(name = "published_global_translation_id", referencedColumnName = "id")],
 		inverseJoinColumns = [JoinColumn(name = "global_translation_revision_id", referencedColumnName = "id")]
 	)
-	val globalTranslations: List<GlobalTranslationRevisionEntity>
+	val globalTranslationRevisions: List<GlobalTranslationRevisionEntity>
 ) {
 
 	override fun equals(other: Any?): Boolean {

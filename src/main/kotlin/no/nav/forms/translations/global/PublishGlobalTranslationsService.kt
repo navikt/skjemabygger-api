@@ -22,7 +22,7 @@ class PublishGlobalTranslationsService(
 	fun getPublishedGlobalTranslations(languageCode: LanguageCode): Map<String, String> {
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")
-		return publishedGlobalTranslations.globalTranslations.mapToDictionary(languageCode)
+		return publishedGlobalTranslations.globalTranslationRevisions.mapToDictionary(languageCode)
 	}
 
 	@Transactional
@@ -33,7 +33,7 @@ class PublishGlobalTranslationsService(
 			PublishedGlobalTranslationsEntity(
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
-				globalTranslations = latestRevisions
+				globalTranslationRevisions = latestRevisions
 			)
 		)
 	}
@@ -42,7 +42,7 @@ class PublishGlobalTranslationsService(
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")
 		val translations = languageCodes?.associate {
-			it.value to publishedGlobalTranslations.globalTranslations.mapToDictionary(it)
+			it.value to publishedGlobalTranslations.globalTranslationRevisions.mapToDictionary(it)
 		}
 		return PublishedGlobalTranslationsDto(
 			publishedAt = mapDateTime(publishedGlobalTranslations.createdAt),
