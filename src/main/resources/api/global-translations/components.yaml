@@ -16,6 +16,8 @@ components:
       - id
       - key
       - tag
+      - changedAt
+      - changedBy
       properties:
         id:
           $ref: "#/components/schemas/GlobalTranslationId"
@@ -50,6 +52,15 @@ components:
           type: string
           description: Hvem endret denne oversettelsen sist
           example: Nilsen, Nils
+        publishedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsen sist ble publisert
+          example: 2021-12-03T15:10:00Z
+        publishedBy:
+          type: string
+          description: Hvem publiserte denne oversettelsen sist
+          example: Olavsen, Olava
     NewGlobalTranslationRequest:
       type: object
       description: En ny global oversettelse

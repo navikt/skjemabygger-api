@@ -27,8 +27,8 @@ class EditGlobalTranslationsService(
 
 	@Transactional
 	fun getLatestRevisions(): List<GlobalTranslationDto> {
-		val all = globalTranslationRepository.findAllByDeletedAtIsNull()
-		return all.map(GlobalTranslationEntity::toDto)
+		return globalTranslationRepository.findAllByDeletedAtIsNull()
+			.map(GlobalTranslationEntity::toDto)
 	}
 
 	@Transactional
@@ -73,6 +73,7 @@ class EditGlobalTranslationsService(
 		)
 		entityManager.flush()
 		entityManager.refresh(globalTranslation)
+
 		return globalTranslation.toDto()
 	}
 

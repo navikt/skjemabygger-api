@@ -47,7 +47,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testPublishInformationWithoutTranslations() {
-		val response = testFormsApi.getPublishedGlobalTranslationsInformation()
+		val response = testFormsApi.getGlobalTranslationPublication()
 		assertTrue(response.statusCode.is2xxSuccessful)
 		response.body as PublishedGlobalTranslationsDto
 
@@ -58,7 +58,7 @@ class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testPublishInformation() {
-		val response = testFormsApi.getPublishedGlobalTranslationsInformation(listOf("en", "nn"))
+		val response = testFormsApi.getGlobalTranslationPublication(listOf("en", "nn"))
 		assertTrue(response.statusCode.is2xxSuccessful)
 		response.body as PublishedGlobalTranslationsDto
 
