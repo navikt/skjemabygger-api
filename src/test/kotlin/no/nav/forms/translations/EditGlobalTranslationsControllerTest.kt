@@ -149,7 +149,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			),
 			adminToken
 		).assertClientError()
-		assertEquals("Invalid revision: 2", firstPutResponse.errorBody.errorMessage)
+		assertEquals("Conflict", firstPutResponse.errorBody.errorMessage)
 
 		val globalTranslationsResponse = testFormsApi.getGlobalTranslations().assertSuccess()
 		assertEquals(1, globalTranslationsResponse.body.size)

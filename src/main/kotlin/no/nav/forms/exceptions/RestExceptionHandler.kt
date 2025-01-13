@@ -35,10 +35,8 @@ class RestExceptionHandler {
 	}
 
 	@ExceptionHandler(
-		value = [
-			JwtTokenMissingException::class,
-			JwtTokenUnauthorizedException::class,
-		]
+		JwtTokenMissingException::class,
+		JwtTokenUnauthorizedException::class,
 	)
 	fun handlJwtTokenUnauthorized(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.UNAUTHORIZED
@@ -54,19 +52,20 @@ class RestExceptionHandler {
 	}
 
 	@ExceptionHandler(
-		value = [
-			DataIntegrityViolationException::class,
-			DuplicateResourceException::class,
-		]
+		InvalidRevisionException::class,
+		DuplicateResourceException::class,
 	)
-	fun handleDataIntegrityViolationException(exception: Exception): ResponseEntity<ErrorResponseDto> {
+	fun handleConflict(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.CONFLICT
-		logger.info(exception.message ?: status.reasonPhrase, exception)
+		logger.info(exception.message, exception)
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))
 	}
 
-	@ExceptionHandler
-	fun handleIllegalArgumentException(exception: IllegalArgumentException): ResponseEntity<ErrorResponseDto> {
+	@ExceptionHandler(
+		DataIntegrityViolationException::class,
+		IllegalArgumentException::class,
+	)
+	fun handleBadRequest(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.BAD_REQUEST
 		logger.info(exception.message ?: status.reasonPhrase, exception)
 		return ResponseEntity.status(status).body(ErrorResponseDto(exception.message ?: status.reasonPhrase, getCorrelationId()))

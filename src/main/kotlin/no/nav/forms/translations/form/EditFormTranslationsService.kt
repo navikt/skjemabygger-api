@@ -2,6 +2,7 @@ package no.nav.forms.translations.form
 
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.DuplicateResourceException
+import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.FormTranslationDto
 import no.nav.forms.translations.form.repository.FormRevisionTranslationRevisionRepository
@@ -52,10 +53,10 @@ class EditFormTranslationsService(
 		if (formTranslation.formPath != formPath) {
 			throw IllegalArgumentException("Illegal combination of form path and form translation id")
 		}
-		if (formTranslation.revisions?.any { it.revision == revision } == false) {
-			throw IllegalArgumentException("Invalid revision: $revision")
-		}
 		val latestRevision = formTranslation.revisions?.lastOrNull()
+		if (latestRevision?.revision != revision) {
+			throw InvalidRevisionException("Unexpected form translation revision: $revision")
+		}
 		val newFormTranslationRevision = formTranslationRevisionRepository.save(
 			FormTranslationRevisionEntity(
 				formTranslation = formTranslation,

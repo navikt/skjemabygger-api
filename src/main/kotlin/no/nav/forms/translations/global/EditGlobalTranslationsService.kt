@@ -3,6 +3,7 @@ package no.nav.forms.translations.global
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.DuplicateResourceException
+import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.form.repository.FormTranslationRepository
@@ -88,8 +89,9 @@ class EditGlobalTranslationsService(
 	): GlobalTranslationDto {
 		val globalTranslation = globalTranslationRepository.findByIdAndDeletedAtIsNull(id)
 			?: throw ResourceNotFoundException("Global translation not found", id.toString())
-		if (globalTranslation.revisions?.any { it.revision == revision } == false) {
-			throw IllegalArgumentException("Invalid revision: $revision")
+		val latestRevision = globalTranslation.revisions?.lastOrNull()
+		if (latestRevision?.revision != revision) {
+			throw InvalidRevisionException("Unexpected global translation revision: $revision")
 		}
 		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
