@@ -4,7 +4,9 @@ import no.nav.forms.ApplicationTest
 import no.nav.forms.model.*
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
+import no.nav.forms.testutils.FormsTestdata
 import no.nav.forms.utils.LanguageCode
+import no.nav.forms.utils.toFormPath
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
@@ -265,9 +267,11 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			tag = "skjematekster",
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(request, authToken).assertSuccess()
-
+		val newFormRequest = FormsTestdata.newFormRequest(skjemanummer = "NAV 12-34.56")
+		testFormsApi.createForm(newFormRequest, authToken)
+			.assertSuccess()
 		testFormsApi.createFormTranslation(
-			"nav123456",
+			newFormRequest.skjemanummer.toFormPath(),
 			NewFormTranslationRequestDto(
 				"Fornavn",
 				globalTranslationId = createResponse.body.id
@@ -288,15 +292,18 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		)
 		val createResponse = testFormsApi.createGlobalTranslation(request, authToken).assertSuccess()
 
+		val newFormRequest = FormsTestdata.newFormRequest(skjemanummer = "NAV 12-34.56")
+		testFormsApi.createForm(newFormRequest, authToken)
+			.assertSuccess()
 		val createFormTranslationResponse = testFormsApi.createFormTranslation(
-			"nav123456",
+			newFormRequest.skjemanummer.toFormPath(),
 			NewFormTranslationRequestDto(
 				"Fornavn",
 				globalTranslationId = createResponse.body.id
 			),
 			authToken
 		).assertSuccess()
-		val updateFormTranslationResponse = testFormsApi.updateFormTranslation(
+		testFormsApi.updateFormTranslation(
 			"nav123456",
 			createFormTranslationResponse.body.id,
 			createFormTranslationResponse.body.revision!!,

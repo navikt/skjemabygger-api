@@ -1,0 +1,117 @@
+components:
+  schemas:
+    FormDbId:
+      type: integer
+      format: int64
+      description: Skjemaets id i databasen
+      example: 75
+    FormRevision:
+      type: integer
+      description: Revisjonsidentifikator. Hver endring av et skjema gir en ny revisjon.
+      example: 3
+    Skjemanummer:
+      type: string
+      description: Nav skjemanummer
+      example: NAV 12-34.56
+    Component:
+      type: object
+      additionalProperties: {}
+      description: En komponent i skjemadefinisjonen (json)
+      example: {"type": "panel", "label": "Veiledning"}
+    Components:
+      type: array
+      description: En liste med alle komponentene i skjemaet (json)
+      example: [{"type": "panel", "label": "Veiledning", "components": [{"type": "text", "label": "Fornavn"}]}]
+      items:
+        $ref: "#/components/schemas/Component"
+    Properties:
+      type: object
+      additionalProperties: {}
+      description: Et objekt med skjemaets egenskaper (json)
+      example: {"tema": "AAP", "innsending": "PAPIR_OG_DIGITAL"}
+    NewFormRequest:
+      type: object
+      description: Et nytt skjema
+      required:
+      - skjemanummer
+      - title
+      - components
+      - properties
+      properties:
+        skjemanummer:
+          $ref: "#/components/schemas/Skjemanummer"
+        title:
+          type: string
+          description: Skjemaets tittel
+          example: Søknad om servicehund
+        components:
+          $ref: "#/components/schemas/Components"
+        properties:
+          $ref: "#/components/schemas/Properties"
+    UpdateFormRequest:
+      type: object
+      description: Data for skjemaet som skal oppdateres
+      required:
+      - title
+      - components
+      - properties
+      properties:
+        title:
+          type: string
+          description: Skjemaets tittel
+          example: Søknad om servicehund
+        components:
+          $ref: "#/components/schemas/Components"
+        properties:
+          $ref: "#/components/schemas/Properties"
+    FormDto:
+      type: object
+      required:
+      - id
+      - revision
+      - skjemanummer
+      - path
+      - title
+      - components
+      - properties
+      - createdAt
+      - createdBy
+      - changedAt
+      - changedBy
+      properties:
+        id:
+          $ref: "#/components/schemas/FormDbId"
+        revision:
+          $ref: "#/components/schemas/FormRevision"
+        skjemanummer:
+          $ref: "#/components/schemas/Skjemanummer"
+        path:
+          type: string
+          description: Skjemaets path
+          example: nav123456
+        title:
+          type: string
+          description: Skjemaets tittel
+          example: Søknad om servicehund
+        components:
+          $ref: "#/components/schemas/Components"
+        properties:
+          $ref: "#/components/schemas/Properties"
+        createdAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet først ble opprettet
+          example: 2021-10-03T12:00:00Z
+        createdBy:
+          type: string
+          description: Hvem som opprettet skjemaet
+          example: Nils Nilsen
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          type: string
+          description: Hvem endret dette skjemaet sist
+          example: Nils Nilsen

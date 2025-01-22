@@ -1,0 +1,66 @@
+get:
+  summary: Henter et skjema
+  operationId: getForm
+  security: []
+  parameters:
+    - name: id
+      in: path
+      description: Skjemaets id i databasen
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormDbId"
+  responses:
+    200:
+      description: Returnerer skjemadefinisjonen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    404:
+      description: Finner ikke skjema med gitt id
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-forms
+
+put:
+  summary: Oppdaterer skjema
+  operationId: updateForm
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Skjemaets id i databasen
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormDbId"
+    - name: Formsapi-Entity-Revision
+      in: header
+      description: Hvilken revisjon som skal endres
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormRevision"
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/UpdateFormRequest"
+   required: true
+  responses:
+    200:
+      description: Returnerer skjemadefinisjonen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    404:
+      description: Finner ikke skjema med gitt id
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-forms

@@ -1,13 +1,18 @@
 package no.nav.forms.translations.form.repository.entity
 
 import jakarta.persistence.*
+import no.nav.forms.forms.repository.entity.FormEntity
 import org.hibernate.Hibernate
 
 @Entity
 @Table(name = "form_translation")
 data class FormTranslationEntity(
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
-	@Column(name = "form_path", columnDefinition = "varchar") val formPath: String,
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "form_id", nullable = false)
+	val form: FormEntity,
+
 	@Column(name = "key", columnDefinition = "varchar") val key: String,
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formTranslation")

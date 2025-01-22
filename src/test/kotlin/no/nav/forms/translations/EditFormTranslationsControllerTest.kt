@@ -4,15 +4,29 @@ import no.nav.forms.ApplicationTest
 import no.nav.forms.exceptions.db.DbError
 import no.nav.forms.model.*
 import no.nav.forms.testutils.createMockToken
+import no.nav.forms.testutils.FormsTestdata
+import no.nav.forms.utils.Skjemanummer
+import no.nav.forms.utils.toFormPath
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 
 class EditFormTranslationsControllerTest : ApplicationTest() {
 
+	val skjemanummer: Skjemanummer = "NAV 12-34.56"
+	val formPath = skjemanummer.toFormPath()
+
+	@BeforeEach
+	fun createForm() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val newFormRequest = FormsTestdata.newFormRequest(skjemanummer = skjemanummer)
+		testFormsApi.createForm(newFormRequest, authToken)
+			.assertSuccess()
+	}
+
 	@Test
 	fun testChangeOfFormTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(
@@ -50,7 +64,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsOnCreateDuplicateFormTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(
@@ -67,7 +80,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsOnEditAlreadyEditedFormTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(
@@ -102,9 +114,17 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsDueToFormPathMismatchOnUpdate() {
-		val nav111111 = "nav111111"
-		val nav222222 = "nav222222"
 		val authToken = mockOAuth2Server.createMockToken()
+
+		val newFormRequest1 = FormsTestdata.newFormRequest(skjemanummer = "NAV 11-11.11")
+		testFormsApi.createForm(newFormRequest1, authToken)
+			.assertSuccess()
+		val newFormRequest2 = FormsTestdata.newFormRequest(skjemanummer = "NAV 22-22.22")
+		testFormsApi.createForm(newFormRequest2, authToken)
+			.assertSuccess()
+
+		val nav111111 = newFormRequest1.skjemanummer.toFormPath()
+		val nav222222 = newFormRequest2.skjemanummer.toFormPath()
 
 		val createRequest = NewFormTranslationRequestDto(
 			key = "Tester",
@@ -130,7 +150,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testGetAllFormTranslations() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createResponse1 = testFormsApi.createFormTranslation(
@@ -177,7 +196,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testCreateFormTranslationWithGlobalValue() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
@@ -206,7 +224,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsOnCreateWhenGlobalTranslationDoesNotExist() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createResponse = testFormsApi.createFormTranslation(
@@ -223,7 +240,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsOnCreateWhenBothGlobalTranslationIdAndTranslationExistInRequest() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val globalTranslationResponse = testFormsApi.createGlobalTranslation(
@@ -251,7 +267,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun failsOnUpdateWhenBothGlobalTranslationAndLocalTranslationsAreProvided() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(
@@ -288,7 +303,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testUpdateFormTranslationAndLinkToGlobalTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei", nn = "Nei")
@@ -318,7 +332,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testDeleteFormTranslationWithoutAuthToken() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
@@ -330,7 +343,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testDeleteNonExistingFormTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		testFormsApi.deleteFormTranslation(formPath, 123L, authToken)
@@ -339,7 +351,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testDeleteFormTranslation() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
@@ -353,7 +364,6 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 
 	@Test
 	fun testRecreateFormTranslationAfterDelete() {
-		val formPath = "nav123456"
 		val authToken = mockOAuth2Server.createMockToken()
 
 		val createRequest1 = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")

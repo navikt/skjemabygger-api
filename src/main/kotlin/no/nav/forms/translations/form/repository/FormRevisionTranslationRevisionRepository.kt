@@ -5,12 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface FormRevisionTranslationRevisionRepository: JpaRepository<FormRevisionTranslationRevisionEntity, Long> {
 
-	fun findAllByFormPath(formPath: String): List<FormRevisionTranslationRevisionEntity>
+	fun findAllByFormRevisionFormPath(formPath: String): List<FormRevisionTranslationRevisionEntity>
 
-	fun findByFormPathAndFormTranslationRevisionFormTranslationId(formPath: String, formTranslationId: Long): FormRevisionTranslationRevisionEntity?
+	fun findByFormRevisionFormPathAndFormTranslationRevisionFormTranslationId(formPath: String, formTranslationId: Long): FormRevisionTranslationRevisionEntity?
 
-	fun findByFormPathAndFormTranslationRevisionFormTranslationKey(formPath: String, key: String): FormRevisionTranslationRevisionEntity?
+	fun findByFormRevisionFormPathAndFormTranslationRevisionFormTranslationKey(formPath: String, key: String): FormRevisionTranslationRevisionEntity?
 
-	fun findOneByFormPathAndFormTranslationRevisionId(formPath: String, formTranslationRevisionId: Long): FormRevisionTranslationRevisionEntity
+	fun findOneByFormRevisionFormPathAndFormTranslationRevisionId(formPath: String, formTranslationRevisionId: Long): FormRevisionTranslationRevisionEntity
 
 }

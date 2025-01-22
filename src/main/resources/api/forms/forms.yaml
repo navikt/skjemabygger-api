@@ -1,0 +1,32 @@
+post:
+  summary: Oppretter et nytt skjema
+  operationId: createForm
+  security:
+  - bearerAuth: []
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/NewFormRequest"
+   required: true
+  responses:
+    201:
+      description: Det nye skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Skjemaet eksisterer allerede
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-forms

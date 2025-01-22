@@ -37,7 +37,7 @@ data class FormsApiResponse<T>(
 	}
 
 	fun assertHttpStatus(status: HttpStatus): FormsApiResponse<T> {
-		assertEquals(statusCode.value(), status.value())
+		assertEquals(status.value(), statusCode.value())
 		return this
 	}
 }
@@ -243,6 +243,65 @@ class TestFormsApi(
 			String::class.java
 		)
 		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	private fun readFormBody(response: ResponseEntity<String>): Pair<FormDto?, ErrorResponseDto?> {
+		if (response.statusCode.is2xxSuccessful) {
+			val body = objectMapper.readValue(
+				response.body,
+				FormDto::class.java
+			)
+			return Pair(body, null)
+		}
+		val errorBody = objectMapper.readValue(response.body, ErrorResponseDto::class.java)
+		return Pair(null, errorBody)
+	}
+
+
+	private val formsBaseUrl = "$baseUrl/v1/forms"
+
+	fun createForm(
+		request: NewFormRequest,
+		authToken: String? = null,
+		additionalHeaders: Map<String, String> = emptyMap()
+	): FormsApiResponse<FormDto> {
+		val response = restTemplate.exchange(
+			formsBaseUrl,
+			HttpMethod.POST,
+			HttpEntity(request, httpHeaders(authToken, additionalHeaders)),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun updateForm(
+		formId: Long,
+		revision: Int,
+		request: UpdateFormRequest,
+		authToken: String? = null,
+		additionalHeaders: Map<String, String> = emptyMap()
+	): FormsApiResponse<FormDto> {
+		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
+		val response = restTemplate.exchange(
+			"$formsBaseUrl/$formId",
+			HttpMethod.PUT,
+			HttpEntity(request, httpHeaders(authToken, headers.plus(additionalHeaders))),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun getForm(formId: Long): FormsApiResponse<FormDto> {
+		val response = restTemplate.exchange(
+			"$formsBaseUrl/$formId",
+			HttpMethod.GET,
+			HttpEntity(null, httpHeaders(null)),
+			String::class.java
+		)
+		val body = readFormBody(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 

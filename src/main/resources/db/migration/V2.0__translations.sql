@@ -1,3 +1,32 @@
+CREATE TABLE form
+(
+	id           BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	skjemanummer VARCHAR(24),
+	path         VARCHAR(24),
+	created_at   TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	created_by   VARCHAR(128)             NOT NULL,
+	deleted_at   TIMESTAMP WITH TIME ZONE,
+	deleted_by   VARCHAR(128),
+	UNIQUE (skjemanummer),
+	UNIQUE (path)
+);
+
+CREATE TABLE form_revision
+(
+	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_id    BIGINT                   NOT NULL,
+	revision   INT                      NOT NULL,
+	title      VARCHAR(128)             NOT NULL,
+	components JSONB                    NOT NULL,
+	properties JSONB                    NOT NULL,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	created_by VARCHAR(128)             NOT NULL,
+	UNIQUE (form_id, revision),
+	CONSTRAINT fk_form_revision_form
+		FOREIGN KEY (form_id)
+			REFERENCES form (id)
+);
+
 CREATE TABLE global_translation
 (
 	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -7,7 +36,6 @@ CREATE TABLE global_translation
 	deleted_by VARCHAR(128)
 );
 
--- TRIGGER: Only allow inserts into global_translation_revision? Allow delete if not published?
 CREATE TABLE global_translation_revision
 (
 	id                    BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -24,7 +52,6 @@ CREATE TABLE global_translation_revision
 			REFERENCES global_translation (id)
 );
 
--- TRIGGER: Do not allow delete
 CREATE TABLE published_global_translation
 (
 	id         INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -32,7 +59,6 @@ CREATE TABLE published_global_translation
 	created_by VARCHAR(128)             NOT NULL
 );
 
--- TRIGGER: Do not allow delete
 CREATE TABLE published_global_translation_revision
 (
 	published_global_translation_id INT,
@@ -47,18 +73,19 @@ CREATE TABLE published_global_translation_revision
 );
 
 
--- Trigger: Only allow inserts into form_translation? And allow DELETE if not published?
--- form_path is temporary until we also migrate the forms to separate tables and replace form_path with a foreign key to table form
 CREATE TABLE form_translation
 (
-	id        BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	form_path VARCHAR(32),
-	key       VARCHAR(1024) NOT NULL,
-	UNIQUE (form_path, key)
+	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_id    BIGINT        NOT NULL,
+	key        VARCHAR(1024) NOT NULL,
+	deleted_at TIMESTAMP WITH TIME ZONE,
+	deleted_by VARCHAR(128),
+	UNIQUE (form_id, key),
+	CONSTRAINT fk_form_translation_form
+		FOREIGN KEY (form_id)
+			REFERENCES form (id)
 );
 
--- Trigger: Only allow inserts into form_translation_revision? And possibly DELETE if not published?
--- And to ensure nb,nn,en is null if global_translation_id is not null, and that global_translation_id is null if any of nb/nn/en exists?
 CREATE TABLE form_translation_revision
 (
 	id                    BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -79,16 +106,18 @@ CREATE TABLE form_translation_revision
 			REFERENCES global_translation (id)
 );
 
--- form_path is temporary until we also migrate the forms to separate tables and replace form_path with a foreign key to table form_revision
 CREATE TABLE form_revision_translation_revision
 (
 	id                           BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	form_path                    VARCHAR(32),
+	form_revision_id             BIGINT NOT NULL,
 	form_translation_revision_id BIGINT,
-	UNIQUE (form_path, form_translation_revision_id),
-	CONSTRAINT form_translation_revision
+	UNIQUE (form_revision_id, form_translation_revision_id),
+	CONSTRAINT fk_form_revision_translation_revision_form_translation_revision
 		FOREIGN KEY (form_translation_revision_id)
-			REFERENCES form_translation_revision (id)
+			REFERENCES form_translation_revision (id),
+	CONSTRAINT fk_form_revision_translation_revision_form_revision
+		FOREIGN KEY (form_revision_id)
+			REFERENCES form_revision (id)
 );
 
 CREATE FUNCTION form_translation_revision_check_link_to_global()
