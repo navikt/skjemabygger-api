@@ -305,9 +305,13 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getForms(): FormsApiResponse<List<FormDto>> {
+	fun getForms(select: String? = ""): FormsApiResponse<List<FormDto>> {
+		val queryString = when {
+			select?.isNotEmpty() == true -> "?select=${select}"
+			else -> ""
+		}
 		val responseType = object : ParameterizedTypeReference<List<FormDto>>() {}
-		val response = restTemplate.exchange(formsBaseUrl, HttpMethod.GET, null, responseType)
+		val response = restTemplate.exchange("$formsBaseUrl${queryString}", HttpMethod.GET, null, responseType)
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 

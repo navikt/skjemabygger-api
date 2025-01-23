@@ -68,16 +68,6 @@ components:
       type: object
       required:
       - id
-      - revision
-      - skjemanummer
-      - path
-      - title
-      - components
-      - properties
-      - createdAt
-      - createdBy
-      - changedAt
-      - changedBy
       properties:
         id:
           $ref: "#/components/schemas/FormDbId"

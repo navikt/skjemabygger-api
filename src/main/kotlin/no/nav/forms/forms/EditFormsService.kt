@@ -97,7 +97,7 @@ class EditFormsService(
 	}
 
 	@Transactional
-	fun getForms(): List<FormDto> {
-		return formRepository.findAll().map(FormEntity::toDto)
+	fun getForms(listOfProperties: List<String>? = null): List<FormDto> {
+		return formRepository.findAll().map { it.toDto(listOfProperties) }
 	}
 }
