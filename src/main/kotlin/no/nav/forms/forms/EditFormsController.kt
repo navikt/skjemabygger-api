@@ -49,4 +49,10 @@ class EditFormsController(
 		return ResponseEntity.ok(form)
 	}
 
+	@Unprotected
+	override fun getForms(): ResponseEntity<List<FormDto>> {
+		val forms = editFormsService.getForms()
+		return ResponseEntity.ok(forms)
+	}
+
 }

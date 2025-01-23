@@ -305,4 +305,10 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
+	fun getForms(): FormsApiResponse<List<FormDto>> {
+		val responseType = object : ParameterizedTypeReference<List<FormDto>>() {}
+		val response = restTemplate.exchange(formsBaseUrl, HttpMethod.GET, null, responseType)
+		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
+	}
+
 }

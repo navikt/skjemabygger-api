@@ -30,3 +30,18 @@ post:
             $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-forms
+get:
+  summary: Henter skjemaer
+  operationId: getForms
+  security: []
+  responses:
+    200:
+      description: En liste med skjemadefinisjoner
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/FormDto"
+  tags:
+    - edit-forms

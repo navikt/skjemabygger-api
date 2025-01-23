@@ -95,4 +95,9 @@ class EditFormsService(
 		)
 		return formRevision.toDto()
 	}
+
+	@Transactional
+	fun getForms(): List<FormDto> {
+		return formRepository.findAll().map(FormEntity::toDto)
+	}
 }

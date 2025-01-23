@@ -121,4 +121,23 @@ class EditFormsControllerTest : ApplicationTest() {
 		assertEquals(newForm.revision, form.revision)
 	}
 
+	@Test
+	fun testGetAllForms() {
+		val authToken = mockOAuth2Server.createMockToken()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST1"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST2"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST3"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST4"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST5"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TEST6"), authToken)
+			.assertSuccess()
+		val forms = testFormsApi.getForms().assertSuccess().body
+		assertEquals(6, forms.size)
+	}
+
 }
