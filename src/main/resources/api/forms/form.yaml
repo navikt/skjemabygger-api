@@ -3,12 +3,12 @@ get:
   operationId: getForm
   security: []
   parameters:
-    - name: id
+    - name: formPath
       in: path
-      description: Skjemaets id i databasen
+      description: Skjemaets path
       required: true
       schema:
-        $ref: "./components.yaml#/components/schemas/FormDbId"
+        $ref: "./components.yaml#/components/schemas/FormPath"
   responses:
     200:
       description: Returnerer skjemadefinisjonen
@@ -31,12 +31,12 @@ put:
   security:
   - bearerAuth: []
   parameters:
-    - name: id
+    - name: formPath
       in: path
-      description: Skjemaets id i databasen
+      description: Skjemaets path
       required: true
       schema:
-        $ref: "./components.yaml#/components/schemas/FormDbId"
+        $ref: "./components.yaml#/components/schemas/FormPath"
     - name: Formsapi-Entity-Revision
       in: header
       description: Hvilken revisjon som skal endres

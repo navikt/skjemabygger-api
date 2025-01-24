@@ -61,23 +61,21 @@ class EditFormsService(
 	}
 
 	@Transactional
-	fun getForm(id: Long): FormDto {
-		val form =
-			formRepository.findById(id).getOrElse { throw ResourceNotFoundException("Form not found", id.toString()) }
+	fun getForm(formPath: String): FormDto {
+		val form = formRepository.findByPath(formPath) ?:  throw ResourceNotFoundException("Form not found", formPath)
 		return form.revisions.last().toDto()
 	}
 
 	@Transactional
 	fun updateForm(
-		id: Long,
+		formPath: String,
 		revision: Int,
 		title: String,
 		components: List<Map<String, Any>>,
 		properties: Map<String, Any>,
 		userId: String
 	): FormDto {
-		val form =
-			formRepository.findById(id).getOrElse { throw ResourceNotFoundException("Form not found", id.toString()) }
+		val form = formRepository.findByPath(formPath) ?:  throw ResourceNotFoundException("Form not found", formPath)
 		val latestFormRevision = form.revisions.last()
 		if (latestFormRevision.revision != revision) {
 			throw InvalidRevisionException("Unexpected global translation revision: $revision")

@@ -277,7 +277,7 @@ class TestFormsApi(
 	}
 
 	fun updateForm(
-		formId: Long,
+		formPath: String,
 		revision: Int,
 		request: UpdateFormRequest,
 		authToken: String? = null,
@@ -285,7 +285,7 @@ class TestFormsApi(
 	): FormsApiResponse<FormDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
 		val response = restTemplate.exchange(
-			"$formsBaseUrl/$formId",
+			"$formsBaseUrl/$formPath",
 			HttpMethod.PUT,
 			HttpEntity(request, httpHeaders(authToken, headers.plus(additionalHeaders))),
 			String::class.java
@@ -294,9 +294,9 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getForm(formId: Long): FormsApiResponse<FormDto> {
+	fun getForm(formPath: String): FormsApiResponse<FormDto> {
 		val response = restTemplate.exchange(
-			"$formsBaseUrl/$formId",
+			"$formsBaseUrl/$formPath",
 			HttpMethod.GET,
 			HttpEntity(null, httpHeaders(null)),
 			String::class.java

@@ -39,7 +39,7 @@ paths:
   /v1/forms:
     $ref: "./forms/forms.yaml"
 
-  /v1/forms/{id}:
+  /v1/forms/{formPath}:
     $ref: "./forms/form.yaml"
 
   /v1/global-translations:

@@ -5,6 +5,10 @@ components:
       format: int64
       description: Skjemaets id i databasen
       example: 75
+    FormPath:
+      type: string
+      description: Skjemaets path
+      example: nav110420
     FormRevision:
       type: integer
       description: Revisjonsidentifikator. Hver endring av et skjema gir en ny revisjon.
@@ -76,9 +80,7 @@ components:
         skjemanummer:
           $ref: "#/components/schemas/Skjemanummer"
         path:
-          type: string
-          description: Skjemaets path
-          example: nav123456
+          $ref: "#/components/schemas/FormPath"
         title:
           type: string
           description: Skjemaets tittel

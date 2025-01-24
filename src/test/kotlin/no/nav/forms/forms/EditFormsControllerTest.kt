@@ -61,7 +61,7 @@ class EditFormsControllerTest : ApplicationTest() {
 			components = form.components!!,
 			properties = mapOf("tema" to "AAP")
 		)
-		val updatedForm = testFormsApi.updateForm(form.id, form.revision!!, updateRequest, authToken)
+		val updatedForm = testFormsApi.updateForm(form.path!!, form.revision!!, updateRequest, authToken)
 			.assertSuccess()
 			.body
 		assertEquals(2, updatedForm.revision)
@@ -89,7 +89,7 @@ class EditFormsControllerTest : ApplicationTest() {
 			components = newFormComponents,
 			properties = mapOf("tema" to "AAP")
 		)
-		val updatedForm1 = testFormsApi.updateForm(newForm.id, newFormInitialRevision, updateRequest1, authToken)
+		val updatedForm1 = testFormsApi.updateForm(newForm.path!!, newFormInitialRevision, updateRequest1, authToken)
 			.assertSuccess()
 			.body
 		assertEquals(2, updatedForm1.revision)
@@ -101,13 +101,13 @@ class EditFormsControllerTest : ApplicationTest() {
 			properties = mapOf("tema" to "PEN")
 		)
 		// Run second update with same revision as last update, which should fail with 409 Conflict
-		val errorBody = testFormsApi.updateForm(newForm.id, newFormInitialRevision, updateRequest2, authToken)
+		val errorBody = testFormsApi.updateForm(newForm.path, newFormInitialRevision, updateRequest2, authToken)
 			.assertHttpStatus(HttpStatus.CONFLICT)
 			.errorBody
 		assertEquals("Conflict", errorBody.errorMessage)
 
 		// Verify that the second update did not affect the form
-		val currentForm = testFormsApi.getForm(newForm.id)
+		val currentForm = testFormsApi.getForm(newForm.path)
 			.assertSuccess()
 			.body
 		assertEquals("AAP", currentForm.properties?.get("tema"))
@@ -120,7 +120,7 @@ class EditFormsControllerTest : ApplicationTest() {
 		val newForm = testFormsApi.createForm(createRequest, authToken)
 			.assertSuccess()
 			.body
-		val form = testFormsApi.getForm(newForm.id)
+		val form = testFormsApi.getForm(newForm.path!!)
 			.assertSuccess()
 			.body
 		assertEquals(newForm.title, form.title)

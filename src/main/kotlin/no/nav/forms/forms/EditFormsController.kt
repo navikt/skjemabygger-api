@@ -33,19 +33,19 @@ class EditFormsController(
 	}
 
 	@Unprotected
-	override fun getForm(id: Long): ResponseEntity<FormDto> {
-		val form = editFormsService.getForm(id)
+	override fun getForm(formPath: String): ResponseEntity<FormDto> {
+		val form = editFormsService.getForm(formPath)
 		return ResponseEntity.ok(form)
 	}
 
 	override fun updateForm(
-		id: Long,
+		formPath: String,
 		formsapiEntityRevision: Int,
 		updateFormRequest: UpdateFormRequest
 	): ResponseEntity<FormDto> {
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
-		val form = editFormsService.updateForm(id, formsapiEntityRevision, updateFormRequest.title, updateFormRequest.components, updateFormRequest.properties, userId)
+		val form = editFormsService.updateForm(formPath, formsapiEntityRevision, updateFormRequest.title, updateFormRequest.components, updateFormRequest.properties, userId)
 		return ResponseEntity.ok(form)
 	}
 
