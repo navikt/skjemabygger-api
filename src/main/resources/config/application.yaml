@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: forms-api
+  jackson:
+    default-property-inclusion: non_null
   main:
     banner-mode: off
   jpa:
