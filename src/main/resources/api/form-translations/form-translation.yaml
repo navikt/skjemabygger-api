@@ -6,10 +6,10 @@ put:
   parameters:
     - name: formPath
       in: path
-      description: Skjema-path
+      description: Skjemaets path
       required: true
       schema:
-        $ref: "./components.yaml#/components/schemas/FormPath"
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
     - name: id
       in: path
       description: Oversettelsens id
@@ -58,10 +58,10 @@ delete:
   parameters:
     - name: formPath
       in: path
-      description: Skjema-path
+      description: Skjemaets path
       required: true
       schema:
-        $ref: "./components.yaml#/components/schemas/FormPath"
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
     - name: id
       in: path
       description: Oversettelsens id

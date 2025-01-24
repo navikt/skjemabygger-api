@@ -10,7 +10,7 @@ get:
       required: true
       example: nav121415
       schema:
-        $ref: "./components.yaml#/components/schemas/FormPath"
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
   responses:
     '200':
       description: Henter oversettelser som kan endres
@@ -41,7 +41,7 @@ post:
       required: true
       example: nav121415
       schema:
-        $ref: "./components.yaml#/components/schemas/FormPath"
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
   requestBody:
    content:
      application/json:

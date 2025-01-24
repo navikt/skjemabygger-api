@@ -1,9 +1,5 @@
 components:
   schemas:
-    FormPath:
-      type: string
-      description: Skjemaets path basert på skjemanummer
-      example: nav123456
     FormTranslationId:
       type: integer
       format: int64
