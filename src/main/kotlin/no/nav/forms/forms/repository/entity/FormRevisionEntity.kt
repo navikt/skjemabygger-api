@@ -32,6 +32,10 @@ data class FormRevisionEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_id", nullable = false)
 	val form: FormEntity,
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formRevision")
+	@OrderBy("created_at asc")
+	val publications: List<FormPublicationEntity> = emptyList(),
 	) {
 
 	override fun equals(other: Any?): Boolean {

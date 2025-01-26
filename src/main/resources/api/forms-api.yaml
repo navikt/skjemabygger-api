@@ -22,6 +22,8 @@ tags:
     description: Endepunkter for publisering av globale oversettelser
   - name: edit-forms
     description: Vedlikehold av skjemadefinisjoner
+  - name: form-publications
+    description: Publisering av skjemadefinisjoner
 
 paths:
   /v1/recipients:
@@ -41,6 +43,12 @@ paths:
 
   /v1/forms/{formPath}:
     $ref: "./forms/form.yaml"
+
+  /v1/form-publications:
+    $ref: "./forms/form-publications.yaml"
+
+  /v1/form-publications/{formPath}:
+    $ref: "./forms/form-publication.yaml"
 
   /v1/global-translations:
     $ref: "./global-translations/global_translations.yaml"

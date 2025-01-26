@@ -1,10 +1,10 @@
 package no.nav.forms.translations
 
 import no.nav.forms.ApplicationTest
-import no.nav.forms.model.NewGlobalTranslationRequest
 import no.nav.forms.model.UpdateGlobalTranslationRequest
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
 import no.nav.forms.testutils.createMockToken
+import no.nav.forms.translations.testdata.GlobalTranslationsTestdata
 import no.nav.forms.utils.LanguageCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,22 +15,7 @@ import kotlin.test.assertNull
 
 class PublishGlobalTranslationsControllerTest : ApplicationTest() {
 
-	private val translations: Map<String, NewGlobalTranslationRequest> = mapOf(
-		"Fornavn" to NewGlobalTranslationRequest(
-			key = "Fornavn",
-			tag = "skjematekster",
-			nb = null,
-			nn = "Fornamn",
-			en = "Given name",
-		),
-		"required" to NewGlobalTranslationRequest(
-			key = "required",
-			tag = "validering",
-			nb = "Du må fylle ut: {{field}}",
-			nn = "Du må fylle ut: {{field}}",
-			en = "You must fill in: {{field}}",
-		),
-	)
+	private val translations = GlobalTranslationsTestdata.translations
 
 	@BeforeEach
 	fun createGlobalTranslationsForTest() {

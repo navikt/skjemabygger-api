@@ -1,0 +1,73 @@
+post:
+  summary: Publiserer et skjema
+  operationId: publishForm
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjemaets path
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+    - name: Formsapi-Entity-Revision
+      in: header
+      description: Hvilken revisjon som skal publiseres
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormRevision"
+  responses:
+    201:
+      description: Skjemaet har blitt publisert
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Gitt revisjon har allerede blitt publisert, eller det finnes en nyere revisjon av skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - form-publications
+
+get:
+  summary: Henter den publiserte versjonen av et skjema
+  operationId: getPublishedForm
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjemaets path
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+  responses:
+    200:
+      description: Den publiserte versjonen av skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    404:
+      description: Finner ingen publisering av skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - form-publications

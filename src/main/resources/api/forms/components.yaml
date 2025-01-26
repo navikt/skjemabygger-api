@@ -107,3 +107,12 @@ components:
           type: string
           description: Hvem endret dette skjemaet sist
           example: Nils Nilsen
+        publishedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet sist ble publisert
+          example: 2021-12-03T14:10:00Z
+        publishedBy:
+          type: string
+          description: Hvem publiserte dette skjemaet sist
+          example: Lars Larsen

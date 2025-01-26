@@ -101,13 +101,13 @@ class EditFormsControllerTest : ApplicationTest() {
 			properties = mapOf("tema" to "PEN")
 		)
 		// Run second update with same revision as last update, which should fail with 409 Conflict
-		val errorBody = testFormsApi.updateForm(newForm.path, newFormInitialRevision, updateRequest2, authToken)
+		val errorBody = testFormsApi.updateForm(newForm.path!!, newFormInitialRevision, updateRequest2, authToken)
 			.assertHttpStatus(HttpStatus.CONFLICT)
 			.errorBody
 		assertEquals("Conflict", errorBody.errorMessage)
 
 		// Verify that the second update did not affect the form
-		val currentForm = testFormsApi.getForm(newForm.path)
+		val currentForm = testFormsApi.getForm(newForm.path!!)
 			.assertSuccess()
 			.body
 		assertEquals("AAP", currentForm.properties?.get("tema"))

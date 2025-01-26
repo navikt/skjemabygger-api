@@ -139,3 +139,19 @@ CREATE TRIGGER trigger_form_translation_revision_check_insert
 	FOR EACH ROW
 	WHEN ( NEW.global_translation_id IS NOT NULL )
 	EXECUTE FUNCTION form_translation_revision_check_link_to_global();
+
+CREATE TABLE form_publication
+(
+	id                              BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_revision_id                BIGINT                   NOT NULL,
+	published_global_translation_id INT                      NOT NULL,
+	created_at                      TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	created_by                      VARCHAR(128)             NOT NULL,
+	UNIQUE (form_revision_id, published_global_translation_id),
+	CONSTRAINT fk_form_publication_form_revision
+		FOREIGN KEY (form_revision_id)
+			REFERENCES form_revision (id),
+	CONSTRAINT fk_form_publication_published_global_translation
+		FOREIGN KEY (published_global_translation_id)
+			REFERENCES published_global_translation (id)
+);

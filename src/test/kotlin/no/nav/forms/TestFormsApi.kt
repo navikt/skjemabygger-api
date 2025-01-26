@@ -315,4 +315,35 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
+	private val formPublicationsBaseUrl = "$baseUrl/v1/form-publications"
+
+	fun publishForm(formPath: String, formRevision: Int, authToken: String?): FormsApiResponse<FormDto> {
+		val headers = mapOf(formsapiEntityRevisionHeaderName to formRevision.toString())
+		val response = restTemplate.exchange(
+			"$formPublicationsBaseUrl/$formPath",
+			HttpMethod.POST,
+			HttpEntity(null, httpHeaders(authToken, headers)),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun getPublishedForm(formPath: String): FormsApiResponse<FormDto> {
+		val response = restTemplate.exchange(
+			"$formPublicationsBaseUrl/$formPath",
+			HttpMethod.GET,
+			HttpEntity(null, httpHeaders(null)),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun getPublishedForms(): FormsApiResponse<List<FormDto>> {
+		val responseType = object : ParameterizedTypeReference<List<FormDto>>() {}
+		val response = restTemplate.exchange(formPublicationsBaseUrl, HttpMethod.GET, null, responseType)
+		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
+	}
+
 }
