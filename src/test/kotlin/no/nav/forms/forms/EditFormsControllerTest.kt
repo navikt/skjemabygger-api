@@ -55,6 +55,8 @@ class EditFormsControllerTest : ApplicationTest() {
 			.body
 		assertEquals(1, form.revision)
 		assertEquals("BIL", form.properties?.get("tema"))
+		assertEquals(createRequest.title, form.title)
+		assertEquals(createRequest.components.size, form.components?.size)
 
 		val updateRequest = FormsTestdata.updateFormRequest(
 			title = form.title!!,
@@ -66,6 +68,42 @@ class EditFormsControllerTest : ApplicationTest() {
 			.body
 		assertEquals(2, updatedForm.revision)
 		assertEquals("AAP", updatedForm.properties?.get("tema"))
+		assertEquals(createRequest.title, updatedForm.title)
+		assertEquals(createRequest.components.size, updatedForm.components?.size)
+	}
+
+	@Test
+	fun testPartialUpdateOfForm() {
+		val createRequest = FormsTestdata.newFormRequest(
+			title = "Bilsøknad",
+			properties = mapOf("tema" to "BIL"),
+			components = listOf(
+				mapOf("type" to "panel", "title" to "Panel 1"),
+				mapOf("type" to "panel", "title" to "Panel 2"),
+				mapOf("type" to "panel", "title" to "Panel 3"),
+			),
+		)
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		assertEquals(1, form.revision)
+		assertEquals("BIL", form.properties?.get("tema"))
+		assertEquals("Bilsøknad", form.title)
+		assertEquals(3, form.components?.size)
+
+		val updateRequest = FormsTestdata.updateFormRequest(
+			title = null,
+			components = null,
+			properties = mapOf("tema" to "AAP")
+		)
+		val updatedForm = testFormsApi.updateForm(form.path!!, form.revision!!, updateRequest, authToken)
+			.assertSuccess()
+			.body
+		assertEquals(2, updatedForm.revision)
+		assertEquals("AAP", updatedForm.properties?.get("tema")) // only property updated
+		assertEquals("Bilsøknad", updatedForm.title)
+		assertEquals(3, updatedForm.components?.size)
 	}
 
 	@Test

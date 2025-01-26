@@ -22,9 +22,9 @@ class FormsTestdata {
 		}
 
 		fun updateFormRequest(
-			title: String = "Mitt testskjema",
-			properties: Map<String, Any> = mapOf("tema" to "BIL", "innsending" to "PAPIR_OG_DIGITAL"),
-			components: List<Map<String, Any>> = listOf(mapOf("type" to "panel")),
+			title: String? = "Mitt testskjema",
+			properties: Map<String, Any>? = mapOf("tema" to "BIL", "innsending" to "PAPIR_OG_DIGITAL"),
+			components: List<Map<String, Any>>? = listOf(mapOf("type" to "panel")),
 		): UpdateFormRequest {
 			return UpdateFormRequest(
 				title = title,

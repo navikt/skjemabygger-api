@@ -54,11 +54,7 @@ components:
           $ref: "#/components/schemas/Properties"
     UpdateFormRequest:
       type: object
-      description: Data for skjemaet som skal oppdateres
-      required:
-      - title
-      - components
-      - properties
+      description: Data for skjemaet som skal oppdateres. Dersom et felt ikke er inkludert i oppdateringen, vil det ikke endres.
       properties:
         title:
           type: string

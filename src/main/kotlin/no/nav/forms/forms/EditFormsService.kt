@@ -70,9 +70,9 @@ class EditFormsService(
 	fun updateForm(
 		formPath: String,
 		revision: Int,
-		title: String,
-		components: List<Map<String, Any>>,
-		properties: Map<String, Any>,
+		title: String? = null,
+		components: List<Map<String, Any>>? = null,
+		properties: Map<String, Any>? = null,
 		userId: String
 	): FormDto {
 		val form = formRepository.findByPath(formPath) ?:  throw ResourceNotFoundException("Form not found", formPath)
@@ -84,9 +84,9 @@ class EditFormsService(
 			FormRevisionEntity(
 				form = form,
 				revision = latestFormRevision.revision + 1,
-				title = title,
-				components = mapper.valueToTree(components),
-				properties = mapper.valueToTree(properties),
+				title = title ?: latestFormRevision.title,
+				components = if (components != null) mapper.valueToTree(components) else latestFormRevision.components,
+				properties = if (properties != null) mapper.valueToTree(properties) else latestFormRevision.properties,
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
 			)
