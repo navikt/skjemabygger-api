@@ -2,7 +2,7 @@ package no.nav.forms.translations
 
 import no.nav.forms.api.PublishGlobalTranslationsApi
 import no.nav.forms.config.AzureAdConfig
-import no.nav.forms.model.PublishedGlobalTranslationsDto
+import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.translations.global.PublishGlobalTranslationsService
 import no.nav.forms.utils.LanguageCode
@@ -26,7 +26,7 @@ class PublishGlobalTranslationsController(
 	}
 
 	@Unprotected
-	override fun getPublishedGlobalTranslationsInformation(languageCodes: String?): ResponseEntity<PublishedGlobalTranslationsDto> {
+	override fun getPublishedGlobalTranslationsInformation(languageCodes: String?): ResponseEntity<PublishedTranslationsDto> {
 		val langs: List<LanguageCode>? = languageCodes?.split(",")?.map { LanguageCode.validate(it.trim()) }
 		return ResponseEntity.ok(publishGlobalTranslationsService.getPublishedGlobalTranslationsV2(langs))
 	}

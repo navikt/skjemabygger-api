@@ -3,6 +3,7 @@ package no.nav.forms.translations.form.repository.entity
 import jakarta.persistence.*
 import no.nav.forms.forms.repository.entity.FormEntity
 import org.hibernate.Hibernate
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form_translation")
@@ -18,6 +19,9 @@ data class FormTranslationEntity(
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formTranslation")
 	@OrderBy("created_at asc")
 	val revisions: List<FormTranslationRevisionEntity>? = emptyList(),
+
+	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val deletedAt: LocalDateTime? = null,
+	@Column(name = "deleted_by", columnDefinition = "varchar") val deletedBy: String? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {

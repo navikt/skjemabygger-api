@@ -4,6 +4,7 @@ import no.nav.forms.model.FormTranslationDto
 import no.nav.forms.translations.form.repository.entity.FormTranslationEntity
 import no.nav.forms.translations.form.repository.entity.FormTranslationRevisionEntity
 import no.nav.forms.translations.global.utils.getLatestRevision
+import no.nav.forms.utils.LanguageCode
 import no.nav.forms.utils.mapDateTime
 
 fun FormTranslationEntity.toDto(): FormTranslationDto {
@@ -33,4 +34,17 @@ fun FormTranslationRevisionEntity.toDto(): FormTranslationDto {
 		changedAt = mapDateTime(this.createdAt),
 		changedBy = this.createdBy,
 	)
+}
+
+fun FormTranslationRevisionEntity.getTranslation(languageCode: LanguageCode): String? {
+	return when (languageCode) {
+		LanguageCode.NB -> nb
+		LanguageCode.NN -> nn
+		LanguageCode.EN -> en
+	}
+}
+
+fun List<FormTranslationRevisionEntity>.mapToDictionary(languageCode: LanguageCode): Map<String, String> {
+	return associate { it.formTranslation.key to it.getTranslation(languageCode) }
+		.filter { it.value != null } as Map<String, String>
 }

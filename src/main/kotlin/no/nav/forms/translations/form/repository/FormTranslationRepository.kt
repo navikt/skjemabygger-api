@@ -11,4 +11,10 @@ interface FormTranslationRepository: JpaRepository<FormTranslationEntity, Long> 
 
 	fun findByFormPathAndKey(formPath: String, key: String): FormTranslationEntity?
 
+	fun findByFormPathAndId(formPath: String, id: Long): FormTranslationEntity?
+
+	fun findAllByFormPath(formPath: String): List<FormTranslationEntity>
+
+	fun findAllByFormPathAndDeletedAtIsNull(formPath: String): List<FormTranslationEntity>
+
 }

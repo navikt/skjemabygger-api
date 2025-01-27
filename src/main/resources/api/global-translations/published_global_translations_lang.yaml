@@ -15,7 +15,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "./components.yaml#/components/schemas/GlobalTranslationsMap"
+            $ref: "../common/components.yaml#/components/schemas/TranslationsMap"
     '400':
       description: Feil i forespørsel
       content:

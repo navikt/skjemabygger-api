@@ -4,26 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
-import no.nav.forms.forms.utils.toDto
-import no.nav.forms.model.FormDto
 import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormRevisionRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
-import no.nav.forms.translations.form.repository.FormRevisionTranslationRevisionRepository
+import no.nav.forms.forms.utils.toDto
+import no.nav.forms.model.FormDto
 import no.nav.forms.utils.Skjemanummer
 import no.nav.forms.utils.toFormPath
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 class EditFormsService(
 	val formRepository: FormRepository,
 	val formRevisionRepository: FormRevisionRepository,
-	val formRevisionTranslationRevisionRepository: FormRevisionTranslationRevisionRepository,
 ) {
 	val logger: Logger = LoggerFactory.getLogger(javaClass)
 	private val mapper = ObjectMapper()
@@ -92,10 +89,6 @@ class EditFormsService(
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
 			)
-		)
-		val formTranslations = formRevisionTranslationRevisionRepository.findAllByFormRevisionId(latestFormRevision.id!!)
-		formRevisionTranslationRevisionRepository.saveAll(
-			formTranslations.map { t -> t.copy(id = null, formRevision = formRevision) }
 		)
 		return formRevision.toDto()
 	}

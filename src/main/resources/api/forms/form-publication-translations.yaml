@@ -1,34 +1,35 @@
 get:
-  summary: Henter publiserte globale oversettelser
+  summary: Henter publiserte oversettelser for et gitt skjema
   description: Henter
-  operationId: getPublishedGlobalTranslationsInformation
+  operationId: getPublishedFormTranslations
   security: []
   parameters:
+    - name: formPath
+      in: path
+      description: Skjemaets path
+      example: nav121415
+      required: true
+      schema:
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
     - name: languageCodes
+      in: query
       description: Språkkode, kommaseparert hvis flere
       example: nn,en
-      in: query
       required: false
       schema:
         $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
   responses:
-    '200':
-      description: Informasjon om forrige publiserte globale oversettelser
+    200:
+      description: Informasjon om forrige publiserte oversettelser for dette skjemaet
       content:
         application/json:
           schema:
             $ref: "../common/components.yaml#/components/schemas/PublishedTranslationsDto"
-    '400':
-      description: Feil i forespørsel
-      content:
-        application/json:
-          schema:
-            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
-    '500':
-      description: En feil oppstod
+    404:
+      description: Finner ingen publiserte oversettelser for dette skjemaet
       content:
         application/json:
           schema:
             $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
-    - publish-global-translations
+    - form-publications

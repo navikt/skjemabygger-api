@@ -31,3 +31,28 @@ components:
       type: string
       description: Språkkode, kommaseparert hvis flere
       example: nb,en
+    PublishedTranslationsDto:
+      type: object
+      required:
+      - publishedAt
+      - publishedBy
+      properties:
+        publishedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsene ble publisert
+          example: 2025-01-03T14:10:00Z
+        publishedBy:
+          $ref: "#/components/schemas/UserId"
+        translations:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/TranslationsMap"
+    TranslationsMap:
+      description: Oversettelser
+      type: object
+      additionalProperties:
+        type: string
+      example:
+        Fornavn: First name
+        Søknad om barnepensjon: Application for Children's Pension

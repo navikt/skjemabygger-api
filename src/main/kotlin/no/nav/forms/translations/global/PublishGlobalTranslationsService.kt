@@ -1,7 +1,7 @@
 package no.nav.forms.translations.global
 
 import jakarta.transaction.Transactional
-import no.nav.forms.model.PublishedGlobalTranslationsDto
+import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.translations.global.repository.GlobalTranslationRepository
 import no.nav.forms.translations.global.repository.PublishedGlobalTranslationsRepository
 import no.nav.forms.translations.global.repository.entity.GlobalTranslationEntity
@@ -38,13 +38,13 @@ class PublishGlobalTranslationsService(
 		)
 	}
 
-	fun getPublishedGlobalTranslationsV2(languageCodes: List<LanguageCode>?): PublishedGlobalTranslationsDto {
+	fun getPublishedGlobalTranslationsV2(languageCodes: List<LanguageCode>?): PublishedTranslationsDto {
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")
 		val translations = languageCodes?.associate {
 			it.value to publishedGlobalTranslations.globalTranslationRevisions.mapToDictionary(it)
 		}
-		return PublishedGlobalTranslationsDto(
+		return PublishedTranslationsDto(
 			publishedAt = mapDateTime(publishedGlobalTranslations.createdAt),
 			publishedBy = publishedGlobalTranslations.createdBy,
 			translations = translations

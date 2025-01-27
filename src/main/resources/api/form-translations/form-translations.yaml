@@ -11,12 +11,6 @@ get:
       example: nav121415
       schema:
         $ref: "../forms/components.yaml#/components/schemas/FormPath"
-    - name: Formsapi-Entity-Revision
-      in: header
-      description: Hvilken skjemarevision som det skal hentes oversettelser for
-      required: false
-      schema:
-        $ref: "./components.yaml#/components/schemas/FormTranslationRevision"
   responses:
     '200':
       description: Henter oversettelser som kan endres

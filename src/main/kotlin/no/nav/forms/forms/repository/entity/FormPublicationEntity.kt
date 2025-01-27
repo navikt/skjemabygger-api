@@ -1,6 +1,7 @@
 package no.nav.forms.forms.repository.entity
 
 import jakarta.persistence.*
+import no.nav.forms.translations.form.repository.entity.PublishedFormTranslationsEntity
 import no.nav.forms.translations.global.repository.entity.PublishedGlobalTranslationsEntity
 import org.hibernate.Hibernate
 import java.time.LocalDateTime
@@ -19,6 +20,10 @@ data class FormPublicationEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_revision_id", nullable = false)
 	val formRevision: FormRevisionEntity,
+
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "published_form_translation_id", referencedColumnName = "id", nullable = false)
+	val publishedFormTranslation: PublishedFormTranslationsEntity,
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "published_global_translation_id", referencedColumnName = "id", nullable = false)

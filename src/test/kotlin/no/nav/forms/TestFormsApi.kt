@@ -177,16 +177,12 @@ class TestFormsApi(
 		return Pair(null, errorBody)
 	}
 
-	fun getFormTranslations(formPath: String, formRevision: Int? = null): FormsApiResponse<List<FormTranslationDto>> {
+	fun getFormTranslations(formPath: String): FormsApiResponse<List<FormTranslationDto>> {
 		val responseType = object : ParameterizedTypeReference<List<FormTranslationDto>>() {}
-		val headers = when {
-			formRevision != null -> mapOf(formsapiEntityRevisionHeaderName to formRevision.toString())
-			else -> null
-		}
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations",
 			HttpMethod.GET,
-			HttpEntity(null, httpHeaders(null, additionalHeaders = headers)),
+			null,
 			responseType
 		)
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
@@ -217,7 +213,7 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
-	fun getGlobalTranslationPublication(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<PublishedGlobalTranslationsDto> {
+	fun getGlobalTranslationPublication(languageCodeValues: List<String>? = emptyList()): FormsApiResponse<PublishedTranslationsDto> {
 		val queryString = if (languageCodeValues != null && !languageCodeValues.isEmpty()) "?languageCodes=${
 			languageCodeValues.joinToString(",")
 		}" else ""
@@ -227,15 +223,15 @@ class TestFormsApi(
 			HttpEntity(null, httpHeaders(null)),
 			String::class.java
 		)
-		val body = parsePublishedGlobalTranslationsResponse(response)
+		val body = parsePublishedTranslationsResponse(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	private fun parsePublishedGlobalTranslationsResponse(response: ResponseEntity<String>): Pair<PublishedGlobalTranslationsDto?, ErrorResponseDto?> {
+	private fun parsePublishedTranslationsResponse(response: ResponseEntity<String>): Pair<PublishedTranslationsDto?, ErrorResponseDto?> {
 		if (response.statusCode.is2xxSuccessful) {
 			val body = objectMapper.readValue(
 				response.body,
-				PublishedGlobalTranslationsDto::class.java
+				PublishedTranslationsDto::class.java
 			)
 			return Pair(body, null)
 		}
@@ -352,6 +348,17 @@ class TestFormsApi(
 			String::class.java
 		)
 		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun getPublishedFormTranslations(formPath: String): FormsApiResponse<PublishedTranslationsDto> {
+		val response = restTemplate.exchange(
+			"$formPublicationsBaseUrl/$formPath/translations?languageCodes=nb,nn,en",
+			HttpMethod.GET,
+			HttpEntity(null, httpHeaders(null)),
+			String::class.java
+		)
+		val body = parsePublishedTranslationsResponse(response)
 		return FormsApiResponse(response.statusCode, body)
 	}
 
