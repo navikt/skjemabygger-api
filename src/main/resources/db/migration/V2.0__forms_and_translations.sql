@@ -16,7 +16,7 @@ CREATE TABLE form_revision
 	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	form_id    BIGINT                   NOT NULL,
 	revision   INT                      NOT NULL,
-	title      VARCHAR(128)             NOT NULL,
+	title      VARCHAR(256)             NOT NULL,
 	components JSONB                    NOT NULL,
 	properties JSONB                    NOT NULL,
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
