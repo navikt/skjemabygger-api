@@ -10,6 +10,7 @@ import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormRevisionRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
+import no.nav.forms.translations.form.repository.FormRevisionTranslationRevisionRepository
 import no.nav.forms.utils.Skjemanummer
 import no.nav.forms.utils.toFormPath
 import org.slf4j.Logger
@@ -22,6 +23,7 @@ import kotlin.jvm.optionals.getOrElse
 class EditFormsService(
 	val formRepository: FormRepository,
 	val formRevisionRepository: FormRevisionRepository,
+	val formRevisionTranslationRevisionRepository: FormRevisionTranslationRevisionRepository,
 ) {
 	val logger: Logger = LoggerFactory.getLogger(javaClass)
 	private val mapper = ObjectMapper()
@@ -62,7 +64,7 @@ class EditFormsService(
 
 	@Transactional
 	fun getForm(formPath: String): FormDto {
-		val form = formRepository.findByPath(formPath) ?:  throw ResourceNotFoundException("Form not found", formPath)
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
 		return form.revisions.last().toDto()
 	}
 
@@ -75,7 +77,7 @@ class EditFormsService(
 		properties: Map<String, Any>? = null,
 		userId: String
 	): FormDto {
-		val form = formRepository.findByPath(formPath) ?:  throw ResourceNotFoundException("Form not found", formPath)
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
 		val latestFormRevision = form.revisions.last()
 		if (latestFormRevision.revision != revision) {
 			throw InvalidRevisionException("Unexpected global translation revision: $revision")
@@ -90,6 +92,10 @@ class EditFormsService(
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
 			)
+		)
+		val formTranslations = formRevisionTranslationRevisionRepository.findAllByFormRevisionId(latestFormRevision.id!!)
+		formRevisionTranslationRevisionRepository.saveAll(
+			formTranslations.map { t -> t.copy(id = null, formRevision = formRevision) }
 		)
 		return formRevision.toDto()
 	}

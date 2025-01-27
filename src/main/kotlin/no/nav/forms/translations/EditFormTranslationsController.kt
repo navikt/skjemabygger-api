@@ -21,8 +21,11 @@ class EditFormTranslationsController(
 ) : EditFormTranslationsApi {
 
 	@Unprotected
-	override fun getFormTranslations(formPath: String): ResponseEntity<List<FormTranslationDto>> {
-		return ResponseEntity.ok(editFormTranslationsService.getTranslations(formPath))
+	override fun getFormTranslations(
+		formPath: String,
+		formsapiEntityRevision: Int?
+	): ResponseEntity<List<FormTranslationDto>> {
+		return ResponseEntity.ok(editFormTranslationsService.getTranslations(formPath, formsapiEntityRevision))
 	}
 
 	override fun updateFormTranslation(

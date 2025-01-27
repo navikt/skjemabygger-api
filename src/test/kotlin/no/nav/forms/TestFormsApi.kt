@@ -135,7 +135,7 @@ class TestFormsApi(
 	fun createFormTranslation(
 		formPath: String,
 		request: NewFormTranslationRequestDto,
-		authToken: String
+		authToken: String? = null
 	): FormsApiResponse<FormTranslationDto> {
 		val response = restTemplate.exchange(
 			"$baseUrl/v1/forms/$formPath/translations",
@@ -152,7 +152,7 @@ class TestFormsApi(
 		formTranslationId: Long,
 		revision: Int,
 		request: UpdateFormTranslationRequest,
-		authToken: String,
+		authToken: String? = null,
 	): FormsApiResponse<FormTranslationDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to revision.toString())
 		val response = restTemplate.exchange(
@@ -177,9 +177,18 @@ class TestFormsApi(
 		return Pair(null, errorBody)
 	}
 
-	fun getFormTranslations(formPath: String): FormsApiResponse<List<FormTranslationDto>> {
+	fun getFormTranslations(formPath: String, formRevision: Int? = null): FormsApiResponse<List<FormTranslationDto>> {
 		val responseType = object : ParameterizedTypeReference<List<FormTranslationDto>>() {}
-		val response = restTemplate.exchange("$baseUrl/v1/forms/$formPath/translations", HttpMethod.GET, null, responseType)
+		val headers = when {
+			formRevision != null -> mapOf(formsapiEntityRevisionHeaderName to formRevision.toString())
+			else -> null
+		}
+		val response = restTemplate.exchange(
+			"$baseUrl/v1/forms/$formPath/translations",
+			HttpMethod.GET,
+			HttpEntity(null, httpHeaders(null, additionalHeaders = headers)),
+			responseType
+		)
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
@@ -190,7 +199,10 @@ class TestFormsApi(
 			HttpEntity(null, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
+		val body = when {
+			response.statusCode.is2xxSuccessful -> Pair(null, null)
+			else -> Pair(null, readErrorBody(response))
+		}
 		return FormsApiResponse(response.statusCode, body)
 	}
 
@@ -242,7 +254,10 @@ class TestFormsApi(
 			HttpEntity(null, httpHeaders(authToken)),
 			String::class.java
 		)
-		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
+		val body = when {
+			response.statusCode.is2xxSuccessful -> Pair(null, null)
+			else -> Pair(null, readErrorBody(response))
+		}
 		return FormsApiResponse(response.statusCode, body)
 	}
 

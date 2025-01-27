@@ -28,10 +28,16 @@ class EditFormTranslationsService(
 ) {
 
 	@Transactional
-	fun getTranslations(formPath: String): List<FormTranslationDto> {
-		val currentFormTranslationRevisions = formRevisionTranslationRevisionRepository.findAllByFormRevisionFormPath(formPath)
-		val revisions = currentFormTranslationRevisions.map { it.formTranslationRevision }
-		return revisions.map(FormTranslationRevisionEntity::toDto)
+	fun getTranslations(formPath: String, revision: Int? = null): List<FormTranslationDto> {
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		val formRevision = when {
+			revision != null -> form.revisions.find { it.revision == revision }
+			else -> form.revisions.last()
+		} ?: throw IllegalArgumentException("Form revision not found ($revision)")
+		val currentFormTranslationRevisions =
+			formRevisionTranslationRevisionRepository.findAllByFormRevisionId(formRevision.id!!)
+		val translationRevisions = currentFormTranslationRevisions.map { it.formTranslationRevision }
+		return translationRevisions.map(FormTranslationRevisionEntity::toDto)
 	}
 
 	@Transactional
@@ -71,13 +77,17 @@ class EditFormTranslationsService(
 				createdBy = userId,
 			)
 		)
-		val currentFormTranslationRevisionEntity =
-			formRevisionTranslationRevisionRepository.findOneByFormRevisionFormPathAndFormTranslationRevisionId(
-				formPath,
+		val latestFormRevision = formTranslation.form.revisions.last()
+		val currentFormRevisionTranslationRevisionEntity =
+			formRevisionTranslationRevisionRepository.findOneByFormRevisionIdAndFormTranslationRevisionId(
+				latestFormRevision.id!!,
 				latestRevision.id!!
 			)
+		if (currentFormRevisionTranslationRevisionEntity.formRevision.publications.isNotEmpty()) {
+			throw IllegalArgumentException("Form revision has been published")
+		}
 		formRevisionTranslationRevisionRepository.save(
-			currentFormTranslationRevisionEntity.copy(
+			currentFormRevisionTranslationRevisionEntity.copy(
 				formTranslationRevision = newFormTranslationRevision
 			)
 		)
@@ -94,7 +104,12 @@ class EditFormTranslationsService(
 		en: String?,
 		userId: String
 	): FormTranslationDto {
-		formRevisionTranslationRevisionRepository.findByFormRevisionFormPathAndFormTranslationRevisionFormTranslationKey(formPath, key)
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		val latestFormRevision = form.revisions.last()
+		formRevisionTranslationRevisionRepository.findByFormRevisionIdAndFormTranslationRevisionFormTranslationKey(
+			latestFormRevision.id!!,
+			key
+		)
 			.also {
 				if (it != null) throw DuplicateResourceException(
 					"Translation with key is already associated with $formPath",
@@ -106,8 +121,6 @@ class EditFormTranslationsService(
 			globalTranslationRepository.findById(globalTranslationId)
 				.getOrElse { throw IllegalArgumentException("Global translation not found") }
 		} else null
-
-		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
 
 		val formTranslation =
 			formTranslationRepository.findByFormPathAndKey(formPath, key) ?: formTranslationRepository.save(
@@ -130,7 +143,6 @@ class EditFormTranslationsService(
 				createdBy = userId,
 			)
 		)
-		val latestFormRevision = form.revisions?.lastOrNull() ?: throw ResourceNotFoundException("Unable to find latest form revision", formPath)
 		formRevisionTranslationRevisionRepository.save(
 			FormRevisionTranslationRevisionEntity(
 				formRevision = latestFormRevision,
@@ -142,8 +154,16 @@ class EditFormTranslationsService(
 
 	@Transactional
 	fun deleteFormTranslation(formPath: String, id: Long, userId: String) {
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		val latestFormRevision = form.revisions.last()
+		if (latestFormRevision.publications.isNotEmpty()) {
+			throw IllegalArgumentException("Form revision has been published")
+		}
 		val row =
-			formRevisionTranslationRevisionRepository.findByFormRevisionFormPathAndFormTranslationRevisionFormTranslationId(formPath, id)
+			formRevisionTranslationRevisionRepository.findByFormRevisionIdAndFormTranslationRevisionFormTranslationId(
+				latestFormRevision.id!!,
+				id
+			)
 				?: throw ResourceNotFoundException("Translation revision $id does not exist for $formPath", "($formPath:$id)")
 		formRevisionTranslationRevisionRepository.delete(row)
 	}

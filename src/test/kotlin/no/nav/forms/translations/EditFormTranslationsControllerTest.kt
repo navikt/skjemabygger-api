@@ -5,6 +5,7 @@ import no.nav.forms.exceptions.db.DbError
 import no.nav.forms.model.*
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
+import no.nav.forms.translations.testdata.GlobalTranslationsTestdata
 import no.nav.forms.utils.Skjemanummer
 import no.nav.forms.utils.toFormPath
 import org.junit.jupiter.api.Assertions.*
@@ -20,9 +21,17 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 	@BeforeEach
 	fun createForm() {
 		val authToken = mockOAuth2Server.createMockToken()
+
+		// Create form with the given skjemanummer
 		val newFormRequest = FormsTestdata.newFormRequest(skjemanummer = skjemanummer)
 		testFormsApi.createForm(newFormRequest, authToken)
 			.assertSuccess()
+
+		// Create and publish global translations
+		GlobalTranslationsTestdata.translations.values.forEach {
+			testFormsApi.createGlobalTranslation(it, authToken).assertSuccess()
+		}
+		testFormsApi.publishGlobalTranslations(authToken).assertSuccess()
 	}
 
 	@Test
@@ -363,6 +372,19 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 	}
 
 	@Test
+	fun testThatDeleteFormTranslationFailsWhenFormRevisionIsPublished() {
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
+		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
+
+		testFormsApi.publishForm(formPath, 1, authToken).assertSuccess()
+
+		testFormsApi.deleteFormTranslation(formPath, createResponse.body.id, authToken)
+			.assertHttpStatus(HttpStatus.BAD_REQUEST)
+	}
+
+	@Test
 	fun testRecreateFormTranslationAfterDelete() {
 		val authToken = mockOAuth2Server.createMockToken()
 
@@ -382,6 +404,77 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertEquals(createRequest2.nb, formTranslation.nb)
 		assertEquals(createRequest2.nn, formTranslation.nn)
 		assertEquals(createRequest2.en, formTranslation.en)
+	}
+
+	@Test
+	fun testThatFormTranslationCannotBeModifiedAfterTheFormRevisionHasBeenPublished() {
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewFormTranslationRequestDto(key = "Ja", nb = "Ja")
+		val formTranslation = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
+			.assertSuccess().body
+
+		testFormsApi.publishForm(formPath, 1, authToken).assertSuccess()
+
+		val updateRequest = UpdateFormTranslationRequest(
+			nb = "Ja",
+			en = "Yes",
+		)
+		val updateResponse = testFormsApi.updateFormTranslation(
+			formPath,
+			formTranslation.id,
+			formTranslation.revision!!,
+			updateRequest,
+			authToken,
+		).assertHttpStatus(HttpStatus.BAD_REQUEST)
+		assertEquals("Form revision has been published", updateResponse.errorBody.errorMessage)
+	}
+
+	@Test
+	fun testThatUpdatesOfFormTranslationsOnlyAffectsLatestFormRevision() {
+		val authToken = mockOAuth2Server.createMockToken()
+
+		val form = testFormsApi.getForm(formPath).assertSuccess().body
+
+		val createFormTranslationRequest = NewFormTranslationRequestDto(key = "Ja", nb = "Ja")
+		val formTranslation = testFormsApi.createFormTranslation(formPath, createFormTranslationRequest, authToken)
+			.assertSuccess().body
+
+		val translationsBeforeUpdateForm = testFormsApi.getFormTranslations(formPath).assertSuccess().body
+		assertEquals(1, translationsBeforeUpdateForm.size)
+		assertEquals("Ja", translationsBeforeUpdateForm.first().nb)
+		assertNull(translationsBeforeUpdateForm.first().en)
+
+		val updateFormRequest = FormsTestdata.updateFormRequest(title = "Mitt testskjema 2")
+		testFormsApi.updateForm(formPath, form.revision!!, updateFormRequest, authToken).assertSuccess()
+
+		val translationsAfterUpdateForm = testFormsApi.getFormTranslations(formPath).assertSuccess().body
+		assertEquals(1, translationsAfterUpdateForm.size)
+		assertEquals("Ja", translationsAfterUpdateForm.first().nb)
+		assertNull(translationsAfterUpdateForm.first().en)
+
+		val updateFormTranslationRequest = UpdateFormTranslationRequest(
+			nb = "Ja",
+			en = "Yes",
+		)
+		val updateFormTranslationResponse = testFormsApi.updateFormTranslation(
+			formPath,
+			formTranslation.id,
+			formTranslation.revision!!,
+			updateFormTranslationRequest,
+			authToken,
+		).assertSuccess()
+		assertEquals(2, updateFormTranslationResponse.body.revision)
+
+		val translationsAfterUpdateFormTranslation = testFormsApi.getFormTranslations(formPath).assertSuccess().body
+		assertEquals(1, translationsAfterUpdateFormTranslation.size)
+		assertEquals("Ja", translationsAfterUpdateFormTranslation.first().nb)
+		assertEquals("Yes", translationsAfterUpdateFormTranslation.first().en)
+
+		val translationsInitialFormRevision = testFormsApi.getFormTranslations(formPath, form.revision).assertSuccess().body
+		assertEquals(1, translationsInitialFormRevision.size)
+		assertEquals("Ja", translationsInitialFormRevision.first().nb)
+		assertNull(translationsInitialFormRevision.first().en)
 	}
 
 }
