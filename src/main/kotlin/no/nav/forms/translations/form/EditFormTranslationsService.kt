@@ -42,10 +42,10 @@ class EditFormTranslationsService(
 		en: String?,
 		userId: String,
 	): FormTranslationDto {
-		val globalTranslation = if (globalTranslationId != null) {
-			globalTranslationRepository.findById(globalTranslationId)
+		val globalTranslation = globalTranslationId?.let {
+			globalTranslationRepository.findById(it)
 				.getOrElse { throw IllegalArgumentException("Global translation not found") }
-		} else null
+		}
 
 		val formTranslation = formTranslationRepository.findById(id)
 			.getOrElse { throw ResourceNotFoundException("Form translation not found", id.toString()) }
@@ -83,22 +83,18 @@ class EditFormTranslationsService(
 	): FormTranslationDto {
 		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
 
-		val globalTranslation = if (globalTranslationId != null) {
-			globalTranslationRepository.findById(globalTranslationId)
+		val globalTranslation = globalTranslationId?.let {
+			globalTranslationRepository.findById(it)
 				.getOrElse { throw IllegalArgumentException("Global translation not found") }
-		} else null
+		}
 
-		val formTranslation =
-			formTranslationRepository.findByFormPathAndKey(formPath, key).let {
-				when {
-					it == null -> null
-					it.deletedAt != null -> formTranslationRepository.save(it.copy(deletedAt = null, deletedBy = null))
-					else -> throw DuplicateResourceException(
-						"Translation with key is already associated with $formPath",
-						formPath
-					)
-				}
-			} ?: formTranslationRepository.save(FormTranslationEntity(form = form, key = key))
+		val formTranslation = formTranslationRepository.findByFormPathAndKey(formPath, key)?.apply {
+			if (deletedAt != null) {
+				formTranslationRepository.save(copy(deletedAt = null, deletedBy = null))
+			} else {
+				throw DuplicateResourceException("Translation with key is already associated with $formPath", formPath)
+			}
+		} ?: formTranslationRepository.save(FormTranslationEntity(form = form, key = key))
 
 		val latestRevision = formTranslation.revisions?.lastOrNull()
 		val formTranslationRevision = formTranslationRevisionRepository.save(
