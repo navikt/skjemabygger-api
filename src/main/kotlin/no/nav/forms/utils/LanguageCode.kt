@@ -1,6 +1,8 @@
 package no.nav.forms.utils
 
 import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 
 enum class LanguageCode(val value: String) {
 	NB("nb"),
@@ -17,3 +19,9 @@ enum class LanguageCode(val value: String) {
 		}
 	}
 }
+
+fun String.splitLanguageCodes(): List<LanguageCode>? = split(",").map { LanguageCode.validate(it.trim()) }
+
+fun JsonNode.toLanguageCodes(): List<LanguageCode> = map { LanguageCode.validate(it.asText()) }
+
+fun List<LanguageCode>.toJsonNode(): JsonNode = ObjectMapper().valueToTree(map {it.value})

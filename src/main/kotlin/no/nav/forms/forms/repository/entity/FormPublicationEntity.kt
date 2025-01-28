@@ -1,9 +1,12 @@
 package no.nav.forms.forms.repository.entity
 
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
 import no.nav.forms.translations.form.repository.entity.PublishedFormTranslationsEntity
 import no.nav.forms.translations.global.repository.entity.PublishedGlobalTranslationsEntity
 import org.hibernate.Hibernate
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 
 @Entity
@@ -28,6 +31,10 @@ data class FormPublicationEntity(
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "published_global_translation_id", referencedColumnName = "id", nullable = false)
 	val publishedGlobalTranslation: PublishedGlobalTranslationsEntity,
+
+	@Convert(converter = DbJsonArrayConverter::class)
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Column(name = "languages", columnDefinition = "jsonb", nullable = true) val languages: JsonNode,
 ) {
 
 	override fun equals(other: Any?): Boolean {

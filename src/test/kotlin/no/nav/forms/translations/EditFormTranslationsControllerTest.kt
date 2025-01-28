@@ -6,6 +6,7 @@ import no.nav.forms.model.*
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
 import no.nav.forms.translations.testdata.GlobalTranslationsTestdata
+import no.nav.forms.utils.LanguageCode
 import no.nav.forms.utils.Skjemanummer
 import no.nav.forms.utils.toFormPath
 import org.junit.jupiter.api.Assertions.*
@@ -378,7 +379,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val createRequest = NewFormTranslationRequestDto(key = "Nei", nb = "Nei")
 		val createResponse = testFormsApi.createFormTranslation(formPath, createRequest, authToken).assertSuccess()
 
-		testFormsApi.publishForm(formPath, 1, authToken).assertSuccess()
+		testFormsApi.publishForm(formPath, 1, authToken, LanguageCode.entries).assertSuccess()
 
 		val currentFormTranslationsBeforeDelete = testFormsApi.getFormTranslations(formPath).assertSuccess().body
 		assertEquals(1, currentFormTranslationsBeforeDelete.size)
@@ -388,7 +389,7 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		val currentFormTranslationsAfterDelete = testFormsApi.getFormTranslations(formPath).assertSuccess().body
 		assertEquals(0, currentFormTranslationsAfterDelete.size)
 
-		val formTranslationPublication = testFormsApi.getPublishedFormTranslations(formPath).assertSuccess().body
+		val formTranslationPublication = testFormsApi.getPublishedFormTranslations(formPath, LanguageCode.entries).assertSuccess().body
 		assertNotNull(formTranslationPublication.publishedAt)
 		assertNotNull(formTranslationPublication.publishedBy)
 
@@ -425,15 +426,16 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 	fun testThatModificationOfFormTranslationAfterTheFormRevisionHasBeenPublishedDoesNotAffectPublishedTranslations() {
 		val authToken = mockOAuth2Server.createMockToken()
 
-		val createRequest = NewFormTranslationRequestDto(key = "Ja", nb = "Ja")
+		val translationKey = "Ja"
+		val createRequest = NewFormTranslationRequestDto(key = translationKey, nb = "Ja", nn = "Jau", en = "Yes")
 		val formTranslation = testFormsApi.createFormTranslation(formPath, createRequest, authToken)
 			.assertSuccess().body
 
-		testFormsApi.publishForm(formPath, 1, authToken).assertSuccess()
+		testFormsApi.publishForm(formPath, 1, authToken, LanguageCode.entries).assertSuccess()
 
 		val updateRequest = UpdateFormTranslationRequest(
 			nb = "Ja",
-			en = "Yes",
+			en = "Yeah",
 		)
 		testFormsApi.updateFormTranslation(
 			formPath,
@@ -451,18 +453,21 @@ class EditFormTranslationsControllerTest : ApplicationTest() {
 		assertEquals(updateRequest.en, updatedFormTranslation.en)
 		assertNull(updatedFormTranslation.nn)
 
-		val publication = testFormsApi.getPublishedFormTranslations(formPath).assertSuccess().body
+		val publication = testFormsApi.getPublishedFormTranslations(formPath, LanguageCode.entries).assertSuccess().body
 		assertNotNull(publication.publishedAt)
 		assertNotNull(publication.publishedBy)
 
-		val publishedTranslationsMap = publication.translations  as Map<String, Map<String, String>>
-		assertEquals(setOf("nb","nn","en"), publishedTranslationsMap.keys)
+		val publishedTranslations = publication.translations as Map<String, Map<String, String>>
+		assertEquals(setOf("nb","nn","en"), publishedTranslations.keys)
 
-		val bokmal = publishedTranslationsMap["nb"]
-		assertEquals("Ja", bokmal?.get("Ja"))
+		val bokmalMap = publishedTranslations["nb"]
+		assertEquals("Ja", bokmalMap?.get(translationKey))
 
-		val english = publishedTranslationsMap["en"]
-		assertNull(english?.get("Ja"))
+		val nynorskMap = publishedTranslations["nn"]
+		assertEquals("Jau", nynorskMap?.get(translationKey))
+
+		val englishMap = publishedTranslations["en"]
+		assertEquals("Yes", englishMap?.get(translationKey))
 	}
 
 }

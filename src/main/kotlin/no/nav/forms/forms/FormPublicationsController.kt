@@ -6,6 +6,7 @@ import no.nav.forms.model.FormDto
 import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.utils.LanguageCode
+import no.nav.forms.utils.splitLanguageCodes
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
@@ -19,10 +20,15 @@ class FormPublicationsController(
 	private val securityContextHolder: SecurityContextHolder,
 ) : FormPublicationsApi {
 
-	override fun publishForm(formPath: String, formsapiEntityRevision: Int): ResponseEntity<FormDto> {
+	override fun publishForm(
+		formPath: String,
+		formsapiEntityRevision: Int,
+		languageCodes: String?
+	): ResponseEntity<FormDto> {
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
-		val form = formPublicationsService.publishForm(formPath, formsapiEntityRevision, userId)
+		val languages: List<LanguageCode> = languageCodes?.splitLanguageCodes() ?: listOf(LanguageCode.NB)
+		val form = formPublicationsService.publishForm(formPath, formsapiEntityRevision, languages, userId)
 		return ResponseEntity.status(HttpStatus.CREATED).body(form)
 	}
 
@@ -43,8 +49,8 @@ class FormPublicationsController(
 		formPath: String,
 		languageCodes: String?
 	): ResponseEntity<PublishedTranslationsDto> {
-		val langs: List<LanguageCode>? = languageCodes?.split(",")?.map { LanguageCode.validate(it.trim()) }
-		val formTranslations = formPublicationsService.getPublishedFormTranslations(formPath, langs)
+		val languages: List<LanguageCode> = languageCodes?.splitLanguageCodes() ?: LanguageCode.entries
+		val formTranslations = formPublicationsService.getPublishedFormTranslations(formPath, languages)
 		return ResponseEntity.ok(formTranslations)
 	}
 

@@ -6,6 +6,7 @@ import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.translations.global.PublishGlobalTranslationsService
 import no.nav.forms.utils.LanguageCode
+import no.nav.forms.utils.splitLanguageCodes
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
 import org.springframework.http.HttpStatus
@@ -27,8 +28,8 @@ class PublishGlobalTranslationsController(
 
 	@Unprotected
 	override fun getPublishedGlobalTranslationsInformation(languageCodes: String?): ResponseEntity<PublishedTranslationsDto> {
-		val langs: List<LanguageCode>? = languageCodes?.split(",")?.map { LanguageCode.validate(it.trim()) }
-		return ResponseEntity.ok(publishGlobalTranslationsService.getPublishedGlobalTranslationsV2(langs))
+		val languages: List<LanguageCode>? = languageCodes?.splitLanguageCodes()
+		return ResponseEntity.ok(publishGlobalTranslationsService.getPublishedGlobalTranslationsV2(languages))
 	}
 
 	override fun publishGlobalTranslations(): ResponseEntity<Unit> {

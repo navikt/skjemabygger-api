@@ -2,6 +2,7 @@ package no.nav.forms
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.model.*
+import no.nav.forms.utils.LanguageCode
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -328,10 +329,16 @@ class TestFormsApi(
 
 	private val formPublicationsBaseUrl = "$baseUrl/v1/form-publications"
 
-	fun publishForm(formPath: String, formRevision: Int, authToken: String?): FormsApiResponse<FormDto> {
+	fun publishForm(
+		formPath: String,
+		formRevision: Int,
+		authToken: String?,
+		languageCodes: List<LanguageCode>? = null,
+	): FormsApiResponse<FormDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to formRevision.toString())
+		val queryString = languageCodes?.let { "?languageCodes=${it.joinToString(",") { it.name }}" } ?: ""
 		val response = restTemplate.exchange(
-			"$formPublicationsBaseUrl/$formPath",
+			"$formPublicationsBaseUrl/$formPath${queryString}",
 			HttpMethod.POST,
 			HttpEntity(null, httpHeaders(authToken, headers)),
 			String::class.java
@@ -351,9 +358,13 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getPublishedFormTranslations(formPath: String): FormsApiResponse<PublishedTranslationsDto> {
+	fun getPublishedFormTranslations(
+		formPath: String,
+		languageCodes: List<LanguageCode>? = null,
+	): FormsApiResponse<PublishedTranslationsDto> {
+		val queryString = languageCodes?.let { "?languageCodes=${it.joinToString(",") { it.name }}" } ?: ""
 		val response = restTemplate.exchange(
-			"$formPublicationsBaseUrl/$formPath/translations?languageCodes=nb,nn,en",
+			"$formPublicationsBaseUrl/$formPath/translations${queryString}",
 			HttpMethod.GET,
 			HttpEntity(null, httpHeaders(null)),
 			String::class.java

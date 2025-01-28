@@ -10,6 +10,13 @@ post:
       required: true
       schema:
         $ref: "./components.yaml#/components/schemas/FormPath"
+    - name: languageCodes
+      in: query
+      description: Hvilke språk som skal publiseres. Kun bokmål publiseres hvis annet ikke er oppgitt.
+      example: nb,nn
+      required: false
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
     - name: Formsapi-Entity-Revision
       in: header
       description: Hvilken revisjon som skal publiseres

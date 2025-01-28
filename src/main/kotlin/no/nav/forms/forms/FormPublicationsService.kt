@@ -16,6 +16,8 @@ import no.nav.forms.translations.form.utils.mapToDictionary
 import no.nav.forms.translations.global.repository.PublishedGlobalTranslationsRepository
 import no.nav.forms.utils.LanguageCode
 import no.nav.forms.utils.mapDateTime
+import no.nav.forms.utils.toJsonNode
+import no.nav.forms.utils.toLanguageCodes
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -29,7 +31,7 @@ class FormPublicationsService(
 ) {
 
 	@Transactional
-	fun publishForm(formPath: String, formRevision: Int, userId: String): FormDto {
+	fun publishForm(formPath: String, formRevision: Int, languages: List<LanguageCode>, userId: String): FormDto {
 		val form = formRepository.findByPath(formPath) ?: throw IllegalArgumentException("Invalid form path: $formPath")
 
 		val latestPublicationOfGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
@@ -60,6 +62,7 @@ class FormPublicationsService(
 				formRevision = latestFormRevision,
 				publishedFormTranslation = publishedFormTranslations,
 				publishedGlobalTranslation = latestPublicationOfGlobalTranslations,
+				languages = languages.toJsonNode()
 			)
 		)
 		return formPublicationEntity.toFormDto()
@@ -82,10 +85,14 @@ class FormPublicationsService(
 	}
 
 	@Transactional
-	fun getPublishedFormTranslations(formPath: String, languageCodes: List<LanguageCode>?): PublishedTranslationsDto {
+	fun getPublishedFormTranslations(
+		formPath: String,
+		requestedLanguageCodes: List<LanguageCode>
+	): PublishedTranslationsDto {
 		val publication = formPublicationRepository.findFirstByFormRevisionFormPathOrderByCreatedAtDesc(formPath)
 			?: throw ResourceNotFoundException("Form not published", formPath)
-		val translations = languageCodes?.associate {
+		val publishedLanguages = publication.languages.toLanguageCodes()
+		val translations = requestedLanguageCodes.intersect(publishedLanguages).associate {
 			it.value to publication.publishedFormTranslation.formTranslationRevisions.mapToDictionary(it)
 		}
 		return PublishedTranslationsDto(

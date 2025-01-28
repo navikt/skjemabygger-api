@@ -1,9 +1,11 @@
 package no.nav.forms.forms
 
 import no.nav.forms.ApplicationTest
+import no.nav.forms.model.NewFormTranslationRequestDto
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
 import no.nav.forms.translations.testdata.GlobalTranslationsTestdata
+import no.nav.forms.utils.LanguageCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -52,6 +54,151 @@ class FormPublicationsControllerTest : ApplicationTest() {
 			.body
 		assertNotNull(formAfterPublication.publishedAt)
 		assertNotNull(formAfterPublication.publishedBy)
+	}
+
+	@Test
+	fun testGetPublishedFormTranslationsReturnsPublishedLanguagesByDefault() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val translationKey = "Sannheten"
+		testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(key = translationKey, nb = "Sannheten", nn = "Sanninga", en = "The truth"),
+			authToken
+		).assertSuccess()
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.NN))
+			.assertSuccess()
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "nn"), it.translations?.keys)
+			}
+	}
+
+	@Test
+	fun testGetPublishedFormTranslationsReturnsOnlyRequestedLanguages() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val translationKey = "Sannheten"
+		testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(key = translationKey, nb = "Sannheten", nn = "Sanninga", en = "The truth"),
+			authToken
+		).assertSuccess()
+
+		// Publish all languages
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.getPublishedFormTranslations(formPath, listOf(LanguageCode.NB, LanguageCode.NN))
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "nn"), it.translations?.keys)
+			}
+		testFormsApi.getPublishedFormTranslations(formPath, listOf(LanguageCode.EN))
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("en"), it.translations?.keys)
+			}
+		testFormsApi.getPublishedFormTranslations(formPath, listOf(LanguageCode.NN))
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nn"), it.translations?.keys)
+			}
+	}
+
+	@Test
+	fun testPublishFormAndTranslationsWithDifferentLanguagesEnabled() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val translationKey1 = "Tester"
+		testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(key = translationKey1, nb = "Tester", nn = "Testar", en = "Testing"),
+			authToken
+		).assertSuccess()
+
+		val translationKey2 = "Sykdom"
+		testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(key = translationKey2, nb = "Sykdom", nn = "Sjukdom", en = "Illness"),
+			authToken
+		).assertSuccess()
+
+		// Default: only 'nb' is published
+		testFormsApi.publishForm(formPath, formRevision, authToken)
+			.assertSuccess()
+			.body
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb"), it.translations?.keys)
+				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
+				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
+			}
+
+		// Publish "nb" and "nn"
+		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.NN))
+			.assertSuccess()
+			.body
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "nn"), it.translations?.keys)
+				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
+				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
+				assertEquals("Testar", it.translations?.get("nn")?.get(translationKey1))
+				assertEquals("Sjukdom", it.translations?.get("nn")?.get(translationKey2))
+			}
+
+		// Publish "nb" and "en"
+		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.EN))
+			.assertSuccess()
+			.body
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "en"), it.translations?.keys)
+				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
+				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
+				assertEquals("Testing", it.translations?.get("en")?.get(translationKey1))
+				assertEquals("Illness", it.translations?.get("en")?.get(translationKey2))
+			}
+
+		// Publish "nb", "en" and "nn"
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+			.body
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "en", "nn"), it.translations?.keys)
+				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
+				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
+				assertEquals("Testar", it.translations?.get("nn")?.get(translationKey1))
+				assertEquals("Sjukdom", it.translations?.get("nn")?.get(translationKey2))
+				assertEquals("Testing", it.translations?.get("en")?.get(translationKey1))
+				assertEquals("Illness", it.translations?.get("en")?.get(translationKey2))
+			}
 	}
 
 	@Test
