@@ -21,10 +21,12 @@ data class FormRevisionEntity(
 	) val createdAt: LocalDateTime,
 	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
 
+	@Basic(fetch = FetchType.LAZY)
 	@Convert(converter = DbJsonArrayConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "components", columnDefinition = "jsonb", nullable = true) val components: JsonNode,
 
+	@Basic(fetch = FetchType.LAZY)
 	@Convert(converter = DbJsonObjectConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "properties", columnDefinition = "jsonb", nullable = true) val properties: JsonNode,
