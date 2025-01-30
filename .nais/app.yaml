@@ -61,6 +61,8 @@ spec:
         databases:
           - name: {{ database.name }}
   env:
+    - name: JDK_JAVA_OPTIONS
+      value: "-Xms512m -Xmx1g -XX:MaxRAMPercentage=75"
     - name: SPRING_PROFILES_ACTIVE
       value: {{ spring-profiles-active }}
     {{#each azure.ad_groups}}
