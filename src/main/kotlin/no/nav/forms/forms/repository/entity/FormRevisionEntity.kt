@@ -52,6 +52,6 @@ data class FormRevisionEntity(
 
 	@Override
 	override fun toString(): String {
-		return this::class.simpleName + "(id = $id, form = $form, revision = $revision, createdAt = $createdAt)"
+		return this::class.simpleName + "(id = $id, revision = $revision, createdAt = $createdAt)"
 	}
 }

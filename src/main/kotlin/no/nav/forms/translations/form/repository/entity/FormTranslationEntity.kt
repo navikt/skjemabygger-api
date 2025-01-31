@@ -36,6 +36,6 @@ data class FormTranslationEntity(
 
 	@Override
 	override fun toString(): String {
-		return this::class.simpleName + "(id = $id , key = $key)"
+		return this::class.simpleName + "(id = $id)"
 	}
 }

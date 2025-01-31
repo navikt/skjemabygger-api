@@ -49,7 +49,7 @@ data class FormPublicationEntity(
 
 	@Override
 	override fun toString(): String {
-		return this::class.simpleName + "(id = $id, form = ${formRevision.form.path}, createdAt = $createdAt, createdBy = $createdBy)"
+		return this::class.simpleName + "(id = $id, createdAt = $createdAt, createdBy = $createdBy)"
 	}
 
 }
