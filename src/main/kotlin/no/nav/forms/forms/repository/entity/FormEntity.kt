@@ -2,6 +2,8 @@ package no.nav.forms.forms.repository.entity
 
 import jakarta.persistence.*
 import org.hibernate.Hibernate
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import java.time.LocalDateTime
 
 @Entity
@@ -19,7 +21,8 @@ data class FormEntity(
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val deletedAt: LocalDateTime? = null,
 	@Column(name = "deleted_by", columnDefinition = "varchar") val deletedBy: String? = null,
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "form")
+	@Fetch(FetchMode.JOIN)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "form")
 	@OrderBy("created_at asc")
 	val revisions: List<FormRevisionEntity> = emptyList(),
 ) {

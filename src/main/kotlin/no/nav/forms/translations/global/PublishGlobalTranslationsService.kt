@@ -19,6 +19,7 @@ class PublishGlobalTranslationsService(
 	private val globalTranslationRepository: GlobalTranslationRepository,
 ) {
 
+	@Transactional
 	fun getPublishedGlobalTranslations(languageCode: LanguageCode): Map<String, String> {
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")
@@ -38,6 +39,7 @@ class PublishGlobalTranslationsService(
 		)
 	}
 
+	@Transactional
 	fun getPublishedGlobalTranslationsV2(languageCodes: List<LanguageCode>?): PublishedTranslationsDto {
 		val publishedGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
 			?: throw Exception("No published global translations found")

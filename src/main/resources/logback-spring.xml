@@ -25,6 +25,9 @@
 			</layout>
 		</appender>
 
+		<logger name="org.springframework.data" level="debug"/>
+		<logger name="org.hibernate.sql" level="debug"/>
+
 		<root level="INFO">
 			<appender-ref ref="STDOUT_JSON"/>
 		</root>

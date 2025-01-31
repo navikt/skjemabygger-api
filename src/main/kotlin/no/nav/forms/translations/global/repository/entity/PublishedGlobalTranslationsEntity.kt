@@ -11,7 +11,7 @@ data class PublishedGlobalTranslationsEntity(
 	@Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val createdAt: LocalDateTime,
 	@Column(name = "created_by", columnDefinition = "varchar") val createdBy: String,
 
-	@ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+	@ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
 	@JoinTable(
 		name = "published_global_translation_revision",
 		joinColumns = [JoinColumn(name = "published_global_translation_id", referencedColumnName = "id")],

@@ -3,6 +3,8 @@ package no.nav.forms.forms.repository.entity
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
 import org.hibernate.Hibernate
+import org.hibernate.annotations.Fetch
+import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
@@ -26,7 +28,6 @@ data class FormRevisionEntity(
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "components", columnDefinition = "jsonb", nullable = true) val components: JsonNode,
 
-	@Basic(fetch = FetchType.LAZY)
 	@Convert(converter = DbJsonObjectConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(name = "properties", columnDefinition = "jsonb", nullable = true) val properties: JsonNode,
@@ -35,10 +36,11 @@ data class FormRevisionEntity(
 	@JoinColumn(name = "form_id", nullable = false)
 	val form: FormEntity,
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formRevision")
+	@Fetch(FetchMode.JOIN)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "formRevision")
 	@OrderBy("created_at asc")
 	val publications: List<FormPublicationEntity> = emptyList(),
-	) {
+) {
 
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true

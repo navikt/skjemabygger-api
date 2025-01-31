@@ -16,7 +16,7 @@ data class PublishedFormTranslationsEntity(
 	@JoinColumn(name = "form_id", nullable = false)
 	val form: FormEntity,
 
-	@ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+	@ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
 	@JoinTable(
 		name = "published_form_translation_revision",
 		joinColumns = [JoinColumn(name = "published_form_translation_id", referencedColumnName = "id")],
