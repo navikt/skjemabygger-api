@@ -344,4 +344,31 @@ class FormPublicationsControllerTest : ApplicationTest() {
 		assertEquals(2, publishedForms.size)
 	}
 
+	@Test
+	fun testFetchingFormAfterPublishAndUpdate() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+
+		val formPath = form.path!!
+		testFormsApi.publishForm(formPath, form.revision!!, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		val titleUpdated = "Oppdatert skjematittel"
+		val updateFormResponse = testFormsApi.updateForm(formPath, 1, FormsTestdata.updateFormRequest(titleUpdated), authToken)
+			.assertSuccess()
+		assertEquals(titleUpdated, updateFormResponse.body.title)
+		assertNotNull(updateFormResponse.body.publishedAt)
+
+		val getFormResponse = testFormsApi.getForm(formPath).assertSuccess()
+		assertEquals(titleUpdated, getFormResponse.body.title)
+		assertNotNull(getFormResponse.body.publishedAt)
+
+		val getFormsResponse = testFormsApi.getForms().assertSuccess()
+		val correctForm = getFormsResponse.body.find { it.path == formPath }
+		assertEquals(titleUpdated, correctForm?.title)
+		assertNotNull(correctForm?.publishedAt)
+
+	}
+
 }

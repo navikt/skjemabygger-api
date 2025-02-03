@@ -10,13 +10,16 @@ import no.nav.forms.utils.mapDateTime
 
 private val mapper = ObjectMapper()
 
-fun FormEntity.toDto(select: List<String>? = null): FormDto = this.revisions.last().toDto(select)
+fun FormEntity.toDto(select: List<String>? = null, latestPublication: FormPublicationEntity? = null): FormDto = this.revisions.last().toDto(select, latestPublication)
 
-fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
+fun FormEntity.findLatestPublication(): FormPublicationEntity? =
+	this.revisions.findLast { rev -> rev.publications.isNotEmpty() }?.publications?.lastOrNull()
+
+fun FormRevisionEntity.toDto(select: List<String>? = null, latestPublication: FormPublicationEntity? = null): FormDto {
 	val typeRefComponents = object : TypeReference<List<Map<String, Any>>>() {}
 	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
-	fun include(prop: String): Boolean { return select == null || select.contains(prop) == true}
-	val latestPublication = this.publications.lastOrNull()
+	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
+
 	return FormDto(
 		id = this.form.id!!,
 		revision = if (include("revision")) this.revision else null,
@@ -34,4 +37,4 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 	)
 }
 
-fun FormPublicationEntity.toFormDto(): FormDto = this.formRevision.toDto()
+fun FormPublicationEntity.toFormDto(): FormDto = this.formRevision.toDto(null, this)
