@@ -88,8 +88,7 @@ class FormPublicationsService(
 
 	@Transactional
 	fun getPublishedForms(): List<FormCompactDto> {
-		return formViewRepository.findAll()
-			.filter { it.isPublished() }
+		return formViewRepository.findAllByPublishedAtIsNotNull()
 			.map { it.toFormCompactDto() }
 	}
 

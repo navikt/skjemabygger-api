@@ -5,4 +5,8 @@ import no.nav.forms.forms.repository.entity.FormViewEntity
 import org.springframework.stereotype.Repository
 
 @Repository
-interface FormViewRepository: ViewRepository<FormViewEntity, Long>
+interface FormViewRepository: ViewRepository<FormViewEntity, Long> {
+
+	fun findAllByPublishedAtIsNotNull(): List<FormViewEntity>
+
+}
