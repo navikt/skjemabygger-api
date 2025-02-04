@@ -1,6 +1,8 @@
 spring:
   flyway:
     clean-disabled: false
+  jpa:
+    show-sql: true
 
 no.nav.security.jwt:
   mock:
