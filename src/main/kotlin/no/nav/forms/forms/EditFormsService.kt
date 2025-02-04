@@ -9,7 +9,7 @@ import no.nav.forms.forms.repository.FormRevisionRepository
 import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
-import no.nav.forms.forms.utils.toCompactDto
+import no.nav.forms.forms.utils.toFormCompactDto
 import no.nav.forms.forms.utils.toDto
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
@@ -99,6 +99,6 @@ class EditFormsService(
 
 	@Transactional
 	fun getForms(listOfProperties: List<String>? = null): List<FormCompactDto> {
-		return formViewRepository.findAll().map { it.toCompactDto(listOfProperties) }
+		return formViewRepository.findAll().map { it.toFormCompactDto(listOfProperties) }
 	}
 }

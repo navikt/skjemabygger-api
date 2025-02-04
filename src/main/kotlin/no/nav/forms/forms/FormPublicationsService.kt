@@ -6,8 +6,10 @@ import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormPublicationRepository
 import no.nav.forms.forms.repository.FormRepository
+import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
-import no.nav.forms.forms.utils.toCompactFormDto
+import no.nav.forms.forms.utils.isPublished
+import no.nav.forms.forms.utils.toFormCompactDto
 import no.nav.forms.forms.utils.toFormDto
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
@@ -31,6 +33,7 @@ class FormPublicationsService(
 	val publishedGlobalTranslationsRepository: PublishedGlobalTranslationsRepository,
 	val publishedFormTranslationRepository: PublishedFormTranslationRepository,
 	val formTranslationRepository: FormTranslationRepository,
+	val formViewRepository: FormViewRepository,
 	val entityManager: EntityManager,
 ) {
 
@@ -85,9 +88,9 @@ class FormPublicationsService(
 
 	@Transactional
 	fun getPublishedForms(): List<FormCompactDto> {
-		return formRepository.findAll()
-			.filter { it.publications.isNotEmpty() }
-			.map { it.publications.last().toCompactFormDto() }
+		return formViewRepository.findAll()
+			.filter { it.isPublished() }
+			.map { it.toFormCompactDto() }
 	}
 
 	@Transactional

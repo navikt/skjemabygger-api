@@ -9,9 +9,11 @@ import no.nav.forms.utils.LanguageCode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
+import kotlin.test.assertFalse
 
 class FormPublicationsControllerTest : ApplicationTest() {
 
@@ -337,11 +339,19 @@ class FormPublicationsControllerTest : ApplicationTest() {
 		testFormsApi.publishForm(formPath2, formRevision2, authToken)
 			.assertSuccess()
 
+		val createRequest3 = FormsTestdata.newFormRequest(skjemanummer = "NAV 11-40.02")
+		val newForm3 = testFormsApi.createForm(createRequest3, authToken)
+			.assertSuccess()
+			.body
+
 		val publishedForms = testFormsApi.getPublishedForms()
 			.assertSuccess()
 			.body
 
 		assertEquals(2, publishedForms.size)
+		assertTrue(publishedForms.any { it.path == formPath1 })
+		assertTrue(publishedForms.any { it.path == formPath2 })
+		assertFalse(publishedForms.any { it.path == newForm3.path!! })
 	}
 
 	@Test

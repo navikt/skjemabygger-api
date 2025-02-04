@@ -15,23 +15,6 @@ private val mapper = ObjectMapper()
 fun FormEntity.toDto(select: List<String>? = null): FormDto =
 	this.revisions.last().toDto(select)
 
-fun FormViewEntity.toCompactDto(select: List<String>? = null): FormCompactDto {
-	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
-	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
-	return FormCompactDto(
-		id = this.id,
-		revision = if (include("revision")) this.revision else null,
-		skjemanummer = if (include("skjemanummer")) this.skjemanummer else null,
-		path = if (include("path")) this.path else null,
-		title = if (include("title")) this.title else null,
-		properties = if (include("properties")) mapper.convertValue(this.properties, typeRefProperties) else null,
-		changedAt = if (include("changedAt")) mapDateTime(this.changedAt) else null,
-		changedBy = if (include("changedBy")) this.changedBy else null,
-		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt) else null,
-		publishedBy = if (include("publishedBy")) this.publishedBy else null,
-	)
-}
-
 fun FormEntity.findLatestPublication(): FormPublicationEntity? = this.publications.lastOrNull()
 
 fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
@@ -56,24 +39,23 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 	)
 }
 
-fun FormRevisionEntity.toCompactDto(select: List<String>? = null): FormCompactDto {
+fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDto {
 	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
 	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
-	val latestPublication = this.form.findLatestPublication()
 	return FormCompactDto(
-		id = this.form.id!!,
+		id = this.id,
 		revision = if (include("revision")) this.revision else null,
-		skjemanummer = if (include("skjemanummer")) this.form.skjemanummer else null,
-		path = if (include("path")) this.form.path else null,
+		skjemanummer = if (include("skjemanummer")) this.skjemanummer else null,
+		path = if (include("path")) this.path else null,
 		title = if (include("title")) this.title else null,
 		properties = if (include("properties")) mapper.convertValue(this.properties, typeRefProperties) else null,
-		changedAt = if (include("changedAt")) mapDateTime(this.createdAt) else null,
-		changedBy = if (include("changedBy")) this.createdBy else null,
-		publishedAt = if (include("publishedAt") && latestPublication != null) mapDateTime(latestPublication.createdAt) else null,
-		publishedBy = if (include("publishedBy") && latestPublication != null) latestPublication.createdBy else null,
+		changedAt = if (include("changedAt")) mapDateTime(this.changedAt) else null,
+		changedBy = if (include("changedBy")) this.changedBy else null,
+		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt) else null,
+		publishedBy = if (include("publishedBy")) this.publishedBy else null,
 	)
 }
 
-fun FormPublicationEntity.toFormDto(): FormDto = this.formRevision.toDto()
+fun FormViewEntity.isPublished(): Boolean = this.publishedAt != null
 
-fun FormPublicationEntity.toCompactFormDto(): FormCompactDto = this.formRevision.toCompactDto()
+fun FormPublicationEntity.toFormDto(): FormDto = this.formRevision.toDto()
