@@ -6,6 +6,7 @@ import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
 import no.nav.forms.model.FormDto
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
+import no.nav.forms.forms.repository.entity.FormViewEntity
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.utils.mapDateTime
 
@@ -14,8 +15,22 @@ private val mapper = ObjectMapper()
 fun FormEntity.toDto(select: List<String>? = null): FormDto =
 	this.revisions.last().toDto(select)
 
-fun FormEntity.toCompactDto(select: List<String>? = null): FormCompactDto =
-	this.revisions.last().toCompactDto(select)
+fun FormViewEntity.toCompactDto(select: List<String>? = null): FormCompactDto {
+	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
+	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
+	return FormCompactDto(
+		id = this.id,
+		revision = if (include("revision")) this.revision else null,
+		skjemanummer = if (include("skjemanummer")) this.skjemanummer else null,
+		path = if (include("path")) this.path else null,
+		title = if (include("title")) this.title else null,
+		properties = if (include("properties")) mapper.convertValue(this.properties, typeRefProperties) else null,
+		changedAt = if (include("changedAt")) mapDateTime(this.changedAt) else null,
+		changedBy = if (include("changedBy")) this.changedBy else null,
+		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt) else null,
+		publishedBy = if (include("publishedBy")) this.publishedBy else null,
+	)
+}
 
 fun FormEntity.findLatestPublication(): FormPublicationEntity? = this.publications.lastOrNull()
 
@@ -47,6 +62,7 @@ fun FormRevisionEntity.toCompactDto(select: List<String>? = null): FormCompactDt
 	val latestPublication = this.form.findLatestPublication()
 	return FormCompactDto(
 		id = this.form.id!!,
+		revision = if (include("revision")) this.revision else null,
 		skjemanummer = if (include("skjemanummer")) this.form.skjemanummer else null,
 		path = if (include("path")) this.form.path else null,
 		title = if (include("title")) this.title else null,

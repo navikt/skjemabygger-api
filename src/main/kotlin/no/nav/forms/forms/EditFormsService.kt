@@ -6,6 +6,7 @@ import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormRevisionRepository
+import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
 import no.nav.forms.forms.utils.toCompactDto
@@ -23,6 +24,7 @@ import java.time.LocalDateTime
 class EditFormsService(
 	val formRepository: FormRepository,
 	val formRevisionRepository: FormRevisionRepository,
+	val formViewRepository: FormViewRepository,
 ) {
 	val logger: Logger = LoggerFactory.getLogger(javaClass)
 	private val mapper = ObjectMapper()
@@ -97,6 +99,6 @@ class EditFormsService(
 
 	@Transactional
 	fun getForms(listOfProperties: List<String>? = null): List<FormCompactDto> {
-		return formRepository.findAll().map { it.toCompactDto(listOfProperties) }
+		return formViewRepository.findAll().map { it.toCompactDto(listOfProperties) }
 	}
 }

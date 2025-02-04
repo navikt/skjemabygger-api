@@ -119,6 +119,8 @@ components:
       properties:
         id:
           $ref: "#/components/schemas/FormDbId"
+        revision:
+          $ref: "#/components/schemas/FormRevision"
         skjemanummer:
           $ref: "#/components/schemas/Skjemanummer"
         path:
