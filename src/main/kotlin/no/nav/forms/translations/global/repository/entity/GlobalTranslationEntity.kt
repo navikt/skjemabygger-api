@@ -15,7 +15,7 @@ data class GlobalTranslationEntity(
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "globalTranslation", cascade = [CascadeType.ALL])
 	@OrderBy("created_at asc")
-	val revisions: List<GlobalTranslationRevisionEntity>? = emptyList(),
+	val revisions: Set<GlobalTranslationRevisionEntity>? = emptySet(),
 ) {
 
 	override fun equals(other: Any?): Boolean {

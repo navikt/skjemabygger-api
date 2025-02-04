@@ -17,8 +17,7 @@ fun FormEntity.toDto(select: List<String>? = null): FormDto =
 fun FormEntity.toCompactDto(select: List<String>? = null): FormCompactDto =
 	this.revisions.last().toCompactDto(select)
 
-fun FormEntity.findLatestPublication(): FormPublicationEntity? =
-	this.revisions.findLast { rev -> rev.publications.isNotEmpty() }?.publications?.lastOrNull()
+fun FormEntity.findLatestPublication(): FormPublicationEntity? = this.publications.lastOrNull()
 
 fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 	val typeRefComponents = object : TypeReference<List<Map<String, Any>>>() {}

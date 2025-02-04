@@ -18,7 +18,7 @@ data class FormTranslationEntity(
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "formTranslation")
 	@OrderBy("created_at asc")
-	val revisions: List<FormTranslationRevisionEntity>? = emptyList(),
+	val revisions: Set<FormTranslationRevisionEntity>? = emptySet(),
 
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val deletedAt: LocalDateTime? = null,
 	@Column(name = "deleted_by", columnDefinition = "varchar") val deletedBy: String? = null,

@@ -29,7 +29,7 @@ class PublishGlobalTranslationsService(
 	@Transactional
 	fun publish(userId: String) {
 		val globalTranslations = globalTranslationRepository.findAllByDeletedAtIsNull()
-		val latestRevisions = globalTranslations.mapNotNull(GlobalTranslationEntity::getLatestRevision)
+		val latestRevisions = globalTranslations.mapNotNull(GlobalTranslationEntity::getLatestRevision).toSet()
 		publishedGlobalTranslationsRepository.save(
 			PublishedGlobalTranslationsEntity(
 				createdAt = LocalDateTime.now(),

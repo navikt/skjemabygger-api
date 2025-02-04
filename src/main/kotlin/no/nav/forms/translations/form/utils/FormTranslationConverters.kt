@@ -44,7 +44,7 @@ fun FormTranslationRevisionEntity.getTranslation(languageCode: LanguageCode): St
 	}
 }
 
-fun List<FormTranslationRevisionEntity>.mapToDictionary(languageCode: LanguageCode): Map<String, String> {
+fun Set<FormTranslationRevisionEntity>.mapToDictionary(languageCode: LanguageCode): Map<String, String> {
 	return associate { it.formTranslation.key to it.getTranslation(languageCode) }
 		.filter { it.value != null } as Map<String, String>
 }

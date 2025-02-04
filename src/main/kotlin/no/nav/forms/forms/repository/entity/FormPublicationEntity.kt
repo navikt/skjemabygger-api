@@ -26,6 +26,10 @@ data class FormPublicationEntity(
 	@JoinColumn(name = "form_revision_id", nullable = false)
 	val formRevision: FormRevisionEntity,
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "form_id", nullable = false)
+	val form: FormEntity,
+
 	@Fetch(FetchMode.JOIN)
 	@OneToOne(optional = false)
 	@JoinColumn(name = "published_form_translation_id", referencedColumnName = "id", nullable = false)

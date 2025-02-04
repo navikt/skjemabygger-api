@@ -24,7 +24,12 @@ data class FormEntity(
 	@Fetch(FetchMode.JOIN)
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "form")
 	@OrderBy("created_at asc")
-	val revisions: List<FormRevisionEntity> = emptyList(),
+	val revisions: Set<FormRevisionEntity> = emptySet(),
+
+	@Fetch(FetchMode.JOIN)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "form")
+	@OrderBy("created_at asc")
+	val publications: Set<FormPublicationEntity> = emptySet(),
 ) {
 
 	override fun equals(other: Any?): Boolean {

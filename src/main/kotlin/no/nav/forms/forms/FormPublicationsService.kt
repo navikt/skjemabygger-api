@@ -1,5 +1,6 @@
 package no.nav.forms.forms
 
+import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
@@ -30,6 +31,7 @@ class FormPublicationsService(
 	val publishedGlobalTranslationsRepository: PublishedGlobalTranslationsRepository,
 	val publishedFormTranslationRepository: PublishedFormTranslationRepository,
 	val formTranslationRepository: FormTranslationRepository,
+	val entityManager: EntityManager,
 ) {
 
 	@Transactional
@@ -54,19 +56,21 @@ class FormPublicationsService(
 				createdAt = createdAt,
 				createdBy = userId,
 				form = form,
-				formTranslationRevisions = latestFormTranslations
+				formTranslationRevisions = latestFormTranslations.toSet()
 			)
 		)
 		val formPublicationEntity = formPublicationRepository.save(
 			FormPublicationEntity(
 				createdAt = createdAt,
 				createdBy = userId,
+				form = form,
 				formRevision = latestFormRevision,
 				publishedFormTranslation = publishedFormTranslations,
 				publishedGlobalTranslation = latestPublicationOfGlobalTranslations,
 				languages = languages.toJsonNode()
 			)
 		)
+		entityManager.refresh(form)
 		return formPublicationEntity.toFormDto()
 	}
 
@@ -74,15 +78,15 @@ class FormPublicationsService(
 	fun getPublishedForm(formPath: String): FormDto {
 		val form = formRepository.findByPath(formPath)
 			?: throw ResourceNotFoundException("Form not found", formPath)
-		val latestPublication = form.revisions.lastOrNull { it.publications.isNotEmpty() }?.publications?.last()
+		val latestPublication = form.publications.lastOrNull()
 			?: throw ResourceNotFoundException("Form not published", formPath)
 		return latestPublication.toFormDto()
 	}
 
 	@Transactional
 	fun getPublishedForms(): List<FormCompactDto> {
-		return formRepository.findAll().filter { it.revisions.any { it.publications.isNotEmpty() } }
-			.map { it.revisions.last { it.publications.isNotEmpty() } }
+		return formRepository.findAll()
+			.filter { it.publications.isNotEmpty() }
 			.map { it.publications.last().toCompactFormDto() }
 	}
 

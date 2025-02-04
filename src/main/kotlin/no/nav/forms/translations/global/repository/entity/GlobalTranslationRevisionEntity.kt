@@ -30,7 +30,7 @@ data class GlobalTranslationRevisionEntity(
 		inverseJoinColumns = [JoinColumn(name = "published_global_translation_id", referencedColumnName = "id")]
 	)
 	@OrderBy("created_at asc")
-	val publications: List<PublishedGlobalTranslationsEntity>? = emptyList(),
+	val publications: Set<PublishedGlobalTranslationsEntity>? = emptySet(),
 ) {
 
 	override fun equals(other: Any?): Boolean {

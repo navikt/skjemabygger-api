@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FormRepository: JpaRepository<FormEntity, Long> {
 
-	@EntityGraph(attributePaths = ["revisions"])
+	@EntityGraph(attributePaths = ["revisions", "publications", "publications.publishedFormTranslation", "publications.publishedGlobalTranslation"])
 	fun findByPath(path: String): FormEntity?
 
-	@EntityGraph(attributePaths = ["revisions"])
+	@EntityGraph(attributePaths = ["revisions", "publications", "publications.publishedFormTranslation", "publications.publishedGlobalTranslation"])
 	override fun findAll(): List<FormEntity>
 
 }

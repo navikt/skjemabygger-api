@@ -22,7 +22,7 @@ data class PublishedFormTranslationsEntity(
 		joinColumns = [JoinColumn(name = "published_form_translation_id", referencedColumnName = "id")],
 		inverseJoinColumns = [JoinColumn(name = "form_translation_revision_id", referencedColumnName = "id")]
 	)
-	val formTranslationRevisions: List<FormTranslationRevisionEntity>
+	val formTranslationRevisions: Set<FormTranslationRevisionEntity>
 ){
 
 	override fun equals(other: Any?): Boolean {
