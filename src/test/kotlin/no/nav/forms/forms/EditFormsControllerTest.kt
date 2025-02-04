@@ -1,7 +1,7 @@
 package no.nav.forms.forms
 
 import no.nav.forms.ApplicationTest
-import no.nav.forms.model.FormDto
+import no.nav.forms.model.FormCompactDto
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -186,8 +186,8 @@ class EditFormsControllerTest : ApplicationTest() {
 		assertEquals(6, forms.size)
 	}
 
-	fun assertPrecenceOfProps(formDto: FormDto, select: List<String>) {
-		for (prop in FormDto::class.memberProperties) {
+	fun assertPrecenceOfProps(formDto: FormCompactDto, select: List<String>) {
+		for (prop in FormCompactDto::class.memberProperties) {
 			// id should always be present
 			if (prop.name == "id" || select.contains(prop.name)) {
 				assertNotNull(prop.getter.call(formDto), "Expected ${prop.name} not to be null")
@@ -209,7 +209,7 @@ class EditFormsControllerTest : ApplicationTest() {
 			select1.split(",")
 		)
 
-		val select2 = "title,skjemanummer,revision"
+		val select2 = "title,skjemanummer,changedAt"
 		assertPrecenceOfProps(
 			testFormsApi.getForms(select2).assertSuccess().body.first(),
 			select2.split(",")

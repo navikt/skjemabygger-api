@@ -112,3 +112,38 @@ components:
           type: string
           description: Hvem publiserte dette skjemaet sist
           example: Lars Larsen
+    FormCompactDto:
+      type: object
+      required:
+      - id
+      properties:
+        id:
+          $ref: "#/components/schemas/FormDbId"
+        skjemanummer:
+          $ref: "#/components/schemas/Skjemanummer"
+        path:
+          $ref: "#/components/schemas/FormPath"
+        title:
+          type: string
+          description: Skjemaets tittel
+          example: Søknad om servicehund
+        properties:
+          $ref: "#/components/schemas/Properties"
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          type: string
+          description: Hvem endret dette skjemaet sist
+          example: Nils Nilsen
+        publishedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet sist ble publisert
+          example: 2021-12-03T14:10:00Z
+        publishedBy:
+          type: string
+          description: Hvem publiserte dette skjemaet sist
+          example: Lars Larsen

@@ -6,7 +6,9 @@ import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormPublicationRepository
 import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
+import no.nav.forms.forms.utils.toCompactFormDto
 import no.nav.forms.forms.utils.toFormDto
+import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
 import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.translations.form.repository.FormTranslationRepository
@@ -78,10 +80,10 @@ class FormPublicationsService(
 	}
 
 	@Transactional
-	fun getPublishedForms(): List<FormDto> {
+	fun getPublishedForms(): List<FormCompactDto> {
 		return formRepository.findAll().filter { it.revisions.any { it.publications.isNotEmpty() } }
 			.map { it.revisions.last { it.publications.isNotEmpty() } }
-			.map { it.publications.last().toFormDto() }
+			.map { it.publications.last().toCompactFormDto() }
 	}
 
 	@Transactional

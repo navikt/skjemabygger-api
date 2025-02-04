@@ -8,8 +8,9 @@ import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormRevisionRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
-import no.nav.forms.forms.utils.findLatestPublication
+import no.nav.forms.forms.utils.toCompactDto
 import no.nav.forms.forms.utils.toDto
+import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
 import no.nav.forms.utils.Skjemanummer
 import no.nav.forms.utils.toFormPath
@@ -63,7 +64,7 @@ class EditFormsService(
 	@Transactional
 	fun getForm(formPath: String): FormDto {
 		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
-		return form.revisions.last().toDto(null, form.findLatestPublication())
+		return form.toDto()
 	}
 
 	@Transactional
@@ -91,11 +92,11 @@ class EditFormsService(
 				createdBy = userId,
 			)
 		)
-		return formRevision.toDto(null, form.findLatestPublication())
+		return formRevision.toDto()
 	}
 
 	@Transactional
-	fun getForms(listOfProperties: List<String>? = null): List<FormDto> {
-		return formRepository.findAll().map { it.toDto(listOfProperties, it.findLatestPublication()) }
+	fun getForms(listOfProperties: List<String>? = null): List<FormCompactDto> {
+		return formRepository.findAll().map { it.toCompactDto(listOfProperties) }
 	}
 }

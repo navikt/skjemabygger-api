@@ -2,6 +2,7 @@ package no.nav.forms.forms
 
 import no.nav.forms.api.FormPublicationsApi
 import no.nav.forms.config.AzureAdConfig
+import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
 import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
@@ -39,7 +40,7 @@ class FormPublicationsController(
 	}
 
 	@Unprotected
-	override fun getPublishedForms(): ResponseEntity<List<FormDto>> {
+	override fun getPublishedForms(): ResponseEntity<List<FormCompactDto>> {
 		val forms = formPublicationsService.getPublishedForms()
 		return ResponseEntity.ok(forms)
 	}

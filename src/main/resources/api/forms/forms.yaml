@@ -32,6 +32,7 @@ post:
     - edit-forms
 get:
   summary: Henter skjemaer
+  description: Returner aldri components for skjemaene.
   operationId: getForms
   security: []
   parameters:
@@ -50,6 +51,6 @@ get:
           schema:
             type: array
             items:
-              $ref: "./components.yaml#/components/schemas/FormDto"
+              $ref: "./components.yaml#/components/schemas/FormCompactDto"
   tags:
     - edit-forms

@@ -2,6 +2,7 @@ package no.nav.forms.forms
 
 import no.nav.forms.api.EditFormsApi
 import no.nav.forms.config.AzureAdConfig
+import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
 import no.nav.forms.model.NewFormRequest
 import no.nav.forms.model.UpdateFormRequest
@@ -50,7 +51,7 @@ class EditFormsController(
 	}
 
 	@Unprotected
-	override fun getForms(select: String?): ResponseEntity<List<FormDto>> {
+	override fun getForms(select: String?): ResponseEntity<List<FormCompactDto>> {
 		val selectList = when {
 			select?.isNotEmpty() == true -> select.split(",")
 			else -> null

@@ -317,12 +317,12 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getForms(select: String? = ""): FormsApiResponse<List<FormDto>> {
+	fun getForms(select: String? = ""): FormsApiResponse<List<FormCompactDto>> {
 		val queryString = when {
 			select?.isNotEmpty() == true -> "?select=${select}"
 			else -> ""
 		}
-		val responseType = object : ParameterizedTypeReference<List<FormDto>>() {}
+		val responseType = object : ParameterizedTypeReference<List<FormCompactDto>>() {}
 		val response = restTemplate.exchange("$formsBaseUrl${queryString}", HttpMethod.GET, null, responseType)
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
@@ -373,8 +373,8 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
-	fun getPublishedForms(): FormsApiResponse<List<FormDto>> {
-		val responseType = object : ParameterizedTypeReference<List<FormDto>>() {}
+	fun getPublishedForms(): FormsApiResponse<List<FormCompactDto>> {
+		val responseType = object : ParameterizedTypeReference<List<FormCompactDto>>() {}
 		val response = restTemplate.exchange(formPublicationsBaseUrl, HttpMethod.GET, null, responseType)
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}

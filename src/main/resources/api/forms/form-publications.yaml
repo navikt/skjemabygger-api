@@ -1,5 +1,6 @@
 get:
   summary: Henter alle publiserte skjemaer
+  description: Returner aldri components for skjemaene.
   operationId: getPublishedForms
   security:
   - bearerAuth: []
@@ -11,6 +12,6 @@ get:
           schema:
             type: array
             items:
-              $ref: "./components.yaml#/components/schemas/FormDto"
+              $ref: "./components.yaml#/components/schemas/FormCompactDto"
   tags:
     - form-publications
