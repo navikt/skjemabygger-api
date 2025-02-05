@@ -78,3 +78,39 @@ get:
             $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - form-publications
+
+delete:
+  summary: Avpubliserer et skjema
+  operationId: unpublishForm
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjemaets path
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/FormPath"
+  responses:
+    204:
+      description: Skjemaet er avpublisert
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    404:
+      description: Finner ingen publisering av skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - form-publications

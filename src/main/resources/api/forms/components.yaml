@@ -33,6 +33,10 @@ components:
       additionalProperties: {}
       description: Et objekt med skjemaets egenskaper (json)
       example: {"tema": "AAP", "innsending": "PAPIR_OG_DIGITAL"}
+    FormStatus:
+      type: string
+      enum: [ "draft", "published", "pending", "unpublished" ]
+      description: Skjemaets status
     NewFormRequest:
       type: object
       description: Et nytt skjema
@@ -112,6 +116,8 @@ components:
           type: string
           description: Hvem publiserte dette skjemaet sist
           example: Lars Larsen
+        status:
+          $ref: "#/components/schemas/FormStatus"
     FormCompactDto:
       type: object
       required:
@@ -149,3 +155,5 @@ components:
           type: string
           description: Hvem publiserte dette skjemaet sist
           example: Lars Larsen
+        status:
+          $ref: "#/components/schemas/FormStatus"

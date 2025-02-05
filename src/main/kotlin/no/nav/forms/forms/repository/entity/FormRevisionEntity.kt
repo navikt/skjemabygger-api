@@ -2,9 +2,9 @@ package no.nav.forms.forms.repository.entity
 
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
+import no.nav.forms.forms.repository.converter.DbJsonArrayConverter
+import no.nav.forms.forms.repository.converter.DbJsonObjectConverter
 import org.hibernate.Hibernate
-import org.hibernate.annotations.Fetch
-import org.hibernate.annotations.FetchMode
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime

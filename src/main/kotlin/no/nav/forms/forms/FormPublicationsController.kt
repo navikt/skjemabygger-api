@@ -55,5 +55,12 @@ class FormPublicationsController(
 		return ResponseEntity.ok(formTranslations)
 	}
 
+	override fun unpublishForm(formPath: String): ResponseEntity<Unit> {
+		securityContextHolder.requireValidUser()
+		val userId = securityContextHolder.getUserName()
+		formPublicationsService.unpublishForm(formPath, userId)
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
+	}
+
 
 }

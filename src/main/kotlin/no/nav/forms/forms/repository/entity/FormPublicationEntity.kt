@@ -2,6 +2,7 @@ package no.nav.forms.forms.repository.entity
 
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
+import no.nav.forms.forms.repository.converter.DbJsonArrayConverter
 import no.nav.forms.translations.form.repository.entity.PublishedFormTranslationsEntity
 import no.nav.forms.translations.global.repository.entity.PublishedGlobalTranslationsEntity
 import org.hibernate.Hibernate
@@ -42,7 +43,11 @@ data class FormPublicationEntity(
 
 	@Convert(converter = DbJsonArrayConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)
-	@Column(name = "languages", columnDefinition = "jsonb", nullable = true) val languages: JsonNode,
+	@Column(name = "languages", columnDefinition = "jsonb", nullable = true)
+	val languages: JsonNode,
+
+	@Column(name = "status", columnDefinition = "varchar", nullable = false)
+	val status: FormPublicationStatusDb,
 ) {
 
 	override fun equals(other: Any?): Boolean {

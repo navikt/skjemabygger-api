@@ -8,7 +8,7 @@ import no.nav.forms.forms.repository.FormPublicationRepository
 import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
-import no.nav.forms.forms.utils.isPublished
+import no.nav.forms.forms.repository.entity.FormPublicationStatusDb
 import no.nav.forms.forms.utils.toFormCompactDto
 import no.nav.forms.forms.utils.toFormDto
 import no.nav.forms.model.FormCompactDto
@@ -70,7 +70,8 @@ class FormPublicationsService(
 				formRevision = latestFormRevision,
 				publishedFormTranslation = publishedFormTranslations,
 				publishedGlobalTranslation = latestPublicationOfGlobalTranslations,
-				languages = languages.toJsonNode()
+				languages = languages.toJsonNode(),
+				status = FormPublicationStatusDb.Published,
 			)
 		)
 		entityManager.refresh(form)
@@ -81,14 +82,15 @@ class FormPublicationsService(
 	fun getPublishedForm(formPath: String): FormDto {
 		val form = formRepository.findByPath(formPath)
 			?: throw ResourceNotFoundException("Form not found", formPath)
-		val latestPublication = form.publications.lastOrNull()
+		val latestPublication = form.publications.lastOrNull().takeIf { it?.status == FormPublicationStatusDb.Published }
 			?: throw ResourceNotFoundException("Form not published", formPath)
 		return latestPublication.toFormDto()
 	}
 
 	@Transactional
 	fun getPublishedForms(): List<FormCompactDto> {
-		return formViewRepository.findAllByPublishedAtIsNotNull()
+		return formViewRepository
+			.findAllByPublicationStatusEquals(FormPublicationStatusDb.Published)
 			.map { it.toFormCompactDto() }
 	}
 
@@ -108,6 +110,24 @@ class FormPublicationsService(
 			publishedBy = publication.createdBy,
 			translations = translations
 		)
+	}
+
+	@Transactional
+	fun unpublishForm(formPath: String, userId: String) {
+		val publication = formPublicationRepository.findFirstByFormRevisionFormPathOrderByCreatedAtDesc(formPath)
+			?: throw ResourceNotFoundException("Form not published", formPath)
+		if (publication.status == FormPublicationStatusDb.Unpublished) {
+			throw IllegalArgumentException("Form $formPath is already unpublished")
+		}
+		formPublicationRepository.save(
+			publication.copy(
+				id = null,
+				createdAt = LocalDateTime.now(),
+				createdBy = userId,
+				status = FormPublicationStatusDb.Unpublished,
+			)
+		)
+
 	}
 
 }

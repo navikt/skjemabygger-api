@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
+import no.nav.forms.forms.repository.entity.FormPublicationStatusDb
 import no.nav.forms.model.FormDto
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
 import no.nav.forms.forms.repository.entity.FormViewEntity
 import no.nav.forms.model.FormCompactDto
+import no.nav.forms.model.FormStatus
 import no.nav.forms.utils.mapDateTime
 
 private val mapper = ObjectMapper()
@@ -22,6 +24,12 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
 	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
 	val latestPublication = this.form.findLatestPublication()
+	val status = when {
+		latestPublication == null -> FormStatus.draft
+		latestPublication.status == FormPublicationStatusDb.Unpublished -> FormStatus.unpublished
+		this.id == latestPublication.formRevision.id -> FormStatus.published
+		else -> FormStatus.pending
+	}
 	return FormDto(
 		id = this.form.id!!,
 		revision = if (include("revision")) this.revision else null,
@@ -36,12 +44,20 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 		changedBy = if (include("changedBy")) this.createdBy else null,
 		publishedAt = if (include("publishedAt") && latestPublication != null) mapDateTime(latestPublication.createdAt) else null,
 		publishedBy = if (include("publishedBy") && latestPublication != null) latestPublication.createdBy else null,
+		status = if (include("status")) status else null,
 	)
 }
 
 fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDto {
 	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
 	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
+	val status = when {
+		this.publicationStatus == null -> FormStatus.draft
+		this.publicationStatus == FormPublicationStatusDb.Unpublished -> FormStatus.unpublished
+		this.currentRevisionId == this.publishedRevisionId -> FormStatus.published
+		this.publishedRevisionId != null -> FormStatus.pending
+		else -> null
+	}
 	return FormCompactDto(
 		id = this.id,
 		revision = if (include("revision")) this.revision else null,
@@ -53,9 +69,8 @@ fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDt
 		changedBy = if (include("changedBy")) this.changedBy else null,
 		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt) else null,
 		publishedBy = if (include("publishedBy")) this.publishedBy else null,
+		status = if (include("status")) status else null,
 	)
 }
-
-fun FormViewEntity.isPublished(): Boolean = this.publishedAt != null
 
 fun FormPublicationEntity.toFormDto(): FormDto = this.formRevision.toDto()

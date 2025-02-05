@@ -347,6 +347,20 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, body)
 	}
 
+	fun unpublishForm(
+		formPath: String,
+		authToken: String?,
+	): FormsApiResponse<Unit> {
+		val response = restTemplate.exchange(
+			"$formPublicationsBaseUrl/$formPath",
+			HttpMethod.DELETE,
+			HttpEntity(null, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body = if (!response.statusCode.is2xxSuccessful) Pair(null, readErrorBody(response)) else Pair(null, null)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
 	fun getPublishedForm(formPath: String): FormsApiResponse<FormDto> {
 		val response = restTemplate.exchange(
 			"$formPublicationsBaseUrl/$formPath",

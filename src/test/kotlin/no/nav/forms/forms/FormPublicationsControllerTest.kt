@@ -1,6 +1,7 @@
 package no.nav.forms.forms
 
 import no.nav.forms.ApplicationTest
+import no.nav.forms.model.FormStatus
 import no.nav.forms.model.NewFormTranslationRequestDto
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
@@ -365,20 +366,25 @@ class FormPublicationsControllerTest : ApplicationTest() {
 			.assertSuccess()
 
 		val titleUpdated = "Oppdatert skjematittel"
-		val updateFormResponse = testFormsApi.updateForm(formPath, 1, FormsTestdata.updateFormRequest(titleUpdated), authToken)
-			.assertSuccess()
-		assertEquals(titleUpdated, updateFormResponse.body.title)
-		assertNotNull(updateFormResponse.body.publishedAt)
+		testFormsApi.updateForm(formPath, 1, FormsTestdata.updateFormRequest(titleUpdated), authToken)
+			.assertSuccess().body.run {
+				assertEquals(titleUpdated, this.title)
+				assertNotNull(this.publishedAt)
+				assertEquals(FormStatus.pending, this.status)
+			}
 
-		val getFormResponse = testFormsApi.getForm(formPath).assertSuccess()
-		assertEquals(titleUpdated, getFormResponse.body.title)
-		assertNotNull(getFormResponse.body.publishedAt)
+		testFormsApi.getForm(formPath).assertSuccess().body.run {
+			assertEquals(titleUpdated, this.title)
+			assertNotNull(this.publishedAt)
+			assertEquals(FormStatus.pending, this.status)
+		}
 
-		val getFormsResponse = testFormsApi.getForms().assertSuccess()
-		val correctForm = getFormsResponse.body.find { it.path == formPath }
-		assertEquals(titleUpdated, correctForm?.title)
-		assertNotNull(correctForm?.publishedAt)
-
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(titleUpdated, correctForm.title)
+			assertNotNull(correctForm.publishedAt)
+			assertEquals(FormStatus.pending, correctForm.status)
+		}
 	}
 
 	@Test
@@ -388,46 +394,206 @@ class FormPublicationsControllerTest : ApplicationTest() {
 			.assertSuccess().body
 		val formPath = form.path!!
 
-		testFormsApi.getForms().assertSuccess().body.also {
-			val correctForm = it.find { it.path == formPath }
-			assertEquals(1, correctForm?.revision)
-			assertEquals("Initiell tittel", correctForm?.title)
-			assertNull(correctForm?.publishedAt)
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(1, correctForm.revision)
+			assertEquals("Initiell tittel", correctForm.title)
+			assertNull(correctForm.publishedAt)
+			assertEquals(FormStatus.draft, correctForm.status)
 		}
 
 		testFormsApi.updateForm(formPath, 1, FormsTestdata.updateFormRequest("Oppdatert tittel"), authToken)
 			.assertSuccess()
 
-		testFormsApi.getForms().assertSuccess().body.also {
-			val correctForm = it.find { it.path == formPath }
-			assertEquals(2, correctForm?.revision)
-			assertEquals("Oppdatert tittel", correctForm?.title)
-			assertNull(correctForm?.publishedAt)
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(2, correctForm.revision)
+			assertEquals("Oppdatert tittel", correctForm.title)
+			assertNull(correctForm.publishedAt)
+			assertEquals(FormStatus.draft, correctForm.status)
 		}
 
 		testFormsApi.publishForm(formPath, 2, authToken, LanguageCode.entries)
 			.assertSuccess()
 
-		testFormsApi.getForms().assertSuccess().body.also {
-			val correctForm = it.find { it.path == formPath }
-			assertEquals(2, correctForm?.revision)
-			assertNotNull(correctForm?.publishedAt)
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(2, correctForm.revision)
+			assertNotNull(correctForm.publishedAt)
+			assertEquals(FormStatus.published, correctForm.status)
 		}
 
 		val finalTitle = "Endelig tittel"
-		val updateFormResponse = testFormsApi.updateForm(formPath, 2, FormsTestdata.updateFormRequest(finalTitle), authToken)
-			.assertSuccess().body.also {
-				assertNotNull(it.publishedAt)
-			}
+		val updateFormResponse =
+			testFormsApi.updateForm(formPath, 2, FormsTestdata.updateFormRequest(finalTitle), authToken)
+				.assertSuccess().body.run {
+					assertNotNull(this.publishedAt)
+					assertEquals(finalTitle, this.title)
+					this
+				}
 
-		testFormsApi.getForms().assertSuccess().body.also {
-			val correctForm = it.find { it.path == formPath }
-			assertEquals(3, correctForm?.revision)
-			assertEquals(finalTitle, correctForm?.title)
-			assertNotNull(correctForm?.publishedAt)
-			assertEquals(updateFormResponse.publishedAt, correctForm?.publishedAt)
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(3, correctForm.revision)
+			assertEquals(finalTitle, correctForm.title)
+			assertNotNull(correctForm.publishedAt)
+			assertEquals(updateFormResponse.publishedAt, correctForm.publishedAt)
+			assertEquals(FormStatus.pending, correctForm.status)
 		}
 
+	}
+
+	@Test
+	fun testUnpublishForm() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+		val formRevision = form.revision!!
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForms().assertSuccess().body.run {
+			assertEquals(1, this.count { it.path == formPath })
+		}
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertSuccess().body.run {
+				assertNotNull(this.publishedAt)
+				assertNotNull(this.publishedBy)
+			}
+
+		testFormsApi.unpublishForm(formPath, authToken)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertHttpStatus(HttpStatus.NOT_FOUND)
+
+		testFormsApi.getForms().assertSuccess().body.run {
+			val correctForm = this.first { it.path == formPath }
+			assertEquals(1, correctForm.revision)
+			assertEquals(FormStatus.unpublished, correctForm.status)
+			assertNotNull(correctForm.publishedAt)
+			assertNotNull(correctForm.publishedBy)
+		}
+
+		testFormsApi.getPublishedForms().assertSuccess().body.run {
+			assertTrue(this.none { it.path == formPath })
+		}
+
+		testFormsApi.getForm(formPath).assertSuccess().body.run {
+			assertEquals(1, this.revision)
+			assertNotNull(this.publishedAt)
+			assertNotNull(this.publishedBy)
+			assertEquals(FormStatus.unpublished, this.status)
+		}
+	}
+
+	@Test
+	fun testUnpublishFormWhichNeverHaveBeenPublished() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+
+		testFormsApi.unpublishForm(formPath, authToken)
+			.assertHttpStatus(HttpStatus.NOT_FOUND)
+	}
+
+	@Test
+	fun testUnpublishNonexistentForm() {
+		val authToken = mockOAuth2Server.createMockToken()
+		testFormsApi.unpublishForm("doesnotexist", authToken)
+			.assertHttpStatus(HttpStatus.NOT_FOUND)
+	}
+
+	@Test
+	fun testUnpublishFormWithoutAuthToken() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+		val formRevision = form.revision!!
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.unpublishForm(formPath, authToken = null)
+			.assertHttpStatus(HttpStatus.UNAUTHORIZED)
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertSuccess().body.run {
+				assertEquals(FormStatus.published, this.status)
+				assertNotNull(this.publishedAt)
+				assertNotNull(this.publishedBy)
+			}
+	}
+
+	@Test
+	fun testUnpublishAlreadyUnpublishedForm() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+		val formRevision = form.revision!!
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.unpublishForm(formPath, authToken)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForm(formPath).assertHttpStatus(HttpStatus.NOT_FOUND)
+		val unpublishedForm = testFormsApi.getForm(formPath)
+			.assertSuccess().body.run {
+				assertEquals(FormStatus.unpublished, this.status)
+				this
+			}
+
+		// form is already unpublished, so expecting BAD_REQUEST
+		testFormsApi.unpublishForm(formPath, authToken)
+			.assertHttpStatus(HttpStatus.BAD_REQUEST)
+
+		testFormsApi.getPublishedForm(formPath).assertHttpStatus(HttpStatus.NOT_FOUND)
+		testFormsApi.getForm(formPath)
+			.assertSuccess().body.run {
+				assertEquals(FormStatus.unpublished, this.status)
+				assertEquals(unpublishedForm.publishedAt, this.publishedAt)
+				assertEquals(unpublishedForm.publishedBy, this.publishedBy)
+				this
+			}
+	}
+
+	@Test
+	fun testPublishFormAfterUnpublish() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+		val formRevision = form.revision!!
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertSuccess().body.run {
+				assertEquals(FormStatus.published, this.status)
+			}
+
+		testFormsApi.unpublishForm(formPath, authToken)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForm(formPath).assertHttpStatus(HttpStatus.NOT_FOUND)
+
+		// publish the unpublished form
+		testFormsApi.publishForm(formPath, formRevision, authToken, LanguageCode.entries)
+			.assertSuccess()
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertSuccess().body.run {
+				assertEquals(FormStatus.published, this.status)
+			}
 	}
 
 }

@@ -1,11 +1,11 @@
-package no.nav.forms.forms.repository.entity
+package no.nav.forms.forms.repository.converter
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
 
-@Converter(autoApply = true)
+@Converter
 class DbJsonArrayConverter : AttributeConverter<JsonNode, String> {
 
 	private val mapper = ObjectMapper()
