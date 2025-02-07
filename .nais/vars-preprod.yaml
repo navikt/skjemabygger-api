@@ -11,6 +11,8 @@ accessPolicy:
         namespace: skjemadigitalisering
       - application: skjemabygging-preprod-alt
         namespace: skjemadigitalisering
+      - application: skjemautfylling
+        namespace: skjemadigitalisering
       - application: skjemautfylling-preprod
         namespace: skjemadigitalisering
       - application: skjemautfylling-preprod-alt
