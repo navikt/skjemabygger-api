@@ -90,7 +90,9 @@ class EditFormTranslationsService(
 
 		val formTranslation = formTranslationRepository.findByFormPathAndKey(formPath, key)?.apply {
 			if (deletedAt != null) {
-				formTranslationRepository.save(copy(deletedAt = null, deletedBy = null))
+				this.deletedAt = null
+				this.deletedBy = null
+				formTranslationRepository.save(this)
 			} else {
 				throw DuplicateResourceException("Translation with key is already associated with $formPath", formPath)
 			}
@@ -119,9 +121,9 @@ class EditFormTranslationsService(
 				"Form translation not found",
 				id.toString()
 			)
-		formTranslationRepository.save(
-			formTranslation.copy(deletedAt = LocalDateTime.now(), deletedBy = userId)
-		);
+		formTranslation.deletedAt = LocalDateTime.now()
+		formTranslation.deletedBy = userId
+		formTranslationRepository.save(formTranslation)
 	}
 
 }

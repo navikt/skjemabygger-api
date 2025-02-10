@@ -52,13 +52,10 @@ class EditGlobalTranslationsService(
 			)
 		)
 		if (globalTranslation.isDeleted()) {
-			globalTranslationRepository.save(
-				globalTranslation.copy(
-					deletedAt = null,
-					deletedBy = null,
-					tag = tag,
-				)
-			)
+			globalTranslation.deletedAt = null
+			globalTranslation.deletedBy = null
+			globalTranslation.tag = tag
+			globalTranslationRepository.save(globalTranslation)
 		}
 		val latestRevision = globalTranslation.getLatestRevision()
 		globalTranslationRevisionRepository.save(
@@ -119,12 +116,9 @@ class EditGlobalTranslationsService(
 			throw IllegalArgumentException("Cannot delete global translation since it is referenced by one or more form translations")
 		}
 
-		globalTranslationRepository.save(
-			globalTranslation.copy(
-				deletedAt = LocalDateTime.now(),
-				deletedBy = userId,
-			)
-		)
+		globalTranslation.deletedAt = LocalDateTime.now()
+		globalTranslation.deletedBy = userId
+		globalTranslationRepository.save(globalTranslation)
 	}
 
 }

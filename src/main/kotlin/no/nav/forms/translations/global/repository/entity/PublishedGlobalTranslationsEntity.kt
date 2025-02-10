@@ -6,10 +6,12 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "published_global_translation")
-data class PublishedGlobalTranslationsEntity(
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
-	@Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val createdAt: LocalDateTime,
-	@Column(name = "created_by", columnDefinition = "varchar") val createdBy: String,
+class PublishedGlobalTranslationsEntity(
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	val createdAt: LocalDateTime,
+
+	@Column(name = "created_by", columnDefinition = "varchar")
+	val createdBy: String,
 
 	@ManyToMany(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
 	@JoinTable(
@@ -17,7 +19,12 @@ data class PublishedGlobalTranslationsEntity(
 		joinColumns = [JoinColumn(name = "published_global_translation_id", referencedColumnName = "id")],
 		inverseJoinColumns = [JoinColumn(name = "global_translation_revision_id", referencedColumnName = "id")]
 	)
-	val globalTranslationRevisions: Set<GlobalTranslationRevisionEntity>
+	val globalTranslationRevisions: Set<GlobalTranslationRevisionEntity>,
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	val id: Long? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {

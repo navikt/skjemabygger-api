@@ -11,16 +11,20 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form_revision")
-data class FormRevisionEntity(
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
-	@Column(name = "revision", columnDefinition = "int", nullable = false) val revision: Int,
+class FormRevisionEntity(
+	@Column(name = "revision", columnDefinition = "int", nullable = false)
+	val revision: Int,
 
-	@Column(name = "title", columnDefinition = "varchar", nullable = false) val title: String,
+	@Column(name = "title", columnDefinition = "varchar", nullable = false)
+	val title: String,
+
 	@Column(
 		name = "created_at",
 		columnDefinition = "TIMESTAMP WITH TIME ZONE",
 		nullable = false
-	) val createdAt: LocalDateTime,
+	)
+	val createdAt: LocalDateTime,
+
 	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
 
 	@Basic(fetch = FetchType.LAZY)
@@ -35,6 +39,11 @@ data class FormRevisionEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_id", nullable = false)
 	val form: FormEntity,
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	val id: Long? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {

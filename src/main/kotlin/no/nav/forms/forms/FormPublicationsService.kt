@@ -121,7 +121,6 @@ class FormPublicationsService(
 		}
 		formPublicationRepository.save(
 			publication.copy(
-				id = null,
 				createdAt = LocalDateTime.now(),
 				createdBy = userId,
 				status = FormPublicationStatusDb.Unpublished,

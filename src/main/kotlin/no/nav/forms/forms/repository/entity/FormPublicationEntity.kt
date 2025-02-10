@@ -14,14 +14,16 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form_publication")
-data class FormPublicationEntity(
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
+class FormPublicationEntity(
 	@Column(
 		name = "created_at",
 		columnDefinition = "TIMESTAMP WITH TIME ZONE",
 		nullable = false
-	) val createdAt: LocalDateTime,
-	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
+	)
+	val createdAt: LocalDateTime,
+
+	@Column(name = "created_by", columnDefinition = "varchar", nullable = false)
+	val createdBy: String,
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_revision_id", nullable = false)
@@ -48,6 +50,11 @@ data class FormPublicationEntity(
 
 	@Column(name = "status", columnDefinition = "varchar", nullable = false)
 	val status: FormPublicationStatusDb,
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	val id: Long? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {
@@ -63,6 +70,20 @@ data class FormPublicationEntity(
 	@Override
 	override fun toString(): String {
 		return this::class.simpleName + "(id = $id, createdAt = $createdAt, createdBy = $createdBy)"
+	}
+
+	fun copy(createdAt: LocalDateTime, createdBy: String, status: FormPublicationStatusDb): FormPublicationEntity {
+		return FormPublicationEntity(
+			id = null,
+			createdAt = createdAt,
+			createdBy = createdBy,
+			formRevision = this.formRevision,
+			form = this.form,
+			publishedFormTranslation = this.publishedFormTranslation,
+			publishedGlobalTranslation = this.publishedGlobalTranslation,
+			languages = this.languages,
+			status = status,
+		)
 	}
 
 }

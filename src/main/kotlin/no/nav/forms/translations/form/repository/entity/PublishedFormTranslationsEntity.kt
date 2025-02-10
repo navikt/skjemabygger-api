@@ -7,10 +7,12 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "published_form_translation")
-data class PublishedFormTranslationsEntity(
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
-	@Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE") val createdAt: LocalDateTime,
-	@Column(name = "created_by", columnDefinition = "varchar") val createdBy: String,
+class PublishedFormTranslationsEntity(
+	@Column(name = "created_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
+	val createdAt: LocalDateTime,
+
+	@Column(name = "created_by", columnDefinition = "varchar")
+	val createdBy: String,
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_id", nullable = false)
@@ -22,7 +24,12 @@ data class PublishedFormTranslationsEntity(
 		joinColumns = [JoinColumn(name = "published_form_translation_id", referencedColumnName = "id")],
 		inverseJoinColumns = [JoinColumn(name = "form_translation_revision_id", referencedColumnName = "id")]
 	)
-	val formTranslationRevisions: Set<FormTranslationRevisionEntity>
+	val formTranslationRevisions: Set<FormTranslationRevisionEntity>,
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	val id: Long? = null,
 ){
 
 	override fun equals(other: Any?): Boolean {

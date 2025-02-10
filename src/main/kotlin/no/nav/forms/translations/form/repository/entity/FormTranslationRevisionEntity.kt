@@ -7,18 +7,28 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form_translation_revision")
-data class FormTranslationRevisionEntity(
-	@Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "id") val id: Long? = null,
-	@Column(name = "nb", columnDefinition = "varchar") val nb: String? = null,
-	@Column(name = "nn", columnDefinition = "varchar") val nn: String? = null,
-	@Column(name = "en", columnDefinition = "varchar") val en: String? = null,
-	@Column(name = "revision", columnDefinition = "int") val revision: Int,
+class FormTranslationRevisionEntity(
+	@Column(name = "nb", columnDefinition = "varchar")
+	val nb: String? = null,
+
+	@Column(name = "nn", columnDefinition = "varchar")
+	val nn: String? = null,
+
+	@Column(name = "en", columnDefinition = "varchar")
+	val en: String? = null,
+
+	@Column(name = "revision", columnDefinition = "int")
+	val revision: Int,
+
 	@Column(
 		name = "created_at",
 		columnDefinition = "TIMESTAMP WITH TIME ZONE",
 		nullable = false
-	) val createdAt: LocalDateTime,
-	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
+	)
+	val createdAt: LocalDateTime,
+
+	@Column(name = "created_by", columnDefinition = "varchar", nullable = false)
+	val createdBy: String,
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "form_translation_id", nullable = false)
@@ -27,6 +37,11 @@ data class FormTranslationRevisionEntity(
 	@ManyToOne(fetch = FetchType.LAZY, optional = true)
 	@JoinColumn(name = "global_translation_id", nullable = true)
 	val globalTranslation: GlobalTranslationEntity? = null,
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	val id: Long? = null,
 ) {
 
 	override fun equals(other: Any?): Boolean {

@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form_view")
-data class FormViewEntity(
+class FormViewEntity(
 	@Id @Column(name = "id")
 	val id: Long,
 

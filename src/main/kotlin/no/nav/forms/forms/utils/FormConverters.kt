@@ -11,6 +11,7 @@ import no.nav.forms.forms.repository.entity.FormViewEntity
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormStatus
 import no.nav.forms.utils.mapDateTime
+import java.time.LocalDateTime
 
 private val mapper = ObjectMapper()
 
@@ -67,7 +68,7 @@ fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDt
 		properties = if (include("properties")) mapper.convertValue(this.properties, typeRefProperties) else null,
 		changedAt = if (include("changedAt")) mapDateTime(this.changedAt) else null,
 		changedBy = if (include("changedBy")) this.changedBy else null,
-		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt) else null,
+		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt as LocalDateTime) else null,
 		publishedBy = if (include("publishedBy")) this.publishedBy else null,
 		status = if (include("status")) status else null,
 	)
