@@ -2,7 +2,6 @@ package no.nav.forms.forms.repository.entity
 
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
-import no.nav.forms.forms.repository.converter.DbJsonArrayConverter
 import no.nav.forms.forms.repository.converter.DbJsonObjectConverter
 import org.hibernate.Hibernate
 import org.hibernate.annotations.JdbcTypeCode
@@ -27,10 +26,11 @@ class FormRevisionEntity(
 
 	@Column(name = "created_by", columnDefinition = "varchar", nullable = false) val createdBy: String,
 
-	@Basic(fetch = FetchType.LAZY)
-	@Convert(converter = DbJsonArrayConverter::class)
-	@JdbcTypeCode(SqlTypes.JSON)
-	@Column(name = "components", columnDefinition = "jsonb", nullable = true) val components: JsonNode,
+	/**
+	 * Only map the id pointing to components json due to performance issues. Fetch type LAZY was not respected.
+	 */
+	@Column(name = "form_revision_components_id", nullable = false)
+	val componentsId: Long,
 
 	@Convert(converter = DbJsonObjectConverter::class)
 	@JdbcTypeCode(SqlTypes.JSON)

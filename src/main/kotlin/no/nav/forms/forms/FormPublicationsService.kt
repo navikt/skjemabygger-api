@@ -6,11 +6,14 @@ import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormPublicationRepository
 import no.nav.forms.forms.repository.FormRepository
+import no.nav.forms.forms.repository.FormRevisionComponentsRepository
 import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormPublicationEntity
 import no.nav.forms.forms.repository.entity.FormPublicationStatusDb
+import no.nav.forms.forms.utils.findLatestPublication
+import no.nav.forms.forms.utils.toDto
 import no.nav.forms.forms.utils.toFormCompactDto
-import no.nav.forms.forms.utils.toFormDto
+import no.nav.forms.forms.utils.withComponents
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
 import no.nav.forms.model.PublishedTranslationsDto
@@ -30,6 +33,7 @@ import java.time.LocalDateTime
 class FormPublicationsService(
 	val formPublicationRepository: FormPublicationRepository,
 	val formRepository: FormRepository,
+	val formRevisionComponentsRepository: FormRevisionComponentsRepository,
 	val publishedGlobalTranslationsRepository: PublishedGlobalTranslationsRepository,
 	val publishedFormTranslationRepository: PublishedFormTranslationRepository,
 	val formTranslationRepository: FormTranslationRepository,
@@ -62,7 +66,7 @@ class FormPublicationsService(
 				formTranslationRevisions = latestFormTranslations.toSet()
 			)
 		)
-		val formPublicationEntity = formPublicationRepository.save(
+		formPublicationRepository.save(
 			FormPublicationEntity(
 				createdAt = createdAt,
 				createdBy = userId,
@@ -75,16 +79,20 @@ class FormPublicationsService(
 			)
 		)
 		entityManager.refresh(form)
-		return formPublicationEntity.toFormDto()
+
+		val formRevisionComponents = formRevisionComponentsRepository.findById(latestFormRevision.componentsId).get()
+		return latestFormRevision.toDto().withComponents(formRevisionComponents)
 	}
 
 	@Transactional
 	fun getPublishedForm(formPath: String): FormDto {
 		val form = formRepository.findByPath(formPath)
 			?: throw ResourceNotFoundException("Form not found", formPath)
-		val latestPublication = form.publications.lastOrNull().takeIf { it?.status == FormPublicationStatusDb.Published }
+		val latestPublication = form.findLatestPublication().takeIf { it?.status == FormPublicationStatusDb.Published }
 			?: throw ResourceNotFoundException("Form not published", formPath)
-		return latestPublication.toFormDto()
+		val publishedFormRevision = latestPublication.formRevision
+		val formRevisionComponents = formRevisionComponentsRepository.findById(publishedFormRevision.componentsId).get()
+		return publishedFormRevision.toDto().withComponents(formRevisionComponents)
 	}
 
 	@Transactional
