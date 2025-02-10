@@ -11,20 +11,29 @@ CREATE TABLE form
 	UNIQUE (path)
 );
 
+CREATE TABLE form_revision_components
+(
+	id    BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	value JSONB NOT NULL
+);
+
 CREATE TABLE form_revision
 (
-	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	form_id    BIGINT                   NOT NULL,
-	revision   INT                      NOT NULL,
-	title      VARCHAR(256)             NOT NULL,
-	components JSONB                    NOT NULL,
-	properties JSONB                    NOT NULL,
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
-	created_by VARCHAR(128)             NOT NULL,
+	id                          BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_id                     BIGINT                   NOT NULL,
+	revision                    INT                      NOT NULL,
+	title                       VARCHAR(256)             NOT NULL,
+	form_revision_components_id BIGINT                   NOT NULL,
+	properties                  JSONB                    NOT NULL,
+	created_at                  TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	created_by                  VARCHAR(128)             NOT NULL,
 	UNIQUE (form_id, revision),
 	CONSTRAINT fk_form_revision_form
 		FOREIGN KEY (form_id)
-			REFERENCES form (id)
+			REFERENCES form (id),
+	CONSTRAINT fk_form_revision_components
+		FOREIGN KEY (form_revision_components_id)
+			REFERENCES form_revision_components (id)
 );
 
 CREATE TABLE global_translation
@@ -77,7 +86,7 @@ CREATE TABLE form_translation
 (
 	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	form_id    BIGINT        NOT NULL,
-	key        VARCHAR(1024) NOT NULL,
+	key        VARCHAR(5120) NOT NULL,
 	deleted_at TIMESTAMP WITH TIME ZONE,
 	deleted_by VARCHAR(128),
 	UNIQUE (form_id, key),
@@ -92,9 +101,9 @@ CREATE TABLE form_translation_revision
 	form_translation_id   BIGINT                   NOT NULL,
 	revision              INT                      NOT NULL,
 	global_translation_id BIGINT,
-	nb                    VARCHAR(1024),
-	nn                    VARCHAR(1024),
-	en                    VARCHAR(1024),
+	nb                    VARCHAR(5120),
+	nn                    VARCHAR(5120),
+	en                    VARCHAR(5120),
 	created_at            TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
 	created_by            VARCHAR(128)             NOT NULL,
 	UNIQUE (form_translation_id, revision),
@@ -128,10 +137,10 @@ CREATE TRIGGER trigger_form_translation_revision_check_insert
 
 CREATE TABLE published_form_translation
 (
-	id                              BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	form_id 											  BIGINT                   NOT NULL,
-	created_at                      TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
-	created_by                      VARCHAR(128)             NOT NULL,
+	id         BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_id    BIGINT                   NOT NULL,
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	created_by VARCHAR(128)             NOT NULL,
 	CONSTRAINT fk_published_form_translation_form
 		FOREIGN KEY (form_id)
 			REFERENCES form (id)
@@ -140,7 +149,7 @@ CREATE TABLE published_form_translation
 CREATE TABLE published_form_translation_revision
 (
 	published_form_translation_id INT,
-	form_translation_revision_id   BIGINT,
+	form_translation_revision_id  BIGINT,
 	PRIMARY KEY (published_form_translation_id, form_translation_revision_id),
 	CONSTRAINT fk_published_form_translation
 		FOREIGN KEY (published_form_translation_id)
@@ -153,12 +162,19 @@ CREATE TABLE published_form_translation_revision
 CREATE TABLE form_publication
 (
 	id                              BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+	form_id                         BIGINT                   NOT NULL,
 	form_revision_id                BIGINT                   NOT NULL,
 	published_form_translation_id   INT                      NOT NULL,
 	published_global_translation_id INT                      NOT NULL,
-	created_at                      TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'UTC'),
+	languages                       JSONB                    NOT NULL DEFAULT '[
+		"nb"
+	]'::jsonb,
+	status                          VARCHAR(16)              NOT NULL DEFAULT 'published',
+	created_at                      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (now() at time zone 'UTC'),
 	created_by                      VARCHAR(128)             NOT NULL,
-	UNIQUE (form_revision_id, published_form_translation_id, published_global_translation_id),
+	CONSTRAINT fk_form_publication_form
+		FOREIGN KEY (form_id)
+			REFERENCES form (id),
 	CONSTRAINT fk_form_publication_form_revision
 		FOREIGN KEY (form_revision_id)
 			REFERENCES form_revision (id),
