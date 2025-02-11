@@ -52,6 +52,7 @@ class EditGlobalTranslationsController(
 			updateGlobalTranslationRequest.nb,
 			updateGlobalTranslationRequest.nn,
 			updateGlobalTranslationRequest.en,
+			updateGlobalTranslationRequest.tag,
 			userId,
 		)
 		return ResponseEntity.ok(dto)

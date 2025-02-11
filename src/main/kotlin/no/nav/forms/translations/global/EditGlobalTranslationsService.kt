@@ -82,6 +82,7 @@ class EditGlobalTranslationsService(
 		nb: String?,
 		nn: String?,
 		en: String?,
+		tag: String?,
 		userId: String
 	): GlobalTranslationDto {
 		val globalTranslation = globalTranslationRepository.findByIdAndDeletedAtIsNull(id)
@@ -89,6 +90,10 @@ class EditGlobalTranslationsService(
 		val latestRevision = globalTranslation.revisions?.lastOrNull()
 		if (latestRevision?.revision != revision) {
 			throw InvalidRevisionException("Unexpected global translation revision: $revision")
+		}
+		if (tag != null) {
+			globalTranslation.tag = tag
+			globalTranslationRepository.save(globalTranslation)
 		}
 		globalTranslationRevisionRepository.save(
 			GlobalTranslationRevisionEntity(
@@ -101,6 +106,7 @@ class EditGlobalTranslationsService(
 				revision = revision + 1,
 			)
 		)
+		entityManager.flush()
 		entityManager.refresh(globalTranslation)
 		return globalTranslation.toDto()
 	}

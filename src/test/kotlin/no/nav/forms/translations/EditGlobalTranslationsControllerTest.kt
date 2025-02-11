@@ -83,6 +83,33 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 			.putGlobalTranslation(translationBody.id, translationBody.revision!!, putRequest, adminToken)
 			.assertSuccess()
 		assertEquals(2, putResponse.body.revision)
+		assertEquals("skjematekster", putResponse.body.tag)
+	}
+
+	@Test
+	fun testUpdateGlobalTranslationTag() {
+		val adminToken = mockOAuth2Server.createMockToken()
+
+		val createRequest = NewGlobalTranslationRequest(
+			key = "Fornavn",
+			tag = "skjematekster",
+			nb = "Fornavn",
+		)
+		val postResponse = testFormsApi.createGlobalTranslation(createRequest, adminToken)
+			.assertSuccess()
+
+		val translationBody = postResponse.body
+		assertEquals(1, translationBody.revision)
+
+		val putRequest = UpdateGlobalTranslationRequest(
+			nb = "Fornavn",
+			tag = "grensesnitt",
+		)
+		val putResponse =	testFormsApi
+			.putGlobalTranslation(translationBody.id, translationBody.revision!!, putRequest, adminToken)
+			.assertSuccess()
+		assertEquals(2, putResponse.body.revision)
+		assertEquals("grensesnitt", putResponse.body.tag)
 	}
 
 	@Test
