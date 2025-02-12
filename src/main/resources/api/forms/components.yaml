@@ -116,6 +116,11 @@ components:
           type: string
           description: Hvem publiserte dette skjemaet sist
           example: Lars Larsen
+        publishedLanguages:
+          type: array
+          description: Hvilke språk er publisert for dette skjemaet
+          items:
+            $ref: "../common/components.yaml#/components/schemas/LanguageCode"
         status:
           $ref: "#/components/schemas/FormStatus"
     FormCompactDto:

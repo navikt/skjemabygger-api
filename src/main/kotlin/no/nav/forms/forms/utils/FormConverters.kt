@@ -10,11 +10,13 @@ import no.nav.forms.utils.mapDateTime
 import java.time.LocalDateTime
 
 private val mapper = ObjectMapper()
+private val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
+private val typeRefComponents = object : TypeReference<List<Map<String, Any>>>() {}
+private val typeRefPublishedLanguages = object : TypeReference<List<String>>() {}
 
 fun FormEntity.findLatestPublication(): FormPublicationEntity? = this.publications.lastOrNull()
 
 fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
-	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
 	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
 	val latestPublication = this.form.findLatestPublication()
 	val status = when {
@@ -36,19 +38,21 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 		changedBy = if (include("changedBy")) this.createdBy else null,
 		publishedAt = if (include("publishedAt") && latestPublication != null) mapDateTime(latestPublication.createdAt) else null,
 		publishedBy = if (include("publishedBy") && latestPublication != null) latestPublication.createdBy else null,
+		publishedLanguages = if (include("publishedLanguages") && latestPublication != null) mapper.convertValue(
+			latestPublication.languages,
+			typeRefPublishedLanguages
+		) else null,
 		status = if (include("status")) status else null,
 	)
 }
 
 fun FormDto.withComponents(components: FormRevisionComponentsEntity): FormDto {
-	val typeRefComponents = object : TypeReference<List<Map<String, Any>>>() {}
 	return this.copy(
 		components = mapper.convertValue(components.value, typeRefComponents)
 	)
 }
 
 fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDto {
-	val typeRefProperties = object : TypeReference<Map<String, Any>>() {}
 	fun include(prop: String): Boolean = (select == null || select.contains(prop) == true)
 	val status = when {
 		this.publicationStatus == null -> FormStatus.draft

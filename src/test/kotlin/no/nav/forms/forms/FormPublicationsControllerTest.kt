@@ -150,7 +150,9 @@ class FormPublicationsControllerTest : ApplicationTest() {
 		// Default: only 'nb' is published
 		testFormsApi.publishForm(formPath, formRevision, authToken)
 			.assertSuccess()
-			.body
+			.body.let {
+				assertEquals(listOf("nb"), it.publishedLanguages)
+			}
 		testFormsApi.getPublishedFormTranslations(formPath)
 			.assertSuccess()
 			.body.let {
@@ -158,11 +160,18 @@ class FormPublicationsControllerTest : ApplicationTest() {
 				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
 				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
 			}
+		testFormsApi.getForm(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb"), it.publishedLanguages)
+			}
 
 		// Publish "nb" and "nn"
 		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.NN))
 			.assertSuccess()
-			.body
+			.body.let {
+				assertEquals(listOf("nb", "nn"), it.publishedLanguages)
+			}
 		testFormsApi.getPublishedFormTranslations(formPath)
 			.assertSuccess()
 			.body.let {
@@ -172,11 +181,18 @@ class FormPublicationsControllerTest : ApplicationTest() {
 				assertEquals("Testar", it.translations?.get("nn")?.get(translationKey1))
 				assertEquals("Sjukdom", it.translations?.get("nn")?.get(translationKey2))
 			}
+		testFormsApi.getForm(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb", "nn"), it.publishedLanguages)
+			}
 
 		// Publish "nb" and "en"
 		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.EN))
 			.assertSuccess()
-			.body
+			.body.let {
+				assertEquals(listOf("nb", "en"), it.publishedLanguages)
+			}
 		testFormsApi.getPublishedFormTranslations(formPath)
 			.assertSuccess()
 			.body.let {
@@ -185,6 +201,11 @@ class FormPublicationsControllerTest : ApplicationTest() {
 				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
 				assertEquals("Testing", it.translations?.get("en")?.get(translationKey1))
 				assertEquals("Illness", it.translations?.get("en")?.get(translationKey2))
+			}
+		testFormsApi.getForm(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb", "en"), it.publishedLanguages)
 			}
 
 		// Publish "nb", "en" and "nn"
@@ -201,6 +222,11 @@ class FormPublicationsControllerTest : ApplicationTest() {
 				assertEquals("Sjukdom", it.translations?.get("nn")?.get(translationKey2))
 				assertEquals("Testing", it.translations?.get("en")?.get(translationKey1))
 				assertEquals("Illness", it.translations?.get("en")?.get(translationKey2))
+			}
+		testFormsApi.getForm(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb", "nn", "en"), it.publishedLanguages)
 			}
 	}
 
