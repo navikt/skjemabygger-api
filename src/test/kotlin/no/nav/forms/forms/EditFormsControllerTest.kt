@@ -46,6 +46,25 @@ class EditFormsControllerTest : ApplicationTest() {
 	}
 
 	@Test
+	fun testCreateFormWithSkjemanummerThatAlreadyExists() {
+		val authToken = mockOAuth2Server.createMockToken()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TST123"), authToken)
+			.assertSuccess()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = "TST123"), authToken)
+			.assertHttpStatus(HttpStatus.CONFLICT)
+	}
+
+	@Test
+	fun testSkjemanummerAndTitleTrimOnCreate() {
+		val authToken = mockOAuth2Server.createMockToken()
+		testFormsApi.createForm(FormsTestdata.newFormRequest(skjemanummer = " TST123  ", title = "  My form "), authToken)
+			.assertSuccess().body.let {
+				assertEquals("TST123", it.skjemanummer)
+				assertEquals("My form", it.title)
+			}
+	}
+
+	@Test
 	fun testUpdateForm() {
 		val createRequest = FormsTestdata.newFormRequest(
 			properties = mapOf("tema" to "BIL")

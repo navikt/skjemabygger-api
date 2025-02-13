@@ -18,4 +18,6 @@ interface FormRepository: JpaRepository<FormEntity, Long> {
 	@Query("update FormEntity f set f.lock = ?1 where f.id = ?2")
 	fun setLockOnForm(lockDb: FormLockDb?, id: Long)
 
+	fun existsBySkjemanummer(skjemanummer: String): Boolean
+
 }

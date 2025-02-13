@@ -3,6 +3,7 @@ package no.nav.forms.forms
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import no.nav.forms.exceptions.DuplicateResourceException
 import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormRepository
@@ -46,7 +47,9 @@ class EditFormsService(
 		properties: Map<String, Any>,
 		userId: String,
 	): FormDto {
-		logger.info("New form created: $skjemanummer")
+		if (formRepository.existsBySkjemanummer(skjemanummer)) {
+			throw DuplicateResourceException("Form $skjemanummer already exists", skjemanummer)
+		}
 		val now = LocalDateTime.now()
 		val form = formRepository.save(
 			FormEntity(
@@ -73,6 +76,7 @@ class EditFormsService(
 			)
 		)
 
+		logger.info("New form created: $skjemanummer")
 		return formRevision.toDto().withComponents(componentsEntity)
 	}
 

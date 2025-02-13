@@ -25,8 +25,8 @@ class EditFormsController(
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
 		val newForm = editFormsService.createForm(
-			newFormRequest.skjemanummer,
-			newFormRequest.title,
+			newFormRequest.skjemanummer.trim(),
+			newFormRequest.title.trim(),
 			newFormRequest.components,
 			newFormRequest.properties,
 			userId,
@@ -50,7 +50,7 @@ class EditFormsController(
 		val form = editFormsService.updateForm(
 			formPath,
 			formsapiEntityRevision,
-			updateFormRequest.title,
+			updateFormRequest.title?.trim(),
 			updateFormRequest.components,
 			updateFormRequest.properties,
 			userId
