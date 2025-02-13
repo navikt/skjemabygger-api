@@ -62,5 +62,11 @@ put:
         application/json:
           schema:
             $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Feiler dersom skjemaet er låst, eller hvis man oppgir en revisjon som ikke er den nyeste
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
   tags:
     - edit-forms

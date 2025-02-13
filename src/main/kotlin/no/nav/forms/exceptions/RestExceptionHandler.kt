@@ -54,6 +54,7 @@ class RestExceptionHandler {
 	@ExceptionHandler(
 		InvalidRevisionException::class,
 		DuplicateResourceException::class,
+		LockedResourceException::class,
 	)
 	fun handleConflict(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.CONFLICT

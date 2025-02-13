@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.DuplicateResourceException
 import no.nav.forms.exceptions.InvalidRevisionException
+import no.nav.forms.exceptions.LockedResourceException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.forms.repository.FormRepository
 import no.nav.forms.forms.repository.FormRevisionComponentsRepository
@@ -98,7 +99,11 @@ class EditFormsService(
 		properties: Map<String, Any>? = null,
 		userId: String
 	): FormDto {
-		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		val form = formRepository.findByPath(formPath).also {
+			if (it?.lock != null) {
+				throw LockedResourceException("Form ${it.skjemanummer} is locked: ${it.lock?.reason}")
+			}
+		} ?: throw ResourceNotFoundException("Form not found", formPath)
 		val latestFormRevision = form.revisions.last()
 		if (latestFormRevision.revision != revision) {
 			throw InvalidRevisionException("Unexpected form revision: $revision")

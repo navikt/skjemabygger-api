@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
 import kotlin.reflect.full.memberProperties
+import kotlin.test.assertNotEquals
 
 class EditFormsControllerTest : ApplicationTest() {
 
@@ -242,6 +243,7 @@ class EditFormsControllerTest : ApplicationTest() {
 		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
 			.assertSuccess().body
 		val formPath = form.path!!
+		val formRevision = form.revision!!
 
 		val lockReason = "Ingen skal endre dette skjemaet!"
 		val lockRequest = LockFormRequest(lockReason)
@@ -252,9 +254,28 @@ class EditFormsControllerTest : ApplicationTest() {
 				assertEquals(lockReason, it.lock?.reason)
 			}
 
+		val newTitle = "Ny tittel"
+		testFormsApi.updateForm(formPath, formRevision, FormsTestdata.updateFormRequest(title = newTitle), authToken)
+			.assertHttpStatus(HttpStatus.CONFLICT)
+
+		testFormsApi.getForm(formPath)
+			.assertSuccess().body.let {
+				assertNotEquals(newTitle, it.title)
+			}
+
 		testFormsApi.unlockForm(formPath, authToken)
 			.assertSuccess().body.let {
 				assertNull(it.lock)
+			}
+
+		testFormsApi.updateForm(formPath, formRevision, FormsTestdata.updateFormRequest(title = newTitle), authToken)
+			.assertSuccess().body.let {
+				assertEquals(newTitle, it.title)
+			}
+
+		testFormsApi.getForm(formPath)
+			.assertSuccess().body.let {
+				assertEquals(newTitle, it.title)
 			}
 	}
 
