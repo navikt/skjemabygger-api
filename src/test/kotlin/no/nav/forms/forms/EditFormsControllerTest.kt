@@ -2,6 +2,7 @@ package no.nav.forms.forms
 
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.FormCompactDto
+import no.nav.forms.model.LockFormRequest
 import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -214,6 +215,28 @@ class EditFormsControllerTest : ApplicationTest() {
 			testFormsApi.getForms(select2).assertSuccess().body.first(),
 			select2.split(",")
 		)
+	}
+
+	@Test
+	fun testLockForm() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val form = testFormsApi.createForm(FormsTestdata.newFormRequest(), authToken)
+			.assertSuccess().body
+		val formPath = form.path!!
+
+		val lockReason = "Ingen skal endre dette skjemaet!"
+		val lockRequest = LockFormRequest(lockReason)
+		testFormsApi.lockForm(formPath, lockRequest, authToken)
+			.assertSuccess().body.let {
+				assertNotNull(it.lock?.createdAt)
+				assertNotNull(it.lock?.createdBy)
+				assertEquals(lockReason, it.lock?.reason)
+			}
+
+		testFormsApi.unlockForm(formPath, authToken)
+			.assertSuccess().body.let {
+				assertNull(it.lock)
+			}
 	}
 
 }

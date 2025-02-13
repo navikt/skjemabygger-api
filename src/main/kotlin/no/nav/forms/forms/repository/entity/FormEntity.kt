@@ -1,28 +1,33 @@
 package no.nav.forms.forms.repository.entity
 
 import jakarta.persistence.*
+import no.nav.forms.forms.repository.converter.FormLockConverter
+import no.nav.forms.forms.repository.entity.attributes.FormLockDb
 import org.hibernate.Hibernate
 import org.hibernate.annotations.Fetch
 import org.hibernate.annotations.FetchMode
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "form")
 class FormEntity(
-	@Column(name = "skjemanummer", columnDefinition = "varchar", nullable = false)
+	@Column(name = "skjemanummer", columnDefinition = "varchar", nullable = false, updatable = false)
 	val skjemanummer: String,
 
-	@Column(name = "path", columnDefinition = "varchar", nullable = false)
+	@Column(name = "path", columnDefinition = "varchar", nullable = false, updatable = false)
 	val path: String,
 
 	@Column(
 		name = "created_at",
 		columnDefinition = "TIMESTAMP WITH TIME ZONE",
-		nullable = false
+		nullable = false,
+		updatable = false,
 	)
 	val createdAt: LocalDateTime,
 
-	@Column(name = "created_by", columnDefinition = "varchar", nullable = false)
+	@Column(name = "created_by", columnDefinition = "varchar", nullable = false, updatable = false)
 	val createdBy: String,
 
 	@Column(name = "deleted_at", columnDefinition = "TIMESTAMP WITH TIME ZONE")
@@ -40,6 +45,11 @@ class FormEntity(
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "form")
 	@OrderBy("created_at asc")
 	val publications: Set<FormPublicationEntity> = emptySet(),
+
+	@JdbcTypeCode(SqlTypes.JSON)
+	@Convert(converter = FormLockConverter::class)
+	@Column(name = "lock", columnDefinition = "jsonb", nullable = true)
+	var lock: FormLockDb? = null,
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

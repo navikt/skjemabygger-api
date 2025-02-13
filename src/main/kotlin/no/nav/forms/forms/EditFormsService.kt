@@ -1,6 +1,7 @@
 package no.nav.forms.forms
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.InvalidRevisionException
 import no.nav.forms.exceptions.ResourceNotFoundException
@@ -11,6 +12,7 @@ import no.nav.forms.forms.repository.FormViewRepository
 import no.nav.forms.forms.repository.entity.FormEntity
 import no.nav.forms.forms.repository.entity.FormRevisionComponentsEntity
 import no.nav.forms.forms.repository.entity.FormRevisionEntity
+import no.nav.forms.forms.repository.entity.attributes.FormLockDb
 import no.nav.forms.forms.utils.toFormCompactDto
 import no.nav.forms.forms.utils.toDto
 import no.nav.forms.forms.utils.withComponents
@@ -22,6 +24,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import kotlin.jvm.optionals.getOrElse
 
 @Service
@@ -30,6 +33,7 @@ class EditFormsService(
 	val formRevisionRepository: FormRevisionRepository,
 	val formRevisionComponentsRepository: FormRevisionComponentsRepository,
 	val formViewRepository: FormViewRepository,
+	val entityManager: EntityManager,
 ) {
 	val logger: Logger = LoggerFactory.getLogger(javaClass)
 	private val mapper = ObjectMapper()
@@ -120,5 +124,31 @@ class EditFormsService(
 	@Transactional
 	fun getForms(listOfProperties: List<String>? = null): List<FormCompactDto> {
 		return formViewRepository.findAll().map { it.toFormCompactDto(listOfProperties) }
+	}
+
+	@Transactional
+	fun lockForm(formPath: String, lockReason: String, userId: String): FormDto {
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		formRepository.setLockOnForm(FormLockDb(OffsetDateTime.now(), userId, lockReason), form.id!!)
+		entityManager.refresh(form)
+		logger.info("Form ${form.skjemanummer} ($formPath) locked by $userId")
+
+		val latestRevision = form.revisions.last()
+		val componentsEntity = formRevisionComponentsRepository.findById(latestRevision.componentsId)
+			.getOrElse { throw IllegalStateException("Failed to load components for latest form revision (${formPath})") }
+		return latestRevision.toDto().withComponents(componentsEntity)
+	}
+
+	@Transactional
+	fun unlockForm(formPath: String, userId: String): FormDto {
+		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
+		formRepository.setLockOnForm(null, form.id!!)
+		entityManager.refresh(form)
+		logger.info("Form ${form.skjemanummer} ($formPath) unlocked by $userId")
+
+		val latestRevision = form.revisions.last()
+		val componentsEntity = formRevisionComponentsRepository.findById(latestRevision.componentsId)
+			.getOrElse { throw IllegalStateException("Failed to load components for latest form revision (${formPath})") }
+		return latestRevision.toDto().withComponents(componentsEntity)
 	}
 }

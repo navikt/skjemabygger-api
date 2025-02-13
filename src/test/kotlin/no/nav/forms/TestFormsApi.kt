@@ -393,4 +393,26 @@ class TestFormsApi(
 		return FormsApiResponse(response.statusCode, Pair(response.body!!, null))
 	}
 
+	fun lockForm(formPath: String, request: LockFormRequest, authToken: String?) : FormsApiResponse<FormDto> {
+		val response = restTemplate.exchange(
+			"$formsBaseUrl/$formPath/lock",
+			HttpMethod.POST,
+			HttpEntity(request, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
+	fun unlockForm(formPath: String, authToken: String?) : FormsApiResponse<FormDto> {
+		val response = restTemplate.exchange(
+			"$formsBaseUrl/$formPath/lock",
+			HttpMethod.DELETE,
+			HttpEntity(null, httpHeaders(authToken)),
+			String::class.java
+		)
+		val body = readFormBody(response)
+		return FormsApiResponse(response.statusCode, body)
+	}
+
 }

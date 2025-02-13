@@ -4,6 +4,7 @@ import no.nav.forms.api.EditFormsApi
 import no.nav.forms.config.AzureAdConfig
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
+import no.nav.forms.model.LockFormRequest
 import no.nav.forms.model.NewFormRequest
 import no.nav.forms.model.UpdateFormRequest
 import no.nav.forms.security.SecurityContextHolder
@@ -46,7 +47,14 @@ class EditFormsController(
 	): ResponseEntity<FormDto> {
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
-		val form = editFormsService.updateForm(formPath, formsapiEntityRevision, updateFormRequest.title, updateFormRequest.components, updateFormRequest.properties, userId)
+		val form = editFormsService.updateForm(
+			formPath,
+			formsapiEntityRevision,
+			updateFormRequest.title,
+			updateFormRequest.components,
+			updateFormRequest.properties,
+			userId
+		)
 		return ResponseEntity.ok(form)
 	}
 
@@ -58,6 +66,24 @@ class EditFormsController(
 		}
 		val forms = editFormsService.getForms(selectList)
 		return ResponseEntity.ok(forms)
+	}
+
+	override fun lockForm(formPath: String, lockFormRequest: LockFormRequest): ResponseEntity<FormDto> {
+		securityContextHolder.requireValidUser()
+		val userId = securityContextHolder.getUserName()
+		val form = editFormsService.lockForm(
+			formPath,
+			lockFormRequest.reason,
+			userId,
+		)
+		return ResponseEntity.ok(form)
+	}
+
+	override fun unlockForm(formPath: String): ResponseEntity<FormDto> {
+		securityContextHolder.requireValidUser()
+		val userId = securityContextHolder.getUserName()
+		val form = editFormsService.unlockForm(formPath, userId)
+		return ResponseEntity.ok(form)
 	}
 
 }

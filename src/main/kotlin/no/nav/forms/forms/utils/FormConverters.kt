@@ -3,8 +3,10 @@ package no.nav.forms.forms.utils
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.forms.forms.repository.entity.*
+import no.nav.forms.forms.repository.entity.attributes.FormLockDb
 import no.nav.forms.model.FormCompactDto
 import no.nav.forms.model.FormDto
+import no.nav.forms.model.FormLock
 import no.nav.forms.model.FormStatus
 import no.nav.forms.utils.mapDateTime
 import java.time.LocalDateTime
@@ -43,6 +45,15 @@ fun FormRevisionEntity.toDto(select: List<String>? = null): FormDto {
 			typeRefPublishedLanguages
 		) else null,
 		status = if (include("status")) status else null,
+		lock = if (include("lock")) this.form.lock?.toFormLockDto() else null,
+	)
+}
+
+fun FormLockDb.toFormLockDto(): FormLock? {
+	return FormLock(
+		this.createdAt,
+		this.createdBy,
+		this.reason,
 	)
 }
 

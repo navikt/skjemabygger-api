@@ -37,6 +37,26 @@ components:
       type: string
       enum: [ "draft", "published", "pending", "unpublished" ]
       description: Skjemaets status
+    FormLock:
+      type: object
+      required:
+      - createdAt
+      - createdBy
+      - reason
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når skjemaet ble låst
+          example: 2025-01-31T12:10:07Z
+        createdBy:
+          type: string
+          description: Hvem som opprettet låsen
+          example: Nils Nilsen
+        reason:
+          type: string
+          description: Årsaken til at skjemaet er låst
+          example: Låst fordi skjemaet har integrering mot Arena.
     NewFormRequest:
       type: object
       description: Et nytt skjema
@@ -68,6 +88,16 @@ components:
           $ref: "#/components/schemas/Components"
         properties:
           $ref: "#/components/schemas/Properties"
+    LockFormRequest:
+      type: object
+      description: Forespørsel om å låse dette skjemaet
+      required:
+      - reason
+      properties:
+        reason:
+          type: string
+          description: En beskrivelse av hvorfor dette skjemaet skal låses
+          example: Låst fordi skjemaet har integrering mot Arena.
     FormDto:
       type: object
       required:
@@ -123,6 +153,8 @@ components:
             $ref: "../common/components.yaml#/components/schemas/LanguageCode"
         status:
           $ref: "#/components/schemas/FormStatus"
+        lock:
+          $ref: "#/components/schemas/FormLock"
     FormCompactDto:
       type: object
       required:
