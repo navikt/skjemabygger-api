@@ -25,3 +25,5 @@ fun String.splitLanguageCodes(): List<LanguageCode>? = split(",").map { Language
 fun JsonNode.toLanguageCodes(): List<LanguageCode> = map { LanguageCode.validate(it.asText()) }
 
 fun List<LanguageCode>.toJsonNode(): JsonNode = ObjectMapper().valueToTree(map {it.value})
+
+fun List<LanguageCode>.hasDuplicates(): Boolean = this.distinct().size != this.size

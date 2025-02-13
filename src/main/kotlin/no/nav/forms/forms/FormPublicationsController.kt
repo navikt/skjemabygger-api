@@ -7,6 +7,7 @@ import no.nav.forms.model.FormDto
 import no.nav.forms.model.PublishedTranslationsDto
 import no.nav.forms.security.SecurityContextHolder
 import no.nav.forms.utils.LanguageCode
+import no.nav.forms.utils.hasDuplicates
 import no.nav.forms.utils.splitLanguageCodes
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import no.nav.security.token.support.core.api.Unprotected
@@ -29,6 +30,9 @@ class FormPublicationsController(
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
 		val languages: List<LanguageCode> = languageCodes?.splitLanguageCodes() ?: listOf(LanguageCode.NB)
+		if (languages.hasDuplicates()) {
+			throw IllegalArgumentException("Language codes must contain distinct values: $languageCodes")
+		}
 		val form = formPublicationsService.publishForm(formPath, formsapiEntityRevision, languages, userId)
 		return ResponseEntity.status(HttpStatus.CREATED).body(form)
 	}

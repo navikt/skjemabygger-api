@@ -86,6 +86,30 @@ class FormPublicationsControllerTest : ApplicationTest() {
 	}
 
 	@Test
+	fun testBadRequestWhenDuplicateLanguageInPublishFormRequest() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val translationKey = "Sannheten"
+		testFormsApi.createFormTranslation(
+			formPath,
+			NewFormTranslationRequestDto(key = translationKey, nb = "Sannheten", nn = "Sanninga", en = "The truth"),
+			authToken
+		).assertSuccess()
+
+		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.NB))
+			.assertHttpStatus(HttpStatus.BAD_REQUEST)
+
+		testFormsApi.getPublishedForm(formPath)
+			.assertHttpStatus(HttpStatus.NOT_FOUND)
+	}
+
+	@Test
 	fun testGetPublishedFormTranslationsReturnsOnlyRequestedLanguages() {
 		val authToken = mockOAuth2Server.createMockToken()
 		val createRequest = FormsTestdata.newFormRequest()
