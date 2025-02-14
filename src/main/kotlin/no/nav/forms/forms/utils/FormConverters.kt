@@ -84,5 +84,6 @@ fun FormViewEntity.toFormCompactDto(select: List<String>? = null): FormCompactDt
 		publishedAt = if (include("publishedAt") && this.publishedAt != null) mapDateTime(this.publishedAt as LocalDateTime) else null,
 		publishedBy = if (include("publishedBy")) this.publishedBy else null,
 		status = if (include("status")) status else null,
+		lock = if (include("lock")) this.lock?.toFormLockDto() else null,
 	)
 }

@@ -194,3 +194,5 @@ components:
           example: Lars Larsen
         status:
           $ref: "#/components/schemas/FormStatus"
+        lock:
+          $ref: "#/components/schemas/FormLock"

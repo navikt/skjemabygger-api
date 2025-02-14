@@ -263,6 +263,13 @@ class EditFormsControllerTest : ApplicationTest() {
 				assertNotEquals(newTitle, it.title)
 			}
 
+		testFormsApi.getForms("title,lock")
+			.assertSuccess().body.let {
+				assertEquals(1, it.size)
+				assertNotEquals(newTitle, it[0].title)
+				assertNotNull(it[0].lock)
+			}
+
 		testFormsApi.unlockForm(formPath, authToken)
 			.assertSuccess().body.let {
 				assertNull(it.lock)
