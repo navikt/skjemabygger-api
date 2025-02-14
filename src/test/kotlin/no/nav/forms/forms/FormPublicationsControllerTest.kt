@@ -55,8 +55,8 @@ class FormPublicationsControllerTest : ApplicationTest() {
 		val formAfterPublication = testFormsApi.getForm(formPath)
 			.assertSuccess()
 			.body
-		assertNotNull(formAfterPublication.publishedAt)
-		assertNotNull(formAfterPublication.publishedBy)
+		assertEquals(publishedForm.publishedAt, formAfterPublication.publishedAt)
+		assertEquals(publishedForm.publishedBy, formAfterPublication.publishedBy)
 	}
 
 	@Test

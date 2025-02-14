@@ -81,7 +81,7 @@ class EditFormsService(
 		return formRevision.toDto().withComponents(componentsEntity)
 	}
 
-	@Transactional
+	@Transactional(Transactional.TxType.SUPPORTS)
 	fun getForm(formPath: String): FormDto {
 		val form = formRepository.findByPath(formPath) ?: throw ResourceNotFoundException("Form not found", formPath)
 		val latestRevision = form.revisions.last()
@@ -130,7 +130,7 @@ class EditFormsService(
 		return formRevision.toDto().withComponents(componentsEntity)
 	}
 
-	@Transactional
+	@Transactional(Transactional.TxType.SUPPORTS)
 	fun getForms(listOfProperties: List<String>? = null): List<FormCompactDto> {
 		return formViewRepository.findAll().map { it.toFormCompactDto(listOfProperties) }
 	}
