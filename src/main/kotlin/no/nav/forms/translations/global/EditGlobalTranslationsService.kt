@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
 import no.nav.forms.exceptions.DuplicateResourceException
 import no.nav.forms.exceptions.InvalidRevisionException
+import no.nav.forms.exceptions.ResourceDependencyException
 import no.nav.forms.exceptions.ResourceNotFoundException
 import no.nav.forms.model.GlobalTranslationDto
 import no.nav.forms.translations.form.repository.FormTranslationRepository
@@ -119,7 +120,7 @@ class EditGlobalTranslationsService(
 		val isCurrentlyReferenced = formTranslationRepository.findAllByRevisionsGlobalTranslationId(globalTranslation.id!!)
 			.any { it.revisions?.lastOrNull()?.globalTranslation?.id == id }
 		if (isCurrentlyReferenced) {
-			throw IllegalArgumentException("Cannot delete global translation since it is referenced by one or more form translations")
+			throw ResourceDependencyException("Cannot delete global translation since it is referenced by one or more form translations")
 		}
 
 		globalTranslation.deletedAt = LocalDateTime.now()

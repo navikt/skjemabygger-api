@@ -307,7 +307,7 @@ class EditGlobalTranslationsControllerTest : ApplicationTest() {
 		).assertSuccess()
 
 		testFormsApi.deleteGlobalTranslation(createResponse.body.id, authToken)
-			.assertClientError()
+			.assertHttpStatus(HttpStatus.CONFLICT)
 	}
 
 	@Test

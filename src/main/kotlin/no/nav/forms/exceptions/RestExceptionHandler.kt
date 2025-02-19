@@ -51,12 +51,8 @@ class RestExceptionHandler {
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))
 	}
 
-	@ExceptionHandler(
-		InvalidRevisionException::class,
-		DuplicateResourceException::class,
-		LockedResourceException::class,
-	)
-	fun handleConflict(exception: Exception): ResponseEntity<ErrorResponseDto> {
+	@ExceptionHandler
+	fun handleConflict(exception: ConflictException): ResponseEntity<ErrorResponseDto> {
 		val status = HttpStatus.CONFLICT
 		logger.info(exception.message, exception)
 		return ResponseEntity.status(status).body(ErrorResponseDto(status.reasonPhrase, getCorrelationId()))

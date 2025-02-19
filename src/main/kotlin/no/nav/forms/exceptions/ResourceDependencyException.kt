@@ -1,5 +1,5 @@
 package no.nav.forms.exceptions
 
-class InvalidRevisionException(
+class ResourceDependencyException (
 	override val message: String,
 ) : ConflictException(message)
