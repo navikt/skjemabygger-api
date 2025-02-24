@@ -1,0 +1,92 @@
+components:
+  schemas:
+    RecipientName:
+      type: string
+      example: NAV Økonomi Stønad
+      description: Mottakerens navn
+    PoBoxAddress:
+      type: string
+      example: Postboks 352 Etterstad
+      description: Postboksadresse
+    PostalCode:
+      type: string
+      example: 0591
+      description: Norsk postnummer
+    PostalName:
+      type: string
+      example: Oslo
+      description: Norsk poststed
+    RecipientDto:
+      type: object
+      description: En mottaker
+      required:
+      - recipientId
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
+      - createdAt
+      - createdBy
+      - changedAt
+      - changedBy
+      properties:
+        recipientId:
+          $ref: "../common/components.yaml#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/RecipientName"
+        poBoxAddress:
+          $ref: "#/components/schemas/PoBoxAddress"
+        postalCode:
+          $ref: "#/components/schemas/PostalCode"
+        postalName:
+          $ref: "#/components/schemas/PostalName"
+        createdAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når mottakeren ble opprettet
+          example: 2021-12-03T14:10:00Z
+        createdBy:
+          $ref: "../common/components.yaml#/components/schemas/UserId"
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når mottakeren sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          $ref: "../common/components.yaml#/components/schemas/UserId"
+    NewRecipientRequest:
+      type: object
+      description: Nødvendige data for å opprette en ny mottaker
+      required:
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
+      properties:
+        recipientId:
+          $ref: "../common/components.yaml#/components/schemas/UUID"
+        name:
+          $ref: "#/components/schemas/RecipientName"
+        poBoxAddress:
+          $ref: "#/components/schemas/PoBoxAddress"
+        postalCode:
+          $ref: "#/components/schemas/PostalCode"
+        postalName:
+          $ref: "#/components/schemas/PostalName"
+    UpdateRecipientRequest:
+      type: object
+      description: Nødvendige data for å opprette en ny mottaker
+      required:
+      - name
+      - poBoxAddress
+      - postalCode
+      - postalName
+      properties:
+        name:
+          $ref: "#/components/schemas/RecipientName"
+        poBoxAddress:
+          $ref: "#/components/schemas/PoBoxAddress"
+        postalCode:
+          $ref: "#/components/schemas/PostalCode"
+        postalName:
+          $ref: "#/components/schemas/PostalName"

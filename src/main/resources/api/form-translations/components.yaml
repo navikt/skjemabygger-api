@@ -1,0 +1,91 @@
+components:
+  schemas:
+    FormTranslationId:
+      type: integer
+      format: int64
+      description: Identifikasjon av en oversettelse
+      example: 165
+    FormTranslationRevision:
+      type: integer
+      description: Revisjonsidentifikator. Hver endring av en oversettelse gir en ny revisjon.
+      example: 3
+    FormTranslationDto:
+      type: object
+      description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
+      required:
+      - id
+      - key
+      properties:
+        id:
+          $ref: "#/components/schemas/FormTranslationId"
+        revision:
+          $ref: "#/components/schemas/FormTranslationRevision"
+        key:
+          type: string
+          description: Unik key som identifiserer oversettelsen
+          example: Dette er min røde bil
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Dette er min røde bil
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Dette er min raude bil
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: This is my red car
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsen sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          type: string
+          description: Hvem endret denne oversettelsen sist
+          example: Nilsen, Nils
+    NewFormTranslationRequestDto:
+      type: object
+      description: Ny skjemaoversettelse
+      required:
+      - key
+      properties:
+        key:
+          type: string
+          description: Unik key som identifiserer oversettelsen
+          example: Dette er min røde bil
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Dette er min røde bil
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Dette er min raude bil
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: This is my red car
+    UpdateFormTranslationRequest:
+      type: object
+      description: Oppdaterte verdier for en skjemaoversettelse
+      properties:
+        globalTranslationId:
+          $ref: "../global-translations/components.yaml#/components/schemas/GlobalTranslationId"
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Dette er min røde bil
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Dette er min raude bil
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: This is my red car

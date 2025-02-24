@@ -1,0 +1,88 @@
+put:
+  summary: Endrer en global oversettelse
+  description: Oppretter en ny revisjon av den globale oversettelsen
+  operationId: updateGlobalTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Den globale oversettelsens id
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationId"
+    - name: Formsapi-Entity-Revision
+      in: header
+      description: Hvilken revisjon som skal endres
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationRevision"
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/UpdateGlobalTranslationRequest"
+   required: true
+  responses:
+    201:
+      description: Den nye globale oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/GlobalTranslationDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Oversettelsen som blir forsøkt oppdatert har allerede blitt endret
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-global-translations
+delete:
+  summary: Slette en global oversettelse
+  description: Den globale oversettelsen blir slettemerket
+  operationId: deleteGlobalTranslation
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: Den globale oversettelsens id
+      required: true
+      schema:
+        $ref: "./components.yaml#/components/schemas/GlobalTranslationId"
+  responses:
+    204:
+      description: Oversettelsen har blitt slettet
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    404:
+      description: Fant ikke oversettelsen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-global-translations

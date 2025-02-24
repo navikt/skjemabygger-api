@@ -14,168 +14,23 @@ tags:
     description: Adresse for mottaker for en søknad som sendes inn på papir. Settes på førstesiden.
   - name: health
     description: Endepunkter for helsesjekk av applikasjonen.
+  - name: edit-global-translations
+    description: Vedlikehold av globale oversettelser
+  - name: edit-form-translations
+    description: Vedlikehold av oversettelser knyttet til et skjema
+  - name: publish-global-translations
+    description: Endepunkter for publisering av globale oversettelser
+  - name: edit-forms
+    description: Vedlikehold av skjemadefinisjoner
+  - name: form-publications
+    description: Publisering av skjemadefinisjoner
 
 paths:
   /v1/recipients:
-    get:
-      summary: Hent mottakere av papirsøknad
-      description: Henter alle mulige mottakere av søknader som sendes inn på papir i posten.
-      operationId: getRecipients
-      responses:
-        '200':
-          description: Alle mulige mottakere returneres
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RecipientDto"
-      tags:
-        - recipients
-    post:
-      summary: Opprett en ny mottaker
-      description: Oppretter en ny mottaker.
-      operationId: createRecipient
-      security:
-      - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NewRecipientRequest"
-        required: true
-      responses:
-        201:
-          description: Den nye mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecipientDto"
-        401:
-          description: Bruker er ikke autentisert
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-        403:
-          description: Bruker er ikke autorisert for denne handlingen
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-      tags:
-        - recipients
+    $ref: "./recipients/recipients.yaml"
 
   /v1/recipients/{recipientId}:
-    get:
-      summary: Hent en mottaker
-      description: Returnerer mottakeren med gitt id
-      operationId: getRecipient
-      parameters:
-        - name: recipientId
-          in: path
-          description: Mottakerens id
-          required: true
-          schema:
-            $ref: "#/components/schemas/UUID"
-      responses:
-        200:
-          description: Mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecipientDto"
-        404:
-          description: Fant ikke mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-      tags:
-        - recipients
-
-    put:
-      summary: Oppdater en mottaker
-      description: Oppdater en mottaker
-      operationId: updateRecipient
-      security:
-      - bearerAuth: []
-      parameters:
-        - name: recipientId
-          in: path
-          description: Mottakerens id
-          required: true
-          schema:
-            $ref: "#/components/schemas/UUID"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateRecipientRequest"
-        required: true
-      responses:
-        200:
-          description: Den oppdaterte mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RecipientDto"
-        401:
-          description: Bruker er ikke autentisert
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-        403:
-          description: Bruker er ikke autorisert for denne handlingen
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-        404:
-          description: Fant ikke mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-      tags:
-        - recipients
-    delete:
-      summary: Slett en mottaker
-      description: Sletter en mottaker fra databasen
-      operationId: deleteRecipient
-      security:
-      - bearerAuth: []
-      parameters:
-        - name: recipientId
-          in: path
-          description: Mottakerens id
-          required: true
-          schema:
-            $ref: "#/components/schemas/UUID"
-      responses:
-        204:
-          description: Mottakeren har blitt slettet
-        401:
-          description: Bruker er ikke autentisert
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-        403:
-          description: Bruker er ikke autorisert for denne handlingen
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-        404:
-          description: Fant ikke mottakeren
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponseDto"
-      tags:
-        - recipients
+    $ref: "./recipients/recipient.yaml"
 
   /internal/health/isAlive:
     $ref: "./health/is_alive.yaml"
@@ -183,124 +38,41 @@ paths:
   /internal/health/isReady:
     $ref: "./health/is_ready.yaml"
 
-components:
-  securitySchemes:
-    bearerAuth:
-      type: "http"
-      scheme: "bearer"
-  schemas:
-    UUID:
-      type: string
-      description: A Universally Unique Identifier
-      example: 92ee15dd-dc49-4c95-b9b6-6224bae088bb
-    RecipientName:
-      type: string
-      example: NAV Økonomi Stønad
-      description: Mottakerens navn
-    PoBoxAddress:
-      type: string
-      example: Postboks 352 Etterstad
-      description: Postboksadresse
-    PostalCode:
-      type: string
-      example: 0591
-      description: Norsk postnummer
-    PostalName:
-      type: string
-      example: Oslo
-      description: Norsk poststed
-    UserId:
-      type: string
-      example: Navnesen, Navn
-      description: Navn på en bruker
+  /v1/forms:
+    $ref: "./forms/forms.yaml"
 
-    RecipientDto:
-      type: object
-      description: En mottaker
-      required:
-      - recipientId
-      - name
-      - poBoxAddress
-      - postalCode
-      - postalName
-      - createdAt
-      - createdBy
-      - changedAt
-      - changedBy
-      properties:
-        recipientId:
-          $ref: "#/components/schemas/UUID"
-        name:
-          $ref: "#/components/schemas/RecipientName"
-        poBoxAddress:
-          $ref: "#/components/schemas/PoBoxAddress"
-        postalCode:
-          $ref: "#/components/schemas/PostalCode"
-        postalName:
-          $ref: "#/components/schemas/PostalName"
-        createdAt:
-          type: string
-          format: date-time
-          description: Dato og tid for når mottakeren ble opprettet
-          example: 2021-12-03T14:10:00Z
-        createdBy:
-          $ref: "#/components/schemas/UserId"
-        changedAt:
-          type: string
-          format: date-time
-          description: Dato og tid for når mottakeren sist ble endret
-          example: 2021-12-03T14:10:00Z
-        changedBy:
-          $ref: "#/components/schemas/UserId"
+  /v1/forms/{formPath}:
+    $ref: "./forms/form.yaml"
 
-    NewRecipientRequest:
-      type: object
-      description: Nødvendige data for å opprette en ny mottaker
-      required:
-      - name
-      - poBoxAddress
-      - postalCode
-      - postalName
-      properties:
-        recipientId:
-          $ref: "#/components/schemas/UUID"
-        name:
-          $ref: "#/components/schemas/RecipientName"
-        poBoxAddress:
-          $ref: "#/components/schemas/PoBoxAddress"
-        postalCode:
-          $ref: "#/components/schemas/PostalCode"
-        postalName:
-          $ref: "#/components/schemas/PostalName"
+  /v1/forms/{formPath}/lock:
+    $ref: "./forms/form-lock.yaml"
 
-    UpdateRecipientRequest:
-      type: object
-      description: Nødvendige data for å opprette en ny mottaker
-      required:
-      - name
-      - poBoxAddress
-      - postalCode
-      - postalName
-      properties:
-        name:
-          $ref: "#/components/schemas/RecipientName"
-        poBoxAddress:
-          $ref: "#/components/schemas/PoBoxAddress"
-        postalCode:
-          $ref: "#/components/schemas/PostalCode"
-        postalName:
-          $ref: "#/components/schemas/PostalName"
+  /v1/form-publications:
+    $ref: "./forms/form-publications.yaml"
 
-    ErrorResponseDto:
-      type: object
-      description: Informasjon om hva som gikk galt
-      required:
-      - errorMessage
-      properties:
-        errorMessage:
-          type: string
-        correlationId:
-          $ref: "#/components/schemas/UUID"
-      example:
-        message: Resource not found
-        correlationId: 2f9b8d25-1056-4827-8ddd-cedab7fafacc
+  /v1/form-publications/{formPath}:
+    $ref: "./forms/form-publication.yaml"
+
+  /v1/form-publications/{formPath}/translations:
+    $ref: "./forms/form-publication-translations.yaml"
+
+  /v1/global-translations:
+    $ref: "./global-translations/global_translations.yaml"
+
+  /v1/global-translations/{id}:
+    $ref: "./global-translations/global_translation.yaml"
+
+  /v1/global-translations/publish:
+    $ref: "./global-translations/publish_global_translations.yaml"
+
+  /v1/published-global-translations/{languageCode}:
+    $ref: "./global-translations/published_global_translations_lang.yaml"
+
+  /v1/published-global-translations:
+    $ref: "./global-translations/published_global_translations.yaml"
+
+  /v1/forms/{formPath}/translations:
+    $ref: "./form-translations/form-translations.yaml"
+
+  /v1/forms/{formPath}/translations/{id}:
+    $ref: "./form-translations/form-translation.yaml"

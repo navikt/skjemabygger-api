@@ -1,5 +1,6 @@
 package no.nav.forms
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.flywaydb.core.Flyway
@@ -23,14 +24,20 @@ abstract class ApplicationTest {
 	lateinit var mockOAuth2Server: MockOAuth2Server
 
 	@Autowired
+	lateinit var objectMapper: ObjectMapper
+
+	@Autowired
 	private lateinit var flyway: Flyway
 
-	val baseUrl = "http://localhost:8082"
+	final val baseUrl = "http://localhost:8082"
+
+	lateinit var testFormsApi: TestFormsApi
 
 	@BeforeEach
 	fun setup() {
 		flyway.clean()
 		flyway.migrate()
+		testFormsApi = TestFormsApi(baseUrl, restTemplate, objectMapper)
 	}
 
 }

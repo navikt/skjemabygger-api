@@ -13,10 +13,17 @@ spec:
   replicas:
     max: 4
     min: 2
+  resources:
+    limits:
+      memory: 4096Mi
+    requests:
+      memory: 2048Mi
   liveness:
     path: /internal/health/isAlive
+    initialDelay: 30
   readiness:
     path: /internal/health/isReady
+    initialDelay: 30
   prometheus:
     enabled: true
     path: /actuator/prometheus
@@ -54,6 +61,8 @@ spec:
         databases:
           - name: {{ database.name }}
   env:
+    - name: JDK_JAVA_OPTIONS
+      value: "-Xms1g -XX:MaxRAMPercentage=80"
     - name: SPRING_PROFILES_ACTIVE
       value: {{ spring-profiles-active }}
     {{#each azure.ad_groups}}

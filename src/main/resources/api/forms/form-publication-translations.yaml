@@ -1,0 +1,35 @@
+get:
+  summary: Henter publiserte oversettelser for et gitt skjema
+  description: Henter
+  operationId: getPublishedFormTranslations
+  security: []
+  parameters:
+    - name: formPath
+      in: path
+      description: Skjemaets path
+      example: nav121415
+      required: true
+      schema:
+        $ref: "../forms/components.yaml#/components/schemas/FormPath"
+    - name: languageCodes
+      in: query
+      description: Språkkode, kommaseparert hvis flere
+      example: nn,en
+      required: false
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
+  responses:
+    200:
+      description: Informasjon om forrige publiserte oversettelser for dette skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/PublishedTranslationsDto"
+    404:
+      description: Finner ingen publiserte oversettelser for dette skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - form-publications

@@ -1,0 +1,109 @@
+get:
+  summary: Hent en mottaker
+  description: Returnerer mottakeren med gitt id
+  operationId: getRecipient
+  parameters:
+    - name: recipientId
+      in: path
+      description: Mottakerens id
+      required: true
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/UUID"
+  responses:
+    200:
+      description: Mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/RecipientDto"
+    404:
+      description: Fant ikke mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - recipients
+
+put:
+  summary: Oppdater en mottaker
+  description: Oppdater en mottaker
+  operationId: updateRecipient
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: recipientId
+      in: path
+      description: Mottakerens id
+      required: true
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/UUID"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "./components.yaml#/components/schemas/UpdateRecipientRequest"
+    required: true
+  responses:
+    200:
+      description: Den oppdaterte mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/RecipientDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    404:
+      description: Fant ikke mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - recipients
+delete:
+  summary: Slett en mottaker
+  description: Sletter en mottaker fra databasen
+  operationId: deleteRecipient
+  security:
+  - bearerAuth: []
+  parameters:
+    - name: recipientId
+      in: path
+      description: Mottakerens id
+      required: true
+      schema:
+        $ref: "../common/components.yaml#/components/schemas/UUID"
+  responses:
+    204:
+      description: Mottakeren har blitt slettet
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    404:
+      description: Fant ikke mottakeren
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - recipients

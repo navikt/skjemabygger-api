@@ -1,0 +1,56 @@
+post:
+  summary: Oppretter et nytt skjema
+  operationId: createForm
+  security:
+  - bearerAuth: []
+  requestBody:
+   content:
+     application/json:
+       schema:
+         $ref: "./components.yaml#/components/schemas/NewFormRequest"
+   required: true
+  responses:
+    201:
+      description: Det nye skjemaet
+      content:
+        application/json:
+          schema:
+            $ref: "./components.yaml#/components/schemas/FormDto"
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    409:
+      description: Skjemaet eksisterer allerede
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - edit-forms
+get:
+  summary: Henter skjemaer
+  description: Returner aldri components for skjemaene.
+  operationId: getForms
+  security: []
+  parameters:
+    - name: select
+      description: Kommaseparert liste med hvilke egenskaper som skal inkluderes. Id blir alltid inkludert.
+      example: title,properties
+      in: query
+      required: false
+      schema:
+        type: string
+  responses:
+    200:
+      description: En liste med skjemadefinisjoner
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "./components.yaml#/components/schemas/FormCompactDto"
+  tags:
+    - edit-forms

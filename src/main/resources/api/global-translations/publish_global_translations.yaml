@@ -1,0 +1,22 @@
+post:
+  summary: Publiserer globale oversettelser
+  operationId: publishGlobalTranslations
+  security:
+  - bearerAuth: []
+  responses:
+    201:
+      description: Globale oversettelser har blitt publisert
+    401:
+      description: Bruker er ikke autentisert
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+    403:
+      description: Bruker er ikke autorisert for denne handlingen
+      content:
+        application/json:
+          schema:
+            $ref: "../common/components.yaml#/components/schemas/ErrorResponseDto"
+  tags:
+    - publish-global-translations

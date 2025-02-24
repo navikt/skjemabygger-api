@@ -60,17 +60,13 @@ class RecipientsService(
 		val entity = recipientsRepository.findByRecipientId(recipientId)
 			?: throw ResourceNotFoundException("Recipient not found", recipientId)
 
-		val now = LocalDateTime.now()
-		val updatedEntity = recipientsRepository.save(
-			entity.copy(
-				name = name,
-				poBoxAddress = poBoxAddress,
-				postalCode = postalCode,
-				postalName = postalName,
-				changedAt = now,
-				changedBy = userId,
-			)
-		)
+		entity.name = name
+		entity.poBoxAddress = poBoxAddress
+		entity.postalCode = postalCode
+		entity.postalName = postalName
+		entity.changedAt = LocalDateTime.now()
+		entity.changedBy = userId
+		val updatedEntity = recipientsRepository.save(entity)
 		return updatedEntity.toDto()
 	}
 

@@ -9,15 +9,6 @@ Skjemadefinisjoner, oversettelser og mottaksadresser.
 
 Du må ha Docker kjørende for å kjøre testene og for å starte applikasjonen.
 
-Hvis du bruker colima kan det være nødvendig å sette følgende env-variabler for at testcontainers skal fungere:
-
-      export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
-      export DOCKER_HOST="unix://${HOME}/.colima/docker.sock"
-
-For flere detaljer, se
-[Customizing Docker host detection](https://java.testcontainers.org/features/configuration/#customizing-docker-host-detection)
-i dokumentasjonen til [Testcontainers](https://java.testcontainers.org/).
-
 ## Kjøre opp applikasjonen lokalt
 
 Det finnes ulike muligheter for hvordan man kan starte applikasjonen lokalt.
@@ -52,6 +43,28 @@ Swagger url: http://localhost:8082/swagger-ui/index.html
 
 OpenAPI descriptions: http://localhost:8082/v3/api-docs
 
+## Kjente utfordringer ved kjøring lokalt
+
+### Colima
+
+Hvis du bruker [Colima](https://github.com/abiosoft/colima) kan det være nødvendig å sette følgende env-variabler for at
+testcontainers skal fungere:
+
+    export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
+    export DOCKER_HOST="unix://${HOME}/.colima/docker.sock"
+
+For flere detaljer, se
+[Customizing Docker host detection](https://java.testcontainers.org/features/configuration/#customizing-docker-host-detection)
+i dokumentasjonen til [Testcontainers](https://java.testcontainers.org/).
+
+### Flyway
+
+Ved bruk av db i docker container under utvikling lokalt er det lett å gjøre Flyway sur dersom man endrer på
+migreringsskriptene underveis. I slike tilfeller er det enklest å slette docker containere og volumes:
+
+    docker rm forms-api forms-api-db
+    docker volume rm forms-api_db
+
 # Autentisering
 
 Endepunkter som henter data er i utgangspunktet åpne, men de som endrer på data er sikret
@@ -71,6 +84,10 @@ Logg på med din personlige trygdeetaten-bruker. For mer informasjon,
 se [NAIS Doc - Generate a token](https://doc.nais.io/auth/entra-id/how-to/generate/).
 
 ---
+
+# Kode generert av GitHub Copilot
+
+Dette repoet bruker GitHub Copilot til å generere kode.
 
 # Henvendelser
 

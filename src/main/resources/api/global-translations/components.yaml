@@ -1,0 +1,110 @@
+components:
+  schemas:
+    GlobalTranslationId:
+      type: integer
+      format: int64
+      description: Identifikasjon av en global oversettelse
+      example: 165
+    GlobalTranslationRevision:
+      type: integer
+      description: Revisjonsidentifikator. Hver endring av en global oversettelse gir en ny revisjon.
+      example: 3
+    GlobalTranslationDto:
+      type: object
+      description: Oversettelse av et ord, uttrykk eller lengre blokk av tekst, muligens knyttet til en tilfeldig key
+      required:
+      - id
+      - key
+      - tag
+      - changedAt
+      - changedBy
+      properties:
+        id:
+          $ref: "#/components/schemas/GlobalTranslationId"
+        revision:
+          $ref: "#/components/schemas/GlobalTranslationRevision"
+        key:
+          type: string
+          description: Unik key som identifiserer den globale oversettelsen
+          example: Et lite rødt hus
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Et lite rødt hus
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: A small red house
+        tag:
+          type: string
+          description: Hvilken type global oversettelse dette er
+          example: skjematekster
+        changedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsen sist ble endret
+          example: 2021-12-03T14:10:00Z
+        changedBy:
+          type: string
+          description: Hvem endret denne oversettelsen sist
+          example: Nilsen, Nils
+        publishedAt:
+          type: string
+          format: date-time
+          description: Dato og tid for når oversettelsen sist ble publisert
+          example: 2021-12-03T15:10:00Z
+        publishedBy:
+          type: string
+          description: Hvem publiserte denne oversettelsen sist
+          example: Olavsen, Olava
+    NewGlobalTranslationRequest:
+      type: object
+      description: En ny global oversettelse
+      required:
+      - key
+      - tag
+      properties:
+        key:
+          type: string
+          description: Key
+          example: Et lite rødt hus
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Et lite rødt hus
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: A small red house
+        tag:
+          type: string
+          description: Hvilken type global oversettelse dette er
+          example: skjematekster
+    UpdateGlobalTranslationRequest:
+      type: object
+      description: Oppdaterte verdier for en global oversettelse
+      properties:
+        nb:
+          type: string
+          description: Oversettelse på bokmål
+          example: Et lite rødt hus
+        nn:
+          type: string
+          description: Oversettelse på nynorsk
+          example: Eit lite raudt hus
+        en:
+          type: string
+          description: Oversettelse på engelsk
+          example: A small red house
+        tag:
+          type: string
+          description: Hvilken type global oversettelse dette er
+          example: skjematekster

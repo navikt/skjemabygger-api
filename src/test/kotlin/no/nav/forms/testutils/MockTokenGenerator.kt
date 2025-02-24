@@ -8,7 +8,7 @@ import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 const val MOCK_USER_GROUP_ID = "mock-user-group-id"
 const val MOCK_ADMIN_GROUP_ID = "mock-admin-group-id"
 
-fun MockOAuth2Server.createTokenFor(
+fun MockOAuth2Server.createMockToken(
 	navIdent: String = "A123456",
 	userName: String = "Testesen, Test",
 	groups: List<String> = listOf(MOCK_USER_GROUP_ID, MOCK_ADMIN_GROUP_ID)

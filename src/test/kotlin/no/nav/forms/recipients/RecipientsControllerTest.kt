@@ -5,7 +5,7 @@ import no.nav.forms.model.NewRecipientRequest
 import no.nav.forms.model.RecipientDto
 import no.nav.forms.model.UpdateRecipientRequest
 import no.nav.forms.testutils.MOCK_USER_GROUP_ID
-import no.nav.forms.testutils.createTokenFor
+import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.toURI
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ class RecipientsControllerTest : ApplicationTest() {
 		val response = restTemplate.exchange(
 			url.toURI(),
 			HttpMethod.POST,
-			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(userName = testUserName))),
+			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createMockToken(userName = testUserName))),
 			RecipientDto::class.java
 		)
 		assertTrue(response.statusCode.is2xxSuccessful)
@@ -60,7 +60,7 @@ class RecipientsControllerTest : ApplicationTest() {
 		val response = restTemplate.exchange(
 			url.toURI(),
 			HttpMethod.PUT,
-			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createTokenFor(userName = testUserName))),
+			HttpEntity(requestBody, httpHeaders(mockOAuth2Server.createMockToken(userName = testUserName))),
 			String::class.java
 		)
 		assertTrue(response.statusCode.is2xxSuccessful)
@@ -100,7 +100,7 @@ class RecipientsControllerTest : ApplicationTest() {
 			"6425",
 			"Molde",
 		)
-		val tokenNotAdmin = mockOAuth2Server.createTokenFor(groups = listOf(MOCK_USER_GROUP_ID))
+		val tokenNotAdmin = mockOAuth2Server.createMockToken(groups = listOf(MOCK_USER_GROUP_ID))
 		val response = restTemplate.exchange(
 			url.toURI(),
 			HttpMethod.PUT,
