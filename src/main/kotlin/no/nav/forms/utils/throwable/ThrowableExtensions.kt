@@ -6,7 +6,7 @@ fun Throwable.hasCause(targetExceptionClass: Class<out Throwable>): Boolean {
 		if (targetExceptionClass.isInstance(currentCause)) {
 			return true
 		}
-		currentCause = this.cause
+		currentCause = currentCause.cause
 	}
 	return false
 }
