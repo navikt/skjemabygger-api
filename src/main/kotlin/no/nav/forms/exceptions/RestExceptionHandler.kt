@@ -82,7 +82,7 @@ class RestExceptionHandler {
 	@ExceptionHandler
 	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
 		val responseErrorMessage = if (exception.hasCause(ClientAbortException::class.java)) {
-			"Client abort".also { logger.info("$it: ${exception.message} (stackTrace ${exception.stackTrace})") }
+			"Request aborted by client".also { logger.info("$it: ${exception.message} (stackTrace ${exception.stackTrace})") }
 		} else {
 			"Something went wrong".also { logger.error("$it: ${exception.message}", exception) }
 		}
