@@ -3,9 +3,11 @@ package no.nav.forms.exceptions
 import no.nav.forms.exceptions.db.getFormsApiDbError
 import no.nav.forms.logging.MdcInterceptor
 import no.nav.forms.model.ErrorResponseDto
+import no.nav.forms.utils.throwable.hasCause
 import no.nav.security.token.support.core.exceptions.JwtTokenInvalidClaimException
 import no.nav.security.token.support.core.exceptions.JwtTokenMissingException
 import no.nav.security.token.support.spring.validation.interceptor.JwtTokenUnauthorizedException
+import org.apache.catalina.connector.ClientAbortException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -79,8 +81,11 @@ class RestExceptionHandler {
 
 	@ExceptionHandler
 	fun handleGenericException(exception: Exception): ResponseEntity<ErrorResponseDto> {
-		val responseErrorMessage = "Something went wrong"
-		logger.error("$responseErrorMessage: ${exception.message}", exception)
+		val responseErrorMessage = if (exception.hasCause(ClientAbortException::class.java)) {
+			"Client abort".also { logger.info("$it: ${exception.message} (stackTrace ${exception.stackTrace})") }
+		} else {
+			"Something went wrong".also { logger.error("$it: ${exception.message}", exception) }
+		}
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ErrorResponseDto(responseErrorMessage, getCorrelationId()))
 	}
 
