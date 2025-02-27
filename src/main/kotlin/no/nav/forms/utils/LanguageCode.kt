@@ -20,10 +20,15 @@ enum class LanguageCode(val value: String) {
 	}
 }
 
-fun String.splitLanguageCodes(): List<LanguageCode>? = split(",").map { LanguageCode.validate(it.trim()) }
+fun String.splitLanguageCodes(): List<LanguageCode> = split(",").map { LanguageCode.validate(it.trim()) }
+	.also {
+		if (it.hasDuplicates() == true) {
+			throw IllegalArgumentException("Language codes must contain distinct values: $it")
+		}
+	}
 
 fun JsonNode.toLanguageCodes(): List<LanguageCode> = map { LanguageCode.validate(it.asText()) }
 
-fun List<LanguageCode>.toJsonNode(): JsonNode = ObjectMapper().valueToTree(map {it.value})
+fun List<LanguageCode>.toJsonNode(): JsonNode = ObjectMapper().valueToTree(map { it.value })
 
 fun List<LanguageCode>.hasDuplicates(): Boolean = this.distinct().size != this.size

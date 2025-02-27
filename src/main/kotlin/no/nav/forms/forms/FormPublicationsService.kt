@@ -42,7 +42,7 @@ class FormPublicationsService(
 ) {
 
 	@Transactional
-	fun publishForm(formPath: String, formRevision: Int, languages: List<LanguageCode>, userId: String): FormDto {
+	fun publishForm(formPath: String, formRevision: Int, languages: List<LanguageCode>?, userId: String): FormDto {
 		val form = formRepository.findByPath(formPath) ?: throw IllegalArgumentException("Invalid form path: $formPath")
 
 		val latestPublicationOfGlobalTranslations = publishedGlobalTranslationsRepository.findFirstByOrderByCreatedAtDesc()
@@ -53,19 +53,27 @@ class FormPublicationsService(
 			throw InvalidRevisionException("Form revision is not the latest: $formRevision")
 		}
 
-		val latestFormTranslations = formTranslationRepository.findAllByFormPathAndDeletedAtIsNull(formPath)
-			.map { it.revisions!!.last() }
-			.filter { it.globalTranslation == null }
-
 		val createdAt = LocalDateTime.now()
-		val publishedFormTranslations = publishedFormTranslationRepository.save(
-			PublishedFormTranslationsEntity(
-				createdAt = createdAt,
-				createdBy = userId,
-				form = form,
-				formTranslationRevisions = latestFormTranslations.toSet()
+		val (publishedFormTranslations, publishedLanguages) = if (languages == null) {
+			val formPublication = formPublicationRepository.findFirstByFormRevisionFormPathOrderByCreatedAtDesc(formPath)
+				?: throw IllegalArgumentException("Found no existing publication of this form, languages must therefore be provided on publish")
+			Pair(formPublication.publishedFormTranslation, formPublication.languages)
+		} else {
+			val latestFormTranslations = formTranslationRepository.findAllByFormPathAndDeletedAtIsNull(formPath)
+				.map { it.revisions!!.last() }
+				.filter { it.globalTranslation == null }
+
+			val publishedFormTranslations = publishedFormTranslationRepository.save(
+				PublishedFormTranslationsEntity(
+					createdAt = createdAt,
+					createdBy = userId,
+					form = form,
+					formTranslationRevisions = latestFormTranslations.toSet()
+				)
 			)
-		)
+			Pair(publishedFormTranslations, languages.toJsonNode())
+		}
+
 		formPublicationRepository.save(
 			FormPublicationEntity(
 				createdAt = createdAt,
@@ -74,7 +82,7 @@ class FormPublicationsService(
 				formRevision = latestFormRevision,
 				publishedFormTranslation = publishedFormTranslations,
 				publishedGlobalTranslation = latestPublicationOfGlobalTranslations,
-				languages = languages.toJsonNode(),
+				languages = publishedLanguages,
 				status = FormPublicationStatusDb.Published,
 			)
 		)
