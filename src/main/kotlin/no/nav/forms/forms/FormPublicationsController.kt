@@ -25,13 +25,15 @@ class FormPublicationsController(
 	override fun publishForm(
 		formPath: String,
 		formsapiEntityRevision: Int,
-		languageCodes: String?
+		languageCodes: String?,
+		skipTranslations: Boolean?
 	): ResponseEntity<FormDto> {
 		securityContextHolder.requireValidUser()
 		val userId = securityContextHolder.getUserName()
-		val languages: List<LanguageCode> = languageCodes?.splitLanguageCodes() ?: listOf(LanguageCode.NB)
-		if (languages.hasDuplicates()) {
-			throw IllegalArgumentException("Language codes must contain distinct values: $languageCodes")
+		val languages: List<LanguageCode>? = when {
+			skipTranslations == true -> null
+			languageCodes?.isNotEmpty() == true -> languageCodes.splitLanguageCodes()
+			else -> listOf(LanguageCode.NB)
 		}
 		val form = formPublicationsService.publishForm(formPath, formsapiEntityRevision, languages, userId)
 		return ResponseEntity.status(HttpStatus.CREATED).body(form)

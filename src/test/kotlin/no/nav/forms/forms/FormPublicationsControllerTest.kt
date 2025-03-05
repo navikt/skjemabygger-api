@@ -3,14 +3,11 @@ package no.nav.forms.forms
 import no.nav.forms.ApplicationTest
 import no.nav.forms.model.FormStatus
 import no.nav.forms.model.NewFormTranslationRequestDto
-import no.nav.forms.testutils.createMockToken
 import no.nav.forms.testutils.FormsTestdata
+import no.nav.forms.testutils.createMockToken
 import no.nav.forms.translations.testdata.GlobalTranslationsTestdata
 import no.nav.forms.utils.LanguageCode
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpStatus
@@ -211,6 +208,27 @@ class FormPublicationsControllerTest : ApplicationTest() {
 				assertEquals(listOf("nb", "nn"), it.publishedLanguages)
 			}
 
+		// Publish only form, keep previously published form translations
+		testFormsApi.publishForm(formPath, formRevision, authToken, skipTranslations = true)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb", "nn"), it.publishedLanguages)
+			}
+		testFormsApi.getPublishedFormTranslations(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(setOf("nb", "nn"), it.translations?.keys)
+				assertEquals("Tester", it.translations?.get("nb")?.get(translationKey1))
+				assertEquals("Sykdom", it.translations?.get("nb")?.get(translationKey2))
+				assertEquals("Testar", it.translations?.get("nn")?.get(translationKey1))
+				assertEquals("Sjukdom", it.translations?.get("nn")?.get(translationKey2))
+			}
+		testFormsApi.getForm(formPath)
+			.assertSuccess()
+			.body.let {
+				assertEquals(listOf("nb", "nn"), it.publishedLanguages)
+			}
+
 		// Publish "nb" and "en"
 		testFormsApi.publishForm(formPath, formRevision, authToken, listOf(LanguageCode.NB, LanguageCode.EN))
 			.assertSuccess()
@@ -252,6 +270,26 @@ class FormPublicationsControllerTest : ApplicationTest() {
 			.body.let {
 				assertEquals(listOf("nb", "nn", "en"), it.publishedLanguages)
 			}
+	}
+
+	@Test
+	fun testPublishFormFailsWhenSkippingTranslationOnFirstPublish() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val publishError = testFormsApi.publishForm(formPath, formRevision, authToken, skipTranslations = true)
+			.assertClientError()
+			.errorBody
+
+		assertEquals(
+			"Found no existing publication of this form, languages must therefore be provided on publish",
+			publishError.errorMessage
+		)
 	}
 
 	@Test
@@ -358,6 +396,24 @@ class FormPublicationsControllerTest : ApplicationTest() {
 			.errorBody
 
 		assertEquals("Unauthorized", errorBody.errorMessage)
+	}
+
+	@Test
+	fun testPublishFormWithUserWithoutCorrectAuthorization() {
+		val authToken = mockOAuth2Server.createMockToken()
+		val createRequest = FormsTestdata.newFormRequest()
+		val newForm = testFormsApi.createForm(createRequest, authToken)
+			.assertSuccess()
+			.body
+		val formPath = newForm.path!!
+		val formRevision = newForm.revision!!
+
+		val invalidPublishAuthToken = mockOAuth2Server.createMockToken(groups = emptyList())
+		val errorBody = testFormsApi.publishForm(formPath, formRevision, invalidPublishAuthToken)
+			.assertHttpStatus(HttpStatus.FORBIDDEN)
+			.errorBody
+
+		assertEquals("Forbidden", errorBody.errorMessage)
 	}
 
 	@Test

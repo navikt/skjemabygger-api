@@ -17,6 +17,13 @@ post:
       required: false
       schema:
         $ref: "../common/components.yaml#/components/schemas/LanguageCodes"
+    - name: skipTranslations
+      in: query
+      description: Hvis denne settes til 'true' blir kun ny skjemadefinisjon publisert mens eksisterende skjemaoversettelser beholdes.
+      example: true
+      required: false
+      schema:
+        type: boolean
     - name: Formsapi-Entity-Revision
       in: header
       description: Hvilken revisjon som skal publiseres

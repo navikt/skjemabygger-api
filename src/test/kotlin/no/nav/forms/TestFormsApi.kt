@@ -334,9 +334,14 @@ class TestFormsApi(
 		formRevision: Int,
 		authToken: String?,
 		languageCodes: List<LanguageCode>? = null,
+		skipTranslations: Boolean = false,
 	): FormsApiResponse<FormDto> {
 		val headers = mapOf(formsapiEntityRevisionHeaderName to formRevision.toString())
-		val queryString = languageCodes?.let { "?languageCodes=${it.joinToString(",") { it.name }}" } ?: ""
+		val queryString = when {
+			skipTranslations -> "?skipTranslations=true"
+			languageCodes?.isNotEmpty() == true -> languageCodes.let { "?languageCodes=${it.joinToString(",") { it.name }}" }
+			else -> ""
+		}
 		val response = restTemplate.exchange(
 			"$formPublicationsBaseUrl/$formPath${queryString}",
 			HttpMethod.POST,
